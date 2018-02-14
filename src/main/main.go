@@ -154,7 +154,7 @@ func writeSettings(settingsPath string) {
 		"**/.idea": true,
 		// "**/pkg": true,
 		// "*.gorun": true,
-		// "*.iml": true,
+		"*.iml": true,
 		// "debug":true,
 	},
 	//设置gopath
