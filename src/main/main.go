@@ -146,9 +146,10 @@ func writeSettings(settingsPath string) {
 	//search.exclude 用来忽略搜索的文件夹
 	//files.exclude 用来忽略工程打开的文件夹
 	"files.exclude": {
-		"${workspaceRootFolderName}_gorun": true,
+		"${workspaceRootFolderName}_.gorun": true,
 		"${workspaceRootFolderName}_bin": true,
 		"${workspaceRootFolderName}.iml": true,
+		"debug":true,
 	},
 	//设置gopath
 	"go.gopath": "${workspaceRoot}",
