@@ -201,7 +201,9 @@ func writeIgnore(ignorePath string) {
 	ignore := `/.vscode
 /.idea
 /*.iml
-/pkg`
+/pkg
+/*.gorun
+/debug`
 
 	err := ioutil.WriteFile(ignorePath, []byte(ignore), 0644)
 	if err != nil {
