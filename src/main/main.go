@@ -145,8 +145,14 @@ func writeSettings(settingsPath string) {
 	settings := `{
 	//search.exclude 用来忽略搜索的文件夹
 	//files.exclude 用来忽略工程打开的文件夹
+	"search.exclude": {
+        "**/.idea": true,
+		"**/pkg": true,
+		"*.iml": true,
+    },
 	"files.exclude": {
-		// "/.idea": true,
+		"**/.idea": true,
+		// "**/pkg": true,
 		// "*.gorun": true,
 		// "*.iml": true,
 		// "debug":true,
