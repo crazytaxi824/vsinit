@@ -121,7 +121,7 @@ func writeLaunch(launchPath string) {
 			"remotePath": "",
 			"port": 2345,
 			"host": "127.0.0.1",
-			"program": "${workspaceRoot}/launch",
+			"program": "${workspaceRoot}/${workspaceRootFolderName}_.gorun",
 			"preLaunchTask": "go build",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
@@ -174,7 +174,6 @@ func writeSettings(settingsPath string) {
 		"*.iml": true,
 		
 		// "*.gorun": true,		
-		// "launch":true,
 		// "/src/main/debug":true,
 	},
 	//设置gopath
@@ -209,7 +208,7 @@ func writeTasks(tasksPath string) {
                 "go",
                 "build",
                 "-o",
-                "launch",
+                "${workspaceRootFolderName}_.gorun",
                 "./src/main/",
             ]
         }
@@ -229,7 +228,6 @@ func writeIgnore(ignorePath string) {
 /pkg
 /*.iml
 /*.gorun
-/launch
 /src/main/debug`
 
 	err := ioutil.WriteFile(ignorePath, []byte(ignore), 0644)
