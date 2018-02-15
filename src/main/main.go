@@ -121,15 +121,33 @@ func writeLaunch(launchPath string) {
 			"remotePath": "",
 			"port": 2345,
 			"host": "127.0.0.1",
-			"program": "${workspaceRoot}/debug",
+			"program": "${workspaceRoot}/launch",
 			"preLaunchTask": "go build",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
-				"GOPATH": "${workspaceRoot}"
+				"GOPATH": "${workspaceRoot}",
 			},
 			"args": [],
-			"showLog": true
-		}
+			"showLog": true,
+		},
+
+		// debug 设置，可以设置断点
+        {
+            "name": "Debug",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "remotePath": "",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "program": "${workspaceRoot}/src/main",
+            "internalConsoleOptions": "openOnSessionStart",
+            "env": {
+                "GOPATH": "${workspaceRoot}",
+            },
+            "args": [],
+            "showLog": true,
+        },
 	]
 }`
 
@@ -153,9 +171,11 @@ func writeSettings(settingsPath string) {
 	"files.exclude": {
 		"**/.idea": true,
 		// "**/pkg": true,
-		// "*.gorun": true,
 		"*.iml": true,
-		// "debug":true,
+		
+		// "*.gorun": true,		
+		// "launch":true,
+		// "/src/main/debug":true,
 	},
 	//设置gopath
 	"go.gopath": "${workspaceRoot}",
@@ -181,7 +201,7 @@ func writeTasks(tasksPath string) {
                 "echo": true,
                 "reveal": "never",
                 "focus": false,
-                "panel": "shared"
+                "panel": "shared",
             },
             "command": "export",
             "args": [
@@ -189,8 +209,8 @@ func writeTasks(tasksPath string) {
                 "go",
                 "build",
                 "-o",
-                "debug",
-                "./src/main/"
+                "launch",
+                "./src/main/",
             ]
         }
     ]
@@ -206,10 +226,11 @@ func writeTasks(tasksPath string) {
 func writeIgnore(ignorePath string) {
 	ignore := `/.vscode
 /.idea
-/*.iml
 /pkg
+/*.iml
 /*.gorun
-/debug`
+/launch
+/src/main/debug`
 
 	err := ioutil.WriteFile(ignorePath, []byte(ignore), 0644)
 	if err != nil {
