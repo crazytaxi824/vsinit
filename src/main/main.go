@@ -113,23 +113,23 @@ func writeLaunch(launchPath string) {
 	// 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
 	"version": "0.2.0",
 	"configurations": [
-		{
-			"name": "Launch",
-			"type": "go",
-			"request": "launch",
-			"mode": "exec",
-			"remotePath": "",
-			"port": 2345,
-			"host": "127.0.0.1",
-			"program": "${workspaceRoot}/${workspaceRootFolderName}_.gorun",
-			"preLaunchTask": "go build",
-			"internalConsoleOptions": "openOnSessionStart",
-			"env": {
-				"GOPATH": "${workspaceRoot}",
-			},
-			"args": [],
-			"showLog": true,
-		},
+		// {
+		// 	"name": "Launch",
+		// 	"type": "go",
+		// 	"request": "launch",
+		// 	"mode": "exec",
+		// 	"remotePath": "",
+		// 	"port": 2345,
+		// 	"host": "127.0.0.1",
+		// 	"program": "${workspaceRoot}/${workspaceRootFolderName}_.gorun",
+		// 	"preLaunchTask": "go build",
+		// 	"internalConsoleOptions": "openOnSessionStart",
+		// 	"env": {
+		// 		"GOPATH": "${workspaceRoot}",
+		// 	},
+		// 	"args": [],
+		// 	"showLog": true,
+		// },
 
 		// debug 设置，可以设置断点
         {
@@ -141,7 +141,8 @@ func writeLaunch(launchPath string) {
             "port": 2345,
             "host": "127.0.0.1",
             "program": "${workspaceRoot}/src/main",
-            "internalConsoleOptions": "openOnSessionStart",
+			"internalConsoleOptions": "openOnSessionStart",
+			"cwd": "${workspaceRoot}",
             "env": {
                 "GOPATH": "${workspaceRoot}",
             },
