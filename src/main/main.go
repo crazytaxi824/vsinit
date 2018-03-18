@@ -5,9 +5,13 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
+var w sync.WaitGroup
+
 func main() {
+	defer fmt.Println("文件写完!")
 	//获得当前路径
 	curPath, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -80,32 +84,38 @@ func main() {
 	// 写文件
 	if !launchExist {
 		launchPath := curPath + "/.vscode/launch.json"
-		writeLaunch(launchPath)
+		w.Add(1)
+		go writeLaunch(launchPath)
 	}
 
 	if !settingsExist {
 		settingsPath := curPath + "/.vscode/settings.json"
-		writeSettings(settingsPath)
+		w.Add(1)
+		go writeSettings(settingsPath)
 	}
 
 	if !tasksExist {
 		tasksPath := curPath + "/.vscode/tasks.json"
-		writeTasks(tasksPath)
+		w.Add(1)
+		go writeTasks(tasksPath)
 	}
 
 	if !srcExist {
 		mainPath := curPath + "/src/main/main.go"
-		writeMain(mainPath)
+		w.Add(1)
+		go writeMain(mainPath)
 	}
 
 	if !gitExist {
 		ignorePath := curPath + "/.gitignore"
-		writeIgnore(ignorePath)
+		w.Add(1)
+		go writeIgnore(ignorePath)
 	}
-
+	w.Wait()
 }
 
 func writeLaunch(launchPath string) {
+	defer w.Done()
 	// launch.json
 	launch := `{
 	// 使用 IntelliSense 了解相关属性。 
@@ -161,6 +171,7 @@ func writeLaunch(launchPath string) {
 }
 
 func writeSettings(settingsPath string) {
+	defer w.Done()
 	settings := `{
 	//search.exclude 用来忽略搜索的文件夹
 	//files.exclude 用来忽略工程打开的文件夹
@@ -189,6 +200,7 @@ func writeSettings(settingsPath string) {
 }
 
 func writeTasks(tasksPath string) {
+	defer w.Done()
 	tasks := `{
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
@@ -224,6 +236,7 @@ func writeTasks(tasksPath string) {
 }
 
 func writeIgnore(ignorePath string) {
+	defer w.Done()
 	ignore := `/.vscode
 /.idea
 /pkg
@@ -240,6 +253,7 @@ func writeIgnore(ignorePath string) {
 }
 
 func writeMain(mainPath string) {
+	defer w.Done()
 	mainFile := `package main
 
 func main() {
