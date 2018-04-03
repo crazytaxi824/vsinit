@@ -150,9 +150,10 @@ func writeLaunch(launchPath string) {
             "remotePath": "",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${workspaceRoot}/src/main",
+			"program": "${workspaceRoot}/src/main",
+			"output": "${workspaceRoot}/debug",	
+			// "cwd": "${workspaceRoot}",			
 			"internalConsoleOptions": "openOnSessionStart",
-			"cwd": "${workspaceRoot}",
             "env": {
                 "GOPATH": "${workspaceRoot}",
             },
