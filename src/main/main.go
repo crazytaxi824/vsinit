@@ -152,7 +152,7 @@ func writeLaunch(launchPath string) {
             "host": "127.0.0.1",
 			"program": "${workspaceRoot}/src/main",
 			"output": "${workspaceRoot}/debug",	
-			// "cwd": "${workspaceRoot}",			
+			"cwd": "${workspaceRoot}",			
 			"internalConsoleOptions": "openOnSessionStart",
             "env": {
                 "GOPATH": "${workspaceRoot}",
