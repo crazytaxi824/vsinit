@@ -180,6 +180,7 @@ func writeSettings(settingsPath string) {
         "**/.idea": true,
 		"**/pkg": true,
 		"*.iml": true,
+		"**/src/vendor": true,
     },
 	"files.exclude": {
 		"**/.idea": true,
