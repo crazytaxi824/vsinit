@@ -244,7 +244,9 @@ func writeIgnore(ignorePath string) {
 /pkg
 /*.iml
 /*.gorun
-/src/main/debug`
+/src/main/debug
+/debug
+/config.ini`
 
 	err := ioutil.WriteFile(ignorePath, []byte(ignore), 0644)
 	if err != nil {
