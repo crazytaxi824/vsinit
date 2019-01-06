@@ -246,7 +246,8 @@ func writeIgnore(ignorePath string) {
 /*.gorun
 /src/main/debug
 /debug
-/config.ini`
+/config.ini
+/.history`
 
 	err := ioutil.WriteFile(ignorePath, []byte(ignore), 0644)
 	if err != nil {
