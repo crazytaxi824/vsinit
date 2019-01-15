@@ -177,6 +177,8 @@ func writeSettings(settingsPath string) {
 	//search.exclude 用来忽略搜索的文件夹
 	//files.exclude 用来忽略工程打开的文件夹
 	"search.exclude": {
+		"system/": true,
+		"!/system/**/*.ps*": true,
         "**/.idea": true,
 		"**/pkg": true,
 		"*.iml": true,
