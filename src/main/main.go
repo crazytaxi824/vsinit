@@ -188,7 +188,6 @@ func writeSettings(settingsPath string) {
 		"**/.idea": true,
 		// "**/pkg": true,
 		"*.iml": true,
-		
 		// "*.gorun": true,		
 		// "/src/main/debug":true,
 	},
