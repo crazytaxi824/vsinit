@@ -1,7 +1,9 @@
 /.vscode
 /.idea
-/*.iml
-/pkg
-/.gorun
-/debug
-/.history
+*.iml
+**/*.gorun
+**/debug
+**/.history
+**/vendor
+**/go.mod
+**/go.sum
