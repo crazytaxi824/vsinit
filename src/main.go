@@ -109,12 +109,14 @@ const (
 	  "name": "Auto Main",
 	  "type": "go",
 	  "request": "launch",
-	  "mode": "auto", // launch & debug Mode
+	  "mode": "auto",
 	  "port": 12345,
 	  "host": "127.0.0.1",
-	  "program": "${workspaceRoot}/src", // debug 时 main.go 路径
+	  "program": "${workspaceRoot}/src", // main.go 路径
+	  "cwd": "${workspaceRoot}",		 // 只在 debug 模式时有用
+	  // "env": {},
+	  // "args": ["-c","/xxx/config.yml"],
 	  "internalConsoleOptions": "openOnSessionStart",
-	  "cwd": "${workspaceRoot}",
 	  "showLog": true // show logs in debug mode
 	}
   ]
@@ -144,14 +146,20 @@ const (
 }
 `
 
-	gitignoreContent = `/.vscode
+	gitignoreContent = `# 根路径下
+/.vscode
 /.idea
-*.iml
+/*.iml
+
+# 任何路径下
 **/*.gorun
 **/debug
 **/.history
 **/vendor
-**/go.sum`
+**/go.sum
+
+# 配置文件
+/config.*`
 
 	mainGoContent = `package main
 `
