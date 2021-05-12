@@ -124,42 +124,50 @@ const (
 `
 
 	settingsJSONContent = `{
-  //search.exclude 用来忽略搜索的文件夹
-  //files.exclude 用来忽略工程打开的文件夹
+  // golangci-lint 单独设置
+  // "go.lintFlags": ["--config=~/.golangci/release-ci.yml"],
+  // "go.lintOnSave": "package",
+
+  // search.exclude 用来忽略搜索的文件夹
+  // files.exclude 用来忽略工程打开的文件夹
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
   "search.exclude": {
-	"**/.idea": true,
-	// "**/pkg": true,
-	"*.iml": true,
-	"**/src/vendor": true,
-	"**/.history": true
+    ".idea": true,
+    // "**/pkg": true,
+    "*.iml": true,
+    "**/vendor": true,
+    ".history": true
   },
 	  
-  // files.exclude 不显示文件
+  // files.exclude 不显示文件，
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
   "files.exclude": {
-	"**/.idea": true
-	// "**/pkg": true,
-	// "*.iml": true,
-	// "**/.history": true
-	// "*.gorun": true,
-	// "/src/main/debug":true,
+    ".idea": true,
+    // "**/pkg": true,
+    "*.iml": true,
+    ".history": true
   }
 }
 `
 
-	gitignoreContent = `# 根路径下
+	gitignoreContent = `# http://git-scm.com/docs/gitignore
+# 项目根路径下使用 "/" 开头，如果不写 "/" 则在整个项目中进行匹配，类似 "**/"
 /.vscode
 /.idea
 /*.iml
-
-# 任何路径下
-**/*.gorun
-**/debug
-**/.history
-**/vendor
-**/go.sum
+/.history
 
 # 配置文件
-/config.*`
+/config.*
+
+# 任何路径下用 **/ 开头
+**/*.gorun
+**/debug
+**/vendor
+**/go.sum
+`
 
 	mainGoContent = `package main
 `
