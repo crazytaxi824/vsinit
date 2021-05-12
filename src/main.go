@@ -46,7 +46,6 @@ func createDirs() error {
 
 // creating files
 func createFiles(file string) error {
-	// nolint:gosec // vsPath is checked
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("create %s Files error: %w", file, err)
