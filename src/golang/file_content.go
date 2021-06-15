@@ -1,5 +1,12 @@
 package golang
 
+var FilesAndContent = map[string]string{
+	".vscode/launch.json":   launchJSONContent,
+	".vscode/settings.json": settingsJSONContent,
+	"src/main.go":           mainFileContent,
+	".gitignore":            gitignoreContent,
+}
+
 // file content
 const (
 	launchJSONContent = `{

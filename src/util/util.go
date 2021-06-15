@@ -6,8 +6,27 @@ import (
 	"os"
 )
 
+func WriteCfgFiles(fileContent map[string]string) error {
+	// create .vscode & src Dir
+	fmt.Printf("creating .vscode & src directories ... ")
+	err := createVsCodeDirs()
+	if err != nil {
+		fmt.Println("fail")
+		return err
+	}
+	fmt.Println("done")
+
+	for fp, fc := range fileContent {
+		err = createAndWriteFiles(fp, fc)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // create .vscode & src dir,
-func CreateVsCodeDirs() error {
+func createVsCodeDirs() error {
 	err := os.Mkdir(".vscode", 0750)
 	if err != nil && !errors.Is(err, os.ErrExist) {
 		return fmt.Errorf("create .vscode Dir error: %w", err)
@@ -22,7 +41,7 @@ func CreateVsCodeDirs() error {
 }
 
 // create and write files.
-func CreateAndWriteFiles(fpath, content string) error {
+func createAndWriteFiles(fpath, content string) error {
 	f, err := os.OpenFile(fpath, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("create %s Files error: %w", fpath, err)
