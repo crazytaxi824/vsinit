@@ -66,6 +66,6 @@ const (
 **/go.sum
 `
 
-	mainGoContent = `package main
+	mainFileContent = `package main
 `
 )

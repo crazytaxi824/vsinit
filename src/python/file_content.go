@@ -66,7 +66,7 @@ const (
 **/vendor
 `
 
-	mainGoContent = `def main():
+	mainFileContent = `def main():
   print("hello world")
 
 

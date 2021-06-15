@@ -8,7 +8,7 @@ import (
 var filesAndContent = map[string]string{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/settings.json": settingsJSONContent,
-	"src/main.go":           mainGoContent,
+	"src/main.go":           mainFileContent,
 	".gitignore":            gitignoreContent,
 }
 
