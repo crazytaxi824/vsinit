@@ -22,8 +22,8 @@ const (
       "skipFiles": ["<node_internals>/**"],
       "program": "${file}",
       "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "console": "integratedTerminal"
+      // "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"]
     },
     {
       "name": "src/main.ts",
@@ -32,8 +32,8 @@ const (
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/src/main.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-      "console": "integratedTerminal"
+      // "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"]
     }
   ]
 }
@@ -86,7 +86,7 @@ const (
 /.idea
 /*.iml
 /.history
-/dist
+/out
 /node_modules
 
 # 配置文件
@@ -160,17 +160,17 @@ const (
     "moduleResolution": "node",
     "target": "es2015", // es6=es2015, 默认情况下使用es6，拥有 map & set
     "lib": ["es2017", "DOM"], // 包含了声明文件列表，你仍然拥有较新的类型声明
-    "outDir": "./dist", // ts转为js文件时的地址
+    "outDir": "out", // ts转为js文件时的地址
     "sourceMap": true, // 必须为true
     "strict": true, // alwaysStrict, noImplicitAny, noImplicitThis, strictBindCallApply, strictFunctionTypes, strictNullChecks and strictPropertyInitialization
     "allowJs": true,
-    "noEmit": true,
     "experimentalDecorators": true, // 使用装饰器
     "importHelpers": true,
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": false,
+    // "noEmit": true, // 只做 type check，不进行 compilation
     // "isolatedModules": true,
     "jsx": "react-native"
   },
