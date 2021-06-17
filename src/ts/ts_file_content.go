@@ -4,7 +4,6 @@ var FilesAndContent = map[string]string{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/tasks.json":    tasksJSONContent,
 	".vscode/settings.json": settingsJSONContent,
-	".eslintrc.json":        eslintContent,
 	"tsconfig.json":         tsConfigContent,
 	"src/main.ts":           mainFileContent,
 	".gitignore":            gitignoreContent,
@@ -61,9 +60,18 @@ const (
 
 	settingsJSONContent = `{
   // 单独设置 eslint 配置文件
-  // "eslint.options": {
-  //   "configFile": ".eslintrc.json"
-  // },
+  "eslint.options": {
+    // 这里是全局 eslint 配置文件的固定地址
+    "configFile": "/Users/ray/projects/lints/ts/eslintrc.json"
+  },
+
+  // eslint 检查文件类型
+  "eslint.validate": [
+    "typescriptreact",  
+    "typescript",
+    "javascriptreact",
+    "javascript"
+  ],
 
   // NOTE important, ts string 单引号
   "prettier.singleQuote": true,
@@ -75,6 +83,8 @@ const (
   "search.exclude": {
     ".idea": true,
     "*.iml": true,
+    "out": true,
+    "dist": true,
     "**/vendor": true,
     "node_modules": true,
     ".vscode": true,
@@ -144,115 +154,10 @@ main();
     // "noEmit": true, // 只做 type check，不进行 compilation
     // "isolatedModules": true, // 开发 module, 所有 func & type 必须 import/export
   },
-  "include": ["src/**/*"], // 指定编译文件
-  "exclude": ["node_modules", "out", "dist", "**/*.spec.ts", "**/*.config.js"] // 排除编译文件
+  // 指定检查&编译文件
+  "include": ["src/**/*"], 
+  // 排除检查的文件
+  "exclude": ["node_modules", "out", "dist", "**/*.spec.ts", "**/*.config.js"] 
 }  
-`
-
-	eslintContent = `/*
-https://eslint.org/docs/rules/
-https://www.npmjs.com/package/@typescript-eslint/eslint-plugin
-https://www.npmjs.com/package/eslint-config-airbnb-typescript
-https://github.com/iamturns/create-exposed-app/blob/master/.eslintrc.js
-  
-  需要安装的库:
-  // @typescript-eslint/parser
-
-  eslint-plugin-import
-  eslint-plugin-jsx-a11y
-  eslint-plugin-react
-  eslint-plugin-react-hooks
-  @typescript-eslint/eslint-plugin
-  eslint-config-airbnb-typescript
-  
-  如果需要使用 react:
-  "extends": "airbnb-typescript"
-  如果不需要使用 react:
-  "extends": "airbnb-typescript/base"
-*/
-{
-  "extends": [
-    // "eslint:recommended",
-    // "airbnb-typescript", // js 也可以用, with react
-    "airbnb-typescript/base", // js 也可以用
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
-  ],
-  "env": { "node": true, "browser": true, "es6": true },
-  "plugins": ["@typescript-eslint"],
-  // parser config
-  // "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 6, // es6 = es2015
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "impliedStrict": true,
-    "sourceType": "module", // script | module
-    "project": "./tsconfig.json" // NOTE important, ts项目用
-  },
-  // 不需要检查的文件
-  "ignorePatterns": [
-    ".vscode",
-    "out",
-    "dist",
-    "node_modules",
-    "**/vendor/*.js",
-    "**/vendor/*.ts"
-  ],
-  "rules": {
-    "no-console": 0, // DEBUG use only.
-    "no-prototype-builtins": "off",
-    "import/prefer-default-export": "off",
-    // "import/no-default-export": "error",
-    // NOTE react use only
-    // "react/destructuring-assignment": "off",
-    // "react/jsx-filename-extension": "off",
-    // "curly": "error", // FIXME not working, 强制 if/for/do/while 使用一致的括号风格
-    "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
-    "complexity": "warn", // default 20
-    // NOTE lack of no-null-keyword checks.
-
-    // 功能检查
-    "max-len": ["warn", { "code": 120 }],
-    "max-lines": ["warn", 500], // 文件不超过 n 行
-
-    // TS
-    // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/member-ordering.md
-    "@typescript-eslint/member-ordering": "warn", // class 中 member 排序
-    "@typescript-eslint/consistent-type-definitions": "error", // 使用统一的类型定义
-    "@typescript-eslint/no-use-before-define": [
-      "error",
-      {
-        "functions": false,
-        "classes": true,
-        "variables": true,
-        "typedefs": true
-      }
-    ],
-    // interface 必须 I 开头
-    // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/naming-convention.md
-    "@typescript-eslint/naming-convention": [
-      "warn",
-      {
-        "selector": "interface",
-        "format": ["PascalCase"],
-        "custom": {
-          "regex": "^I[A-Z]",
-          "match": true
-        }
-      }
-    ]
-  },
-  "overrides": [
-    {
-      "files": ["*.js"],
-      "rules": {
-        // Allow require()
-        "@typescript-eslint/no-var-requires": "off"
-      }
-    }
-  ]
-}
 `
 )
