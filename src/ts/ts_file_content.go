@@ -9,7 +9,16 @@ var FilesAndContent = map[string]string{
 	".gitignore":            gitignoreContent,
 }
 
-// file content
+var ReactFilesAndContent = map[string]string{
+	".vscode/launch.json":   reactlaunchJSONContent,
+	".vscode/tasks.json":    tasksJSONContent,
+	".vscode/settings.json": reactSettingsJSONContent,
+	"tsconfig.json":         tsConfigContent,
+	"src/main.ts":           mainFileContent,
+	".gitignore":            gitignoreContent,
+}
+
+// ts file content
 const (
 	launchJSONContent = `{
   "version": "0.2.0",
@@ -159,5 +168,68 @@ main();
   // 排除检查的文件
   "exclude": ["node_modules", "out", "dist", "**/*.spec.ts", "**/*.config.js"] 
 }  
+`
+)
+
+// react settings
+const (
+	reactSettingsJSONContent = `{
+  // 单独设置 eslint 配置文件
+  "eslint.options": {
+    // 这里是全局 eslint 配置文件的固定地址
+    "configFile": "/Users/ray/projects/lints/ts/eslintrc-react.json"
+  },
+
+  // eslint 检查文件类型
+  "eslint.validate": [
+    "typescriptreact",  
+    "typescript",
+    "javascriptreact",
+    "javascript"
+  ],
+
+  // NOTE important, ts string 单引号
+  "prettier.singleQuote": true,
+
+  // search.exclude 用来忽略搜索的文件夹
+  // files.exclude 用来忽略工程打开的文件夹
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
+  "search.exclude": {
+    ".idea": true,
+    "*.iml": true,
+    "out": true,
+    "dist": true,
+    "**/vendor": true,
+    "node_modules": true,
+    ".vscode": true,
+    ".history": true
+  },
+	  
+  // files.exclude 不显示文件，
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
+  "files.exclude": {
+    ".idea": true,
+  }
+}
+`
+
+	reactlaunchJSONContent = `{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // launch project
+      "name": "src/main.ts",
+      "type": "node",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/src/main.ts",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      // "console": "integratedTerminal",
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+    }
+  ]
+}
 `
 )
