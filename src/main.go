@@ -5,15 +5,18 @@ import (
 	"os"
 
 	"local/src/golang"
+	"local/src/js"
 	"local/src/python"
 	"local/src/ts"
 	"local/src/util"
 )
 
+const languages = "go/py/ts/js/react"
+
 func main() {
 	args := os.Args
 	if len(args) < 2 {
-		fmt.Println("please specify language - go/py/ts")
+		fmt.Println("please specify language -", languages)
 		fmt.Println("eg: vsinit go")
 		os.Exit(2)
 	}
@@ -30,10 +33,14 @@ func main() {
 	case "ts":
 		fmt.Println("init TypeScript project")
 		fc = ts.FilesAndContent
-	// case "js":
-	// 	fmt.Println("init JavaScript project")
+	case "react":
+		fmt.Println("init React - TS project")
+		fc = ts.ReactFilesAndContent
+	case "js":
+		fmt.Println("init JavaScript project")
+		fc = js.FilesAndContent
 	default:
-		fmt.Println("languang supported - go/py/ts")
+		fmt.Println("languang supported -", languages)
 		fmt.Println("eg: vsinit go")
 		os.Exit(2)
 	}

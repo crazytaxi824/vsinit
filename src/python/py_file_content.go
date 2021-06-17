@@ -13,7 +13,7 @@ const (
   "version": "0.2.0",
   "configurations": [
     {
-      // use for single file
+      // run single file
       "name": "current file",
       "type": "python",
       "request": "launch",
@@ -21,7 +21,7 @@ const (
       "console": "integratedTerminal"
     },
     {
-      // use for project
+      // launch project
       "name": "src/main.py",
       "type": "python",
       "request": "launch",
