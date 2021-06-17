@@ -62,7 +62,7 @@ const (
   // 单独设置 eslint 配置文件
   "eslint.options": {
     // 这里是全局 eslint 配置文件的固定地址
-    "configFile": "/Users/ray/projects/lints/ts/eslintrc.json"
+    "configFile": "/Users/ray/projects/lints/ts/eslintrc-ts.json"
   },
 
   // eslint 检查文件类型
