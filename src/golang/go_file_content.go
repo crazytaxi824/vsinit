@@ -17,13 +17,13 @@ const (
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "port": 12345,
-      "host": "127.0.0.1",
+      "cwd": "${workspaceRoot}", // 只在 debug 模式时有用
+      "host": "127.0.0.1", // debug server addr
+      "port": 12345, // debug server port
       "program": "${workspaceRoot}/src", // main.go 路径
-      "cwd": "${workspaceRoot}",		 // 只在 debug 模式时有用
       // "env": {},
       // "args": ["-c","/xxx/config.yml"],
-      "internalConsoleOptions": "openOnSessionStart",
+      "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
       "showLog": true // show logs in debug mode
     }
   ]
