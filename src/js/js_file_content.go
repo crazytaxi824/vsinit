@@ -35,6 +35,7 @@ const (
 `
 
 	settingsJSONContent = `{
+  // https://eslint.org/docs/developer-guide/nodejs-api#cliengine
   // 单独设置 eslint 配置文件
   "eslint.options": {
     // 这里是全局 eslint 配置文件的固定地址
