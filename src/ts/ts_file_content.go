@@ -31,7 +31,8 @@ const (
       "skipFiles": ["<node_internals>/**"],
       "program": "${file}",
       "preLaunchTask": "tsc: build - tsconfig.json",
-      // "console": "integratedTerminal",
+      "console": "integratedTerminal",
+      "disableOptimisticBPs": true,
       "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     },
     {
@@ -42,8 +43,20 @@ const (
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/src/main.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
-      // "console": "integratedTerminal",
+      "console": "integratedTerminal",
+      "disableOptimisticBPs": true,
       "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+    },
+    {
+      // jest - unit test
+      "name": "Jest Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "/usr/local/bin/jest", // jest 命令行工具位置
+      "args": ["--coverage", "${file}"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true
     }
   ]
 }
@@ -228,8 +241,20 @@ const (
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/src/main.ts",
       "preLaunchTask": "tsc: build - tsconfig.json",
-      // "console": "integratedTerminal",
+      "console": "integratedTerminal",
+      "disableOptimisticBPs": true,
       "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+    },
+    {
+      // jest - unit test
+      "name": "Jest Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "/usr/local/bin/jest", // jest 命令行工具位置
+      "args": ["--coverage", "${file}"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true
     }
   ]
 }
