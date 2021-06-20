@@ -7,6 +7,8 @@
       "type": "node",
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "disableOptimisticBPs": true,
       "program": "${file}"
     },
     {
@@ -15,6 +17,8 @@
       "type": "node",
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "disableOptimisticBPs": true,
       "program": "${workspaceFolder}/src/main.js"
     }
   ]

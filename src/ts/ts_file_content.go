@@ -42,10 +42,10 @@ var ReactFilesAndContent = map[string]string{
 
 // ts file content
 const (
-	mainFileContent = `function main() {
+	mainFileContent = `main();
+
+function main() {
   console.log('hello world');
 }
-
-main();
 `
 )
