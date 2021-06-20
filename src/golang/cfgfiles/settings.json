@@ -1,0 +1,27 @@
+{
+  // golangci-lint 单独设置
+  // golangci-lint 的配置文件位置
+  // "go.lintFlags": ["--config=~/.golangci/release-ci.yml"],
+  // lint 单文件可能有引用问题导致报错
+  // "go.lintOnSave": "file",
+
+  // search.exclude 用来忽略搜索的文件夹
+  // files.exclude 用来忽略工程打开的文件夹
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
+  "search.exclude": {
+    ".idea": true,
+    // "**/pkg": true,
+    "*.iml": true,
+    "**/vendor": true,
+    ".history": true
+  },
+
+  // files.exclude 不显示文件，
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
+  "files.exclude": {
+    ".idea": true
+    // "**/pkg": true,
+  }
+}

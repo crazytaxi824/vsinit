@@ -2,7 +2,20 @@
 
 package js
 
-var FilesAndContent = map[string]string{
+import _ "embed" // for go:embed file use
+
+var (
+	//go:embed cfgfiles/launch.json
+	launchJSONContent []byte
+
+	//go:embed cfgfiles/settings.json
+	settingsJSONContent []byte
+
+	//go:embed cfgfiles/gitignore
+	gitignoreContent []byte
+)
+
+var FilesAndContent = map[string][]byte{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/settings.json": settingsJSONContent,
 	"src/main.js":           mainFileContent,
@@ -10,94 +23,9 @@ var FilesAndContent = map[string]string{
 }
 
 // file content
-const (
-	launchJSONContent = `{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      // run single file
-      "name": "current file",
-      "type": "node",
-      "request": "launch",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${file}"
-    },
-    {
-      // launch project
-      "name": "src/main.js",
-      "type": "node",
-      "request": "launch",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/src/main.js"
-    }
-  ]
-}
-`
+var mainFileContent = []byte(`main();
 
-	settingsJSONContent = `{
-  // https://eslint.org/docs/developer-guide/nodejs-api#cliengine
-  // 单独设置 eslint 配置文件
-  "eslint.options": {
-    // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用。
-    // 这里是全局 eslint 配置文件的固定地址
-    "configFile": "/Users/ray/projects/lints/ts/eslintrc-js.json"
-  },
-
-  // eslint 检查文件类型
-  "eslint.validate": [
-	  // "typescriptreact",
-    // "typescript",
-	  // "javascriptreact",
-    "javascript"
-  ],
-
-  // NOTE important, ts string 单引号
-  "prettier.singleQuote": true,
-
-  // search.exclude 用来忽略搜索的文件夹
-  // files.exclude 用来忽略工程打开的文件夹
-  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
-  // **/所有路径下进行匹配
-  "search.exclude": {
-    ".idea": true,
-    "*.iml": true,
-    "out": true,
-    "dist": true,
-    "**/vendor": true,
-    "node_modules": true,
-    ".vscode": true,
-    ".history": true
-  },
-	  
-  // files.exclude 不显示文件，
-  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
-  // **/所有路径下进行匹配
-  "files.exclude": {
-    ".idea": true,
-  }
-}
-`
-
-	gitignoreContent = `# http://git-scm.com/docs/gitignore
-# 项目根路径下使用 "/" 开头，如果不写 "/" 则在整个项目中进行匹配，类似 "**/"
-/.vscode
-/.idea
-/*.iml
-/.history
-/node_modules
-
-# 配置文件
-/config.*
-
-# 任何路径下用 **/ 开头
-**/debug
-**/vendor
-`
-
-	mainFileContent = `function main() {
+function main() {
   console.log('hello world');
 }
-
-main();
-`
-)
+`)

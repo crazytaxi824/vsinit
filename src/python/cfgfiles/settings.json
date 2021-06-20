@@ -1,0 +1,24 @@
+{
+  // 选择 python version
+  "python.pythonPath": "/usr/local/bin/python3",
+
+  // search.exclude 用来忽略搜索的文件夹
+  // files.exclude 用来忽略工程打开的文件夹
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
+  "search.exclude": {
+    ".idea": true,
+    "*.iml": true,
+    "**/vendor": true,
+    ".vscode": true,
+    ".mypy_cache": true, // python cache
+    ".history": true
+  },
+
+  // files.exclude 不显示文件，
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // **/所有路径下进行匹配
+  "files.exclude": {
+    ".idea": true
+  }
+}

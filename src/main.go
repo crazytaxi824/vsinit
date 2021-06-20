@@ -21,7 +21,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	var fc map[string]string
+	var fc map[string][]byte
 
 	switch args[1] {
 	case "go":

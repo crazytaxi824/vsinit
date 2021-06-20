@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // run single file
+      "name": "current file",
+      "type": "node",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "disableOptimisticBPs": true,
+      "program": "${file}"
+    },
+    {
+      // launch project
+      "name": "src/main.js",
+      "type": "node",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal",
+      "disableOptimisticBPs": true,
+      "program": "${workspaceFolder}/src/main.js"
+    }
+  ]
+}

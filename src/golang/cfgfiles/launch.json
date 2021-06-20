@@ -1,0 +1,22 @@
+{
+  // plugins: gopls, gotests, go-outline, golangci-lint, dlv, impl
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Auto Main",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "cwd": "${workspaceRoot}", // 只在 debug 模式时有用
+      "host": "127.0.0.1", // debug server addr
+      "port": 12345, // debug server port
+      "program": "${workspaceRoot}/src", // main.go 路径
+      // 传入的 enviroment 参数, 程序中可以通过 os.Environ() 获取
+      //   "env": { "GO111MODULE": "on" },
+      // 编译后的程序运行所需参数，通过 flag.Parse() / os.Args 设置/获取
+      //   "args": ["-c", "/xxx/config.yml"],
+      "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
+      "showLog": true // show logs in debug mode
+    }
+  ]
+}
