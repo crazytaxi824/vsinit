@@ -1,3 +1,7 @@
+// NOTE this command line tool only works at PROJECT ROOT directory.
+// This command line tool is used to initialize project of different
+// program languages in vscode.
+
 package main
 
 import (
@@ -16,54 +20,60 @@ const languages = "go/py/ts/js/react"
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("please specify language -", languages)
-		fmt.Println("usage: vsinit <language> [<args>]")
-		fmt.Println("eg: vsinit go")
+		helpMsg()
 		os.Exit(2)
 	}
 
-	testCmd := flag.NewFlagSet("test", flag.ExitOnError)
-	jest := testCmd.Bool("jest", false, "add 'jest' - unit test components")
+	// flag.ExitOnError will os.Exit(2) if subcommand Parse() error.
+	tsCmd := flag.NewFlagSet("ts", flag.ExitOnError)
+	jest := tsCmd.Bool("jest", false, "add 'jest' - unit test components")
 
 	var folders []string
 	var files []util.FileContent
 
 	switch os.Args[1] {
 	case "go":
-		fmt.Println("init Golang project")
 		folders = golang.CreateFolders
 		files = golang.FilesAndContent
+		fmt.Println("init Golang project")
 	case "py":
-		fmt.Println("init Python project")
 		folders = python.CreateFolders
 		files = python.FilesAndContent
+		fmt.Println("init Python project")
 	case "ts":
-		fmt.Println("init TypeScript project")
+		// parse arges first
+		// nolint // flag.ExitOnError will do the os.Exit(2)
+		tsCmd.Parse(os.Args[2:])
+
 		folders = ts.CreateFolders
 		files = ts.FilesAndContent
+		if *jest {
+			folders = append(folders, ts.JestFolder)  // add "test" folder
+			files = append(files, ts.JestFileContent) // add jest example test file
+		}
+
+		// TODO change package.json file
+
+		fmt.Println("init TypeScript project")
 	case "react":
-		fmt.Println("init React - TS project")
 		folders = ts.CreateFolders
 		files = ts.ReactFilesAndContent
+		fmt.Println("init React - TypeScript project")
 	case "js":
-		fmt.Println("init JavaScript project")
 		folders = js.CreateFolders
 		files = js.FilesAndContent
-	case "test":
-		err := testCmd.Parse(os.Args[2:])
-		if err != nil {
-			fmt.Println("test command parse flag error:", err)
-			return
-		}
-		fmt.Println("jest flag is", *jest)
-		// fmt.Println("this is a command test function")
-		return
+		fmt.Println("init JavaScript project")
 	default:
-		fmt.Println("languang supported -", languages)
-		fmt.Println("eg: vsinit go")
+		helpMsg()
 		os.Exit(2)
 	}
 
 	// create folders and write files
 	util.WriteCfgFiles(folders, files)
+}
+
+func helpMsg() {
+	fmt.Println("please specify language -", languages)
+	fmt.Println("usage: vsinit <language> [<args>]")
+	fmt.Println("eg: vsinit go")
 }

@@ -51,12 +51,7 @@ func createAndWriteFile(fpath string, content []byte) error {
 		fmt.Println("failed")
 		return fmt.Errorf("create %s Files error: %w", fpath, err)
 	}
-	defer func() {
-		if er := f.Close(); er != nil {
-			fmt.Println("file close error:", er)
-			return
-		}
-	}()
+	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
