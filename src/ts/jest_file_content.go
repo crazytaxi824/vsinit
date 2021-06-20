@@ -17,6 +17,7 @@ import (
 	"io"
 	"local/src/util"
 	"os"
+	"os/exec"
 )
 
 // 项目根目录下生成 test 文件夹
@@ -114,8 +115,19 @@ func JestSetup() error {
 	return nil
 }
 
-// TODO npm install ts-jest @types/jest
-func npmInstallDependencies(lib ...string) {}
+// npm install ts-jest @types/jest
+func npmInstallDependencies(libs ...string) error {
+	for _, lib := range libs {
+		cmd := exec.Command("npm", "i", "-D", lib)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // 将文件内容 json 反序列化到 map 中。
 func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
@@ -138,18 +150,21 @@ func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
 // package.json 没有任何内容的情况
 func newPackageFile(packageFile *os.File) error {
 	// 先将 "scripts" and "jest" 写入 packagefile
-	result, er := jsonIndentContent(jestPackageConfig)
-	if er != nil {
-		return er
+	result, err := jsonIndentContent(jestPackageConfig)
+	if err != nil {
+		return err
 	}
 
-	_, er = packageFile.Write(result)
-	if er != nil {
-		return er
+	_, err = packageFile.Write(result)
+	if err != nil {
+		return err
 	}
 
 	// npm install ts-jest @types/jest
-	npmInstallDependencies("ts-jest", "@types/jest")
+	err = npmInstallDependencies("ts-jest", "@types/jest")
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -187,7 +202,10 @@ func truncAndReWrieFile(packageFile *os.File, content map[string]interface{}) er
 func checkDependencies(packageMap map[string]interface{}) error {
 	devDependencies, ok := packageMap["devDependencies"]
 	if !ok {
-		npmInstallDependencies("ts-jest", "@types/jest")
+		err := npmInstallDependencies("ts-jest", "@types/jest")
+		if err != nil {
+			return err
+		}
 	}
 
 	devDependenciesMap, ok := devDependencies.(map[string]interface{})
@@ -197,12 +215,18 @@ func checkDependencies(packageMap map[string]interface{}) error {
 
 	if _, ok := devDependenciesMap["ts-jest"]; !ok {
 		// download ts-jest
-		npmInstallDependencies("ts-jest")
+		err := npmInstallDependencies("ts-jest")
+		if err != nil {
+			return err
+		}
 	}
 
 	if _, ok := devDependenciesMap["@types/jest"]; !ok {
 		// download @types/jest
-		npmInstallDependencies("@types/jest")
+		err := npmInstallDependencies("@types/jest")
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
