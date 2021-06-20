@@ -2,6 +2,8 @@ package golang
 
 import _ "embed" // for go:embed file use
 
+var CreateFolders = []string{".vscode", "src"}
+
 var (
 	//go:embed cfgfiles/launch.json
 	launchJSONContent []byte

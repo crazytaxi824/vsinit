@@ -2,6 +2,8 @@ package ts
 
 import _ "embed" // for go:embed file use
 
+var CreateFolders = []string{".vscode", "src"}
+
 var (
 	//go:embed tscfgfiles/launch.json
 	launchJSONContent []byte

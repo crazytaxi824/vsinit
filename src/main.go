@@ -21,23 +21,29 @@ func main() {
 		os.Exit(2)
 	}
 
+	var folders []string
 	var fc map[string][]byte
 
 	switch args[1] {
 	case "go":
 		fmt.Println("init Golang project")
+		folders = golang.CreateFolders
 		fc = golang.FilesAndContent
 	case "py":
 		fmt.Println("init Python project")
+		folders = python.CreateFolders
 		fc = python.FilesAndContent
 	case "ts":
 		fmt.Println("init TypeScript project")
+		folders = ts.CreateFolders
 		fc = ts.FilesAndContent
 	case "react":
 		fmt.Println("init React - TS project")
+		folders = ts.CreateFolders
 		fc = ts.ReactFilesAndContent
 	case "js":
 		fmt.Println("init JavaScript project")
+		folders = js.CreateFolders
 		fc = js.FilesAndContent
 	default:
 		fmt.Println("languang supported -", languages)
@@ -45,7 +51,5 @@ func main() {
 		os.Exit(2)
 	}
 
-	if err := util.WriteCfgFiles(fc); err != nil {
-		fmt.Println(err)
-	}
+	util.WriteCfgFiles(folders, fc)
 }
