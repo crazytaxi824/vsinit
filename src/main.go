@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -14,42 +15,55 @@ import (
 const languages = "go/py/ts/js/react"
 
 func main() {
-	args := os.Args
-	if len(args) < 2 {
+	if len(os.Args) < 2 {
 		fmt.Println("please specify language -", languages)
+		fmt.Println("usage: vsinit <language> [<args>]")
 		fmt.Println("eg: vsinit go")
 		os.Exit(2)
 	}
 
-	var folders []string
-	var fc map[string][]byte
+	testCmd := flag.NewFlagSet("test", flag.ExitOnError)
+	jest := testCmd.Bool("jest", false, "add 'jest' - unit test components")
 
-	switch args[1] {
+	var folders []string
+	var files []util.FileContent
+
+	switch os.Args[1] {
 	case "go":
 		fmt.Println("init Golang project")
 		folders = golang.CreateFolders
-		fc = golang.FilesAndContent
+		files = golang.FilesAndContent
 	case "py":
 		fmt.Println("init Python project")
 		folders = python.CreateFolders
-		fc = python.FilesAndContent
+		files = python.FilesAndContent
 	case "ts":
 		fmt.Println("init TypeScript project")
 		folders = ts.CreateFolders
-		fc = ts.FilesAndContent
+		files = ts.FilesAndContent
 	case "react":
 		fmt.Println("init React - TS project")
 		folders = ts.CreateFolders
-		fc = ts.ReactFilesAndContent
+		files = ts.ReactFilesAndContent
 	case "js":
 		fmt.Println("init JavaScript project")
 		folders = js.CreateFolders
-		fc = js.FilesAndContent
+		files = js.FilesAndContent
+	case "test":
+		err := testCmd.Parse(os.Args[2:])
+		if err != nil {
+			fmt.Println("test command parse flag error:", err)
+			return
+		}
+		fmt.Println("jest flag is", *jest)
+		// fmt.Println("this is a command test function")
+		return
 	default:
 		fmt.Println("languang supported -", languages)
 		fmt.Println("eg: vsinit go")
 		os.Exit(2)
 	}
 
-	util.WriteCfgFiles(folders, fc)
+	// create folders and write files
+	util.WriteCfgFiles(folders, files)
 }

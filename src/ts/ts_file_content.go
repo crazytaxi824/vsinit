@@ -1,6 +1,10 @@
 package ts
 
-import _ "embed" // for go:embed file use
+import (
+	_ "embed" // for go:embed file use
+
+	"local/src/util"
+)
 
 var CreateFolders = []string{".vscode", "src"}
 
@@ -24,27 +28,64 @@ var (
 	reactSettingsJSONContent []byte
 )
 
-var FilesAndContent = map[string][]byte{
-	".vscode/launch.json":   launchJSONContent,
-	".vscode/tasks.json":    tasksJSONContent,
-	".vscode/settings.json": settingsJSONContent,
-	"tsconfig.json":         tsConfigContent,
-	"src/main.ts":           mainFileContent,
-	".gitignore":            gitignoreContent,
-}
-
-var ReactFilesAndContent = map[string][]byte{
-	".vscode/launch.json":   launchJSONContent,
-	".vscode/tasks.json":    tasksJSONContent,
-	".vscode/settings.json": reactSettingsJSONContent,
-	"tsconfig.json":         tsConfigContent,
-	"src/main.ts":           mainFileContent,
-	".gitignore":            gitignoreContent,
-}
-
 var mainFileContent = []byte(`main();
 
 function main() {
   console.log('hello world');
 }
 `)
+
+var FilesAndContent = []util.FileContent{
+	{
+		Path:    ".vscode/launch.json",
+		Content: launchJSONContent,
+	},
+	{
+		Path:    ".vscode/tasks.json",
+		Content: tasksJSONContent,
+	},
+	{
+		Path:    ".vscode/settings.json",
+		Content: settingsJSONContent,
+	},
+	{
+		Path:    ".gitignore",
+		Content: gitignoreContent,
+	},
+	{
+		Path:    "tsconfig.json",
+		Content: tsConfigContent,
+	},
+	{
+		Path:    "src/main.ts",
+		Content: mainFileContent,
+	},
+}
+
+var ReactFilesAndContent = []util.FileContent{
+	{
+		Path:    ".vscode/launch.json",
+		Content: launchJSONContent,
+	},
+	{
+		Path:    ".vscode/tasks.json",
+		Content: tasksJSONContent,
+	},
+	{
+		// 主要修改是 setting，里面改变了 lint 的 config 文件地址
+		Path:    ".vscode/settings.json",
+		Content: reactSettingsJSONContent,
+	},
+	{
+		Path:    ".gitignore",
+		Content: gitignoreContent,
+	},
+	{
+		Path:    "tsconfig.json",
+		Content: tsConfigContent,
+	},
+	{
+		Path:    "src/main.ts",
+		Content: mainFileContent,
+	},
+}

@@ -1,6 +1,10 @@
 package golang
 
-import _ "embed" // for go:embed file use
+import (
+	_ "embed" // for go:embed file use
+
+	"local/src/util"
+)
 
 var CreateFolders = []string{".vscode", "src"}
 
@@ -15,19 +19,31 @@ var (
 	gitignoreContent []byte
 )
 
-var FilesAndContent = map[string][]byte{
-	".vscode/launch.json":   launchJSONContent,
-	".vscode/settings.json": settingsJSONContent,
-	"src/main.go":           mainFileContent,
-	".gitignore":            gitignoreContent,
-}
-
 var mainFileContent = []byte(`package main
 
 import "fmt"
 
 func main() {
 	fmt.Println("hello world")
-  // need to run "go mod init" first.
+    // need to run "go mod init" first.
 }
 `)
+
+var FilesAndContent = []util.FileContent{
+	{
+		Path:    ".vscode/launch.json",
+		Content: launchJSONContent,
+	},
+	{
+		Path:    ".vscode/settings.json",
+		Content: settingsJSONContent,
+	},
+	{
+		Path:    ".gitignore",
+		Content: gitignoreContent,
+	},
+	{
+		Path:    "src/main.go",
+		Content: mainFileContent,
+	},
+}

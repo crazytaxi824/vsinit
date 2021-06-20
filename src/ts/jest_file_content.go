@@ -9,6 +9,8 @@
 
 package ts
 
+var JestFolders = []string{".vscode", "src", "test"}
+
 // 项目根目录下生成 test 文件夹
 
 // 读取 package.json 文件

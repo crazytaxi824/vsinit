@@ -6,7 +6,12 @@ import (
 	"os"
 )
 
-func WriteCfgFiles(folders []string, fileContent map[string][]byte) {
+type FileContent struct {
+	Path    string
+	Content []byte
+}
+
+func WriteCfgFiles(folders []string, fileContents []FileContent) {
 	// create folders
 	for _, v := range folders {
 		err := createDir(v)
@@ -17,8 +22,8 @@ func WriteCfgFiles(folders []string, fileContent map[string][]byte) {
 	}
 
 	// write files
-	for fp, fc := range fileContent {
-		err := createAndWriteFile(fp, fc)
+	for _, fc := range fileContents {
+		err := createAndWriteFile(fc.Path, fc.Content)
 		if err != nil {
 			fmt.Println(err)
 			return
