@@ -23,7 +23,7 @@ var FilesAndContent = map[string]string{
 // file content
 const (
 	mainFileContent = `def main():
-	print("hello world")
+    print("hello world")
 
 
 main()
