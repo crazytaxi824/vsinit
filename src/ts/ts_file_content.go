@@ -4,25 +4,25 @@ import _ "embed" // for go:embed file use
 
 var (
 	//go:embed tscfgfiles/launch.json
-	launchJSONContent string
+	launchJSONContent []byte
 
 	//go:embed tscfgfiles/settings.json
-	settingsJSONContent string
+	settingsJSONContent []byte
 
 	//go:embed tscfgfiles/tasks.json
-	tasksJSONContent string
+	tasksJSONContent []byte
 
 	//go:embed tscfgfiles/gitignore
-	gitignoreContent string
+	gitignoreContent []byte
 
 	//go:embed tscfgfiles/tsconfig.json
-	tsConfigContent string
+	tsConfigContent []byte
 
 	//go:embed reactcfgfiles/settings.json
-	reactSettingsJSONContent string
+	reactSettingsJSONContent []byte
 )
 
-var FilesAndContent = map[string]string{
+var FilesAndContent = map[string][]byte{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/tasks.json":    tasksJSONContent,
 	".vscode/settings.json": settingsJSONContent,
@@ -31,7 +31,7 @@ var FilesAndContent = map[string]string{
 	".gitignore":            gitignoreContent,
 }
 
-var ReactFilesAndContent = map[string]string{
+var ReactFilesAndContent = map[string][]byte{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/tasks.json":    tasksJSONContent,
 	".vscode/settings.json": reactSettingsJSONContent,
@@ -40,12 +40,9 @@ var ReactFilesAndContent = map[string]string{
 	".gitignore":            gitignoreContent,
 }
 
-// ts file content
-const (
-	mainFileContent = `main();
+var mainFileContent = []byte(`main();
 
 function main() {
   console.log('hello world');
 }
-`
-)
+`)

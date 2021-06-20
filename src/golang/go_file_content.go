@@ -4,23 +4,23 @@ import _ "embed" // for go:embed file use
 
 var (
 	//go:embed cfgfiles/launch.json
-	launchJSONContent string
+	launchJSONContent []byte
 
 	//go:embed cfgfiles/settings.json
-	settingsJSONContent string
+	settingsJSONContent []byte
 
 	//go:embed cfgfiles/gitignore
-	gitignoreContent string
+	gitignoreContent []byte
 )
 
-var FilesAndContent = map[string]string{
+var FilesAndContent = map[string][]byte{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/settings.json": settingsJSONContent,
 	"src/main.go":           mainFileContent,
 	".gitignore":            gitignoreContent,
 }
 
-const mainFileContent = `package main
+var mainFileContent = []byte(`package main
 
 import "fmt"
 
@@ -28,4 +28,4 @@ func main() {
 	fmt.Println("hello world")
   // need to run "go mod init" first.
 }
-`
+`)

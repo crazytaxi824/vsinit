@@ -4,28 +4,25 @@ import _ "embed" // for go:embed file use
 
 var (
 	//go:embed cfgfiles/launch.json
-	launchJSONContent string
+	launchJSONContent []byte
 
 	//go:embed cfgfiles/settings.json
-	settingsJSONContent string
+	settingsJSONContent []byte
 
 	//go:embed cfgfiles/gitignore
-	gitignoreContent string
+	gitignoreContent []byte
 )
 
-var FilesAndContent = map[string]string{
+var FilesAndContent = map[string][]byte{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/settings.json": settingsJSONContent,
 	"src/main.py":           mainFileContent,
 	".gitignore":            gitignoreContent,
 }
 
-// file content
-const (
-	mainFileContent = `def main():
+var mainFileContent = []byte(`def main():
     print("hello world")
 
 
 main()
-`
-)
+`)

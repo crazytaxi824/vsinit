@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func WriteCfgFiles(fileContent map[string]string) error {
+func WriteCfgFiles(fileContent map[string][]byte) error {
 	// create .vscode & src Dir
 	fmt.Printf("creating .vscode & src directories ... ")
 	err := createVsCodeDirs()
@@ -41,7 +41,7 @@ func createVsCodeDirs() error {
 }
 
 // create and write files.
-func createAndWriteFiles(fpath, content string) error {
+func createAndWriteFiles(fpath string, content []byte) error {
 	f, err := os.OpenFile(fpath, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("create %s Files error: %w", fpath, err)
@@ -65,7 +65,7 @@ func createAndWriteFiles(fpath, content string) error {
 
 	fmt.Printf("writing file: %s ... ", fpath)
 	// write file content
-	_, err = f.WriteString(content)
+	_, err = f.Write(content)
 	if err != nil {
 		fmt.Println("fail")
 		return fmt.Errorf("write file %s error: %w", fpath, err)

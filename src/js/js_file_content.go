@@ -6,16 +6,16 @@ import _ "embed" // for go:embed file use
 
 var (
 	//go:embed cfgfiles/launch.json
-	launchJSONContent string
+	launchJSONContent []byte
 
 	//go:embed cfgfiles/settings.json
-	settingsJSONContent string
+	settingsJSONContent []byte
 
 	//go:embed cfgfiles/gitignore
-	gitignoreContent string
+	gitignoreContent []byte
 )
 
-var FilesAndContent = map[string]string{
+var FilesAndContent = map[string][]byte{
 	".vscode/launch.json":   launchJSONContent,
 	".vscode/settings.json": settingsJSONContent,
 	"src/main.js":           mainFileContent,
@@ -23,11 +23,9 @@ var FilesAndContent = map[string]string{
 }
 
 // file content
-const (
-	mainFileContent = `main();
+var mainFileContent = []byte(`main();
 
 function main() {
   console.log('hello world');
 }
-`
-)
+`)
