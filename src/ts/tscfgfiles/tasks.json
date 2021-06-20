@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "problemMatcher": ["$tsc"], // 使用 tsc 命令转码
+      "group": "build",
+      "label": "tsc: build - tsconfig.json",
+      "presentation": {
+        "reveal": "silent",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    }
+  ]
+}
