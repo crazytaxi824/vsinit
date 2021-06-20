@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"local/src/util"
 	"os"
@@ -62,15 +63,15 @@ var jestPackageConfig = map[string]map[string]string{
 //     "preset": "ts-jest"
 //   },
 // add "scripts" and "jest" to package.json file
-func ChangePackageFile() error {
-	// 读取 package.json 文件
+func JestSetup() error {
+	// open package.json 文件
 	packageFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
 		return err
 	}
 	defer packageFile.Close()
 
-	// 读取 file info
+	// 获取 file info
 	packageInfo, err := packageFile.Stat()
 	if err != nil {
 		return err
@@ -78,95 +79,85 @@ func ChangePackageFile() error {
 
 	// package.json is empty
 	if packageInfo.Size() == 0 {
-		// 先将 "scripts" and "jest" 写入 packagefile
-		result, er := jsonIndentContent(jestPackageConfig)
-		if er != nil {
-			return er
+		err = newPackageFile(packageFile)
+		if err != nil {
+			return err
 		}
-
-		_, er = packageFile.Write(result)
-		if er != nil {
-			return er
-		}
-
-		// npm install ts-jest @types/jest
-		npmInstalldependencies("ts-jest", "@types/jest")
-
 		return nil
 	}
 
 	// package.json is not empty
+	packageMap, err := readFileToMap(packageFile)
+	if err != nil {
+		return err
+	}
+
+	// 检查 package.json 中是否有 "scripts" 和 "jest"
+	err = checkPackageFile(packageMap)
+	if err != nil {
+		return err
+	}
+
+	// 查看 devDependencies 是否有下载
+	// npm install ts-jest @types/jest
+	err = checkDependencies(packageMap)
+	if err != nil {
+		return err
+	}
+
+	// 清空 package.json 文件写入新内容
+	err = truncAndReWrieFile(packageFile, packageMap)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// TODO npm install ts-jest @types/jest
+func npmInstallDependencies(lib ...string) {}
+
+// 将文件内容 json 反序列化到 map 中。
+func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
 	// 读取 package.json 内容
 	packageContent, err := io.ReadAll(packageFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// json 反序列化
 	var packageMap map[string]interface{}
 	err = json.Unmarshal(packageContent, &packageMap)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// 判断 "scripts" 是否存在
-	if scripts, ok := packageMap["scripts"]; !ok {
-		// "scripts" 不存在
-		packageMap["scripts"] = jestPackageConfig["scripts"]
-	} else {
-		// "scripts" 存在
-		scriptsMap, okk := scripts.(map[string]interface{})
-		if !okk {
-			return errors.New("script assert failed")
-		}
+	return packageMap, nil
+}
 
-		// copy jestPackageConfig to scriptsMap
-		for k, v := range jestPackageConfig["scripts"] {
-			scriptsMap[k] = v
-		}
+// package.json 没有任何内容的情况
+func newPackageFile(packageFile *os.File) error {
+	// 先将 "scripts" and "jest" 写入 packagefile
+	result, er := jsonIndentContent(jestPackageConfig)
+	if er != nil {
+		return er
 	}
 
-	// 判断 "jest" 是否存在
-	if jest, ok := packageMap["jest"]; !ok {
-		// "jest" 不存在
-		packageMap["jest"] = jestPackageConfig["jest"]
-	} else {
-		// "jest" 存在
-		jestMap, okk := jest.(map[string]interface{})
-		if !okk {
-			return errors.New("jest assert failed")
-		}
-
-		// copy jestPackageConfig to jestMap
-		for k, v := range jestPackageConfig["jest"] {
-			jestMap[k] = v
-		}
+	_, er = packageFile.Write(result)
+	if er != nil {
+		return er
 	}
 
-	// 查看 devDependencies 是否有下载
 	// npm install ts-jest @types/jest
-	devDependencies, ok := packageMap["devDependencies"]
-	if !ok {
-		npmInstalldependencies("ts-jest", "@types/jest")
-	}
+	npmInstallDependencies("ts-jest", "@types/jest")
 
-	devDependenciesMap, ok := devDependencies.(map[string]interface{})
-	if !ok {
-		return errors.New("devDependencies assert failed")
-	}
+	return nil
+}
 
-	if _, ok := devDependenciesMap["ts-jest"]; !ok {
-		// download ts-jest
-		npmInstalldependencies("ts-jest")
-	}
-
-	if _, ok := devDependenciesMap["@types/jest"]; !ok {
-		// download @types/jest
-		npmInstalldependencies("@types/jest")
-	}
-
+// 清空文件，重新写入内容
+func truncAndReWrieFile(packageFile *os.File, content map[string]interface{}) error {
 	// 将读写符重置到文件的起始位置
-	_, err = packageFile.Seek(0, io.SeekStart)
+	_, err := packageFile.Seek(0, io.SeekStart)
 	if err != nil {
 		return err
 	}
@@ -177,12 +168,13 @@ func ChangePackageFile() error {
 		return err
 	}
 
-	// 写入新内容
-	result, err := jsonIndentContent(packageMap)
+	// json 序列化 & 格式化
+	result, err := jsonIndentContent(content)
 	if err != nil {
 		return err
 	}
 
+	// 写入新内容
 	_, err = packageFile.Write(result)
 	if err != nil {
 		return err
@@ -191,8 +183,67 @@ func ChangePackageFile() error {
 	return nil
 }
 
-// TODO npm install ts-jest @types/jest
-func npmInstalldependencies(lib ...string) {}
+// 检查是否有安装 "ts-jest", "@types/jest"
+func checkDependencies(packageMap map[string]interface{}) error {
+	devDependencies, ok := packageMap["devDependencies"]
+	if !ok {
+		npmInstallDependencies("ts-jest", "@types/jest")
+	}
+
+	devDependenciesMap, ok := devDependencies.(map[string]interface{})
+	if !ok {
+		return errors.New("devDependencies assert failed")
+	}
+
+	if _, ok := devDependenciesMap["ts-jest"]; !ok {
+		// download ts-jest
+		npmInstallDependencies("ts-jest")
+	}
+
+	if _, ok := devDependenciesMap["@types/jest"]; !ok {
+		// download @types/jest
+		npmInstallDependencies("@types/jest")
+	}
+	return nil
+}
+
+// 添加修改 package.json 中的 "scripts", "jest" 字段
+func checkPackageFile(packageMap map[string]interface{}) error {
+	// 修改 "jest" 字段
+	err := changePackageFile(packageMap, "jest")
+	if err != nil {
+		return err
+	}
+
+	// 修改 "scripts" 字段
+	err = changePackageFile(packageMap, "scripts")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// 将字段添加到 packageMap
+func changePackageFile(packageMap map[string]interface{}, key string) error {
+	// 判断 key 是否存在
+	if value, ok := packageMap[key]; !ok {
+		// key 不存在
+		packageMap[key] = jestPackageConfig[key]
+	} else {
+		// key 存在
+		valMap, okk := value.(map[string]interface{})
+		if !okk {
+			return fmt.Errorf("%s assert failed", key)
+		}
+
+		// copy jestPackageConfig to jestMap
+		for k, v := range jestPackageConfig[key] {
+			valMap[k] = v
+		}
+	}
+	return nil
+}
 
 // json marshal & indent file
 func jsonIndentContent(v interface{}) ([]byte, error) {
