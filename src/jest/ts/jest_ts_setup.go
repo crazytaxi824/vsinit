@@ -11,37 +11,33 @@
 package ts
 
 import (
-	"bytes"
 	_ "embed" // for go:embed file use
-	"encoding/json"
 	"errors"
-	"io"
-	"local/src/util"
 	"os"
 	"os/exec"
+
+	"local/src/jest"
+	"local/src/util"
 
 	jsonvalue "github.com/Andrew-M-C/go.jsonvalue"
 )
 
-// 项目根目录下生成 test 文件夹
-const JestFolder = "test"
-
 var (
-	//go:embed jest/example.test.ts
-	jestExampleTestFile []byte
+	//go:embed cfgfiles/example.test.ts
+	exampleTestFile []byte
 
-	//go:embed jest/packagecfg.json
+	//go:embed cfgfiles/packagecfg.json
 	packageCfgJSON []byte
 )
 
-var JestFileContent = util.FileContent{
+var TSJestFileContent = util.FileContent{
 	Path:    "test/example.test.ts",
-	Content: jestExampleTestFile,
+	Content: exampleTestFile,
 }
 
 // 查看 package.json devDependencies, dependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func JestSetup() error {
+func SetupTS() error {
 	// open package.json 文件
 	packageFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
@@ -66,7 +62,7 @@ func JestSetup() error {
 
 	// package.json is not empty
 	// 反序列化读取 package.json 配置文件
-	packageRootV, err := readFileToJsonvalue(packageFile)
+	packageRootV, err := jest.ReadFileToJsonvalue(packageFile)
 	if err != nil {
 		return err
 	}
@@ -158,18 +154,6 @@ func checkLib(depV *jsonvalue.V, lib string) (bool, error) {
 	return true, nil
 }
 
-// 将文件内容 json 反序列化到 map 中。
-func readFileToJsonvalue(packageFile *os.File) (*jsonvalue.V, error) {
-	// 读取 package.json 内容
-	packageContent, err := io.ReadAll(packageFile)
-	if err != nil {
-		return nil, err
-	}
-
-	// json 反序列化
-	return jsonvalue.Unmarshal(packageContent)
-}
-
 // package.json 没有任何内容的情况下直接写文件
 func newPackageFile(packageFile *os.File) error {
 	_, err := packageFile.Write(packageCfgJSON)
@@ -186,59 +170,6 @@ func newPackageFile(packageFile *os.File) error {
 	return nil
 }
 
-// 清空文件，重新写入内容
-func truncAndWrieFile(packageFile *os.File, root *jsonvalue.V) error {
-	// json 写入字段顺序
-	orders := jsonvalue.Opt{
-		MarshalKeySequence: []string{"name", "version", "description",
-			"main", "scripts", "jest", "keywords", "author", "license", "key"},
-	}
-
-	// json 序列化
-	marshbytes, err := root.Marshal(orders)
-	if err != nil {
-		return err
-	}
-
-	// 格式化
-	var buf bytes.Buffer
-	err = json.Indent(&buf, marshbytes, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	// unescape json string
-	result, err := util.UnescapeStringInJSON(buf.String())
-	if err != nil {
-		return err
-	}
-
-	// 重置 offset 清空文件然后重新写入内容
-	return writeFile(packageFile, result)
-}
-
-func writeFile(packageFile *os.File, content string) error {
-	// 将读写符重置到文件的起始位置
-	_, err := packageFile.Seek(0, io.SeekStart)
-	if err != nil {
-		return err
-	}
-
-	// 清空文件
-	err = packageFile.Truncate(0)
-	if err != nil {
-		return err
-	}
-
-	// 写入新内容
-	_, err = packageFile.WriteString(content)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // 添加修改 package.json 中的 "scripts", "jest" 字段
 func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
 	// 反序列化 package.json 配置文件内容
@@ -248,54 +179,19 @@ func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
 	}
 
 	// 修改 "jest" 字段
-	err = checkPackageFile(packageRootV, packageConfig, "jest")
+	err = jest.CheckPackageFile(packageRootV, packageConfig, "jest")
 	if err != nil {
 		return err
 	}
 
 	// 修改 "scripts" 字段
-	err = checkPackageFile(packageRootV, packageConfig, "scripts")
+	err = jest.CheckPackageFile(packageRootV, packageConfig, "scripts")
 	if err != nil {
 		return err
 	}
 
 	// 清空 package.json 文件写入新内容
-	err = truncAndWrieFile(packageFile, packageRootV)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// 将字段添加到 packageMap
-func checkPackageFile(packageRootV, packageConfig *jsonvalue.V, key string) error {
-	// 判断 key 是否存在
-	value, err := packageRootV.Get(key)
-	if err != nil && !errors.Is(err, jsonvalue.ErrNotFound) {
-		return err
-	} else if !errors.Is(err, jsonvalue.ErrNotFound) && !value.IsObject() {
-		// 如果 jest | scripts 存在，但是不是 object 的情况
-		er := packageRootV.Delete(key)
-		if er != nil {
-			return er
-		}
-	}
-
-	cfgV, err := packageConfig.Get(key)
-	if err != nil {
-		return err
-	}
-
-	// 插入数据
-	cfgV.RangeObjects(func(k string, v *jsonvalue.V) bool {
-		_, er := packageRootV.Set(v).At(key, k)
-		if er != nil {
-			err = er
-			return false
-		}
-		return true
-	})
+	err = jest.WrieFile(packageFile, packageRootV)
 	if err != nil {
 		return err
 	}

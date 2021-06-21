@@ -10,6 +10,8 @@ import (
 	"os"
 
 	"local/src/golang"
+	"local/src/jest"
+	tsjest "local/src/jest/ts"
 	"local/src/js"
 	"local/src/python"
 	"local/src/ts"
@@ -26,7 +28,7 @@ func main() {
 
 	// flag.ExitOnError will os.Exit(2) if subcommand Parse() error.
 	tsCmd := flag.NewFlagSet("ts", flag.ExitOnError)
-	jest := tsCmd.Bool("jest", false, "add 'jest' - unit test components")
+	jestflag := tsCmd.Bool("jest", false, "add 'jest' - unit test components")
 
 	var folders []string
 	var files []util.FileContent
@@ -47,12 +49,12 @@ func main() {
 
 		folders = ts.CreateFolders
 		files = ts.FilesAndContent
-		if *jest {
-			folders = append(folders, ts.JestFolder)  // add "test" folder
-			files = append(files, ts.JestFileContent) // add jest example test file
+		if *jestflag {
+			folders = append(folders, jest.JestFolder)      // add "test" folder
+			files = append(files, tsjest.TSJestFileContent) // add jest example test file
 
 			// 设置 jest
-			err := ts.JestSetup()
+			err := tsjest.SetupTS()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(2)

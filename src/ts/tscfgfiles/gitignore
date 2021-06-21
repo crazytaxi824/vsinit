@@ -7,6 +7,7 @@
 /out
 /dist
 /node_modules
+/coverage
 
 # 配置文件永远不要暴露在 github 上，防止密码泄露
 /config.*
