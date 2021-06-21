@@ -50,9 +50,14 @@ func main() {
 		if *jest {
 			folders = append(folders, ts.JestFolder)  // add "test" folder
 			files = append(files, ts.JestFileContent) // add jest example test file
-		}
 
-		// TODO change package.json file
+			// 设置 jest
+			err := ts.JestSetup()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(2)
+			}
+		}
 
 		fmt.Println("init TypeScript project")
 	case "react":
