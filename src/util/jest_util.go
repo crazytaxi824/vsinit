@@ -1,11 +1,10 @@
-package jest
+package util
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
-	"local/src/util"
 	"os"
 
 	jsonvalue "github.com/Andrew-M-C/go.jsonvalue"
@@ -37,7 +36,7 @@ func WrieFile(packageFile *os.File, root *jsonvalue.V) error {
 	}
 
 	// unescape json string
-	result, err := util.UnescapeStringInJSON(buf.String())
+	result, err := UnescapeStringInJSON(buf.String())
 	if err != nil {
 		return err
 	}

@@ -10,9 +10,6 @@ import (
 	"os"
 
 	"local/src/golang"
-	"local/src/jest"
-	jsjest "local/src/jest/js"
-	tsjest "local/src/jest/ts"
 	"local/src/js"
 	"local/src/python"
 	"local/src/ts"
@@ -51,11 +48,11 @@ func main() {
 		folders = ts.CreateFolders
 		files = ts.FilesAndContent
 		if *jestflag {
-			folders = append(folders, jest.JestFolder)    // add "test" folder
-			files = append(files, tsjest.JestFileContent) // add jest example test file
+			folders = append(folders, util.JestFolder) // add "test" folder
+			files = append(files, ts.JestFileContent)  // add jest example test file
 
 			// 设置 jest
-			err := tsjest.SetupTS()
+			err := ts.SetupTS()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(2)
@@ -75,11 +72,11 @@ func main() {
 		folders = js.CreateFolders
 		files = js.FilesAndContent
 		if *jestflag {
-			folders = append(folders, jest.JestFolder)    // add "test" folder
-			files = append(files, jsjest.JestFileContent) // add jest example test file
+			folders = append(folders, util.JestFolder) // add "test" folder
+			files = append(files, js.JestFileContent)  // add jest example test file
 
 			// 设置 jest
-			err := jsjest.SetupJS()
+			err := js.SetupJS()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(2)

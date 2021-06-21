@@ -9,19 +9,19 @@ import (
 var CreateFolders = []string{".vscode", "src"}
 
 var (
-	//go:embed tscfgfiles/launch.json
+	//go:embed cfgfiles/launch.json
 	launchJSONContent []byte
 
-	//go:embed tscfgfiles/settings.json
+	//go:embed cfgfiles/settings.json
 	settingsJSONContent []byte
 
-	//go:embed tscfgfiles/tasks.json
+	//go:embed cfgfiles/tasks.json
 	tasksJSONContent []byte
 
-	//go:embed tscfgfiles/gitignore
+	//go:embed cfgfiles/gitignore
 	gitignoreContent []byte
 
-	//go:embed tscfgfiles/tsconfig.json
+	//go:embed cfgfiles/tsconfig.json
 	tsConfigContent []byte
 
 	//go:embed reactcfgfiles/settings.json

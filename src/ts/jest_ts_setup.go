@@ -12,21 +12,21 @@ package ts
 
 import (
 	_ "embed" // for go:embed file use
+
 	"errors"
 	"os"
 	"os/exec"
 
-	"local/src/jest"
 	"local/src/util"
 
 	jsonvalue "github.com/Andrew-M-C/go.jsonvalue"
 )
 
 var (
-	//go:embed cfgfiles/example.test.ts
+	//go:embed jestcfgfiles/example.test.ts
 	exampleTestFile []byte
 
-	//go:embed cfgfiles/packagecfg.json
+	//go:embed jestcfgfiles/packagecfg.json
 	packageCfgJSON []byte
 )
 
@@ -62,7 +62,7 @@ func SetupTS() error {
 
 	// package.json is not empty
 	// 反序列化读取 package.json 配置文件
-	packageRootV, err := jest.ReadFileToJsonvalue(packageFile)
+	packageRootV, err := util.ReadFileToJsonvalue(packageFile)
 	if err != nil {
 		return err
 	}
@@ -179,19 +179,19 @@ func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
 	}
 
 	// 修改 "jest" 字段
-	err = jest.CheckPackageFile(packageRootV, packageConfig, "jest")
+	err = util.CheckPackageFile(packageRootV, packageConfig, "jest")
 	if err != nil {
 		return err
 	}
 
 	// 修改 "scripts" 字段
-	err = jest.CheckPackageFile(packageRootV, packageConfig, "scripts")
+	err = util.CheckPackageFile(packageRootV, packageConfig, "scripts")
 	if err != nil {
 		return err
 	}
 
 	// 清空 package.json 文件写入新内容
-	err = jest.WrieFile(packageFile, packageRootV)
+	err = util.WrieFile(packageFile, packageRootV)
 	if err != nil {
 		return err
 	}
