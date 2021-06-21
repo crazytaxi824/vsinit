@@ -27,10 +27,10 @@ import (
 const JestFolder = "test"
 
 var (
-	//go:embed jesttestfiles/example.test.ts
+	//go:embed jest/example.test.ts
 	jestExampleTestFile []byte
 
-	//go:embed jesttestfiles/packagecfg.json
+	//go:embed jest/packagecfg.json
 	packageCfgJSON []byte
 )
 
