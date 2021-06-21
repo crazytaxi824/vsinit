@@ -80,6 +80,7 @@ func createAndWriteFile(fpath string, content []byte) error {
 
 // unescape \uxxxx in json string
 func UnescapeStringInJSON(src string) (string, error) {
+	// FIXME jsonvalue 的问题，等待更新
 	// 先处理 \/ 问题
 	tmp := strings.Replace(src, `\/`, "/", -1)
 
