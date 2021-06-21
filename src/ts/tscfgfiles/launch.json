@@ -31,10 +31,10 @@
       // 测试文件必须以 *.test.ts 结尾
 
       // 测试方法:
-      // npm run test xxx.test.ts
-      // npm run test-c xxx.test.ts
+      // npm run test *.test.ts
+      // npm run test-c *.test.ts
       // npm run test-c **/*.test.ts  测试所有 test 文件
-      // vscode debug 中选择的 Jest Current File
+      // 或者 vscode debug 中选择的 Jest Current File
       "name": "Jest Current File",
       "type": "node",
       "request": "launch",

@@ -1,11 +1,12 @@
-// 使用 jest 需要安装 jest 命令行工具, npm i jest -g
+// 使用 jest 单元测试需要安装 jest 命令行工具, npm i jest -g
 // 项目中安装 npm i -D @types/jest ts-jest
 // 测试文件必须以 *.test.ts 结尾
 
 // 测试方法:
-// npm run test /test/example.test.ts
-// npm run test-c /test/example.test.ts
-// vscode debug 中选择的 Jest Current File
+// npm run test *.test.ts
+// npm run test-c *.test.ts
+// npm run test-c **/*.test.ts  测试所有 test 文件
+// 或者 vscode debug 中选择的 Jest Current File
 
 package ts
 
@@ -64,6 +65,7 @@ func JestSetup() error {
 	}
 
 	// package.json is not empty
+	// 反序列化读取 package.json 配置文件
 	packageRootV, err := readFileToJsonvalue(packageFile)
 	if err != nil {
 		return err
@@ -100,6 +102,7 @@ func checkDependencies(packageRootV *jsonvalue.V) error {
 		return nil
 	} else if !depV.IsObject() {
 		// devDependencies 存在, 但不是 object
+		// 删除后重新下载依赖
 		er := packageRootV.Delete("devDependencies")
 		if er != nil {
 			return er
@@ -167,7 +170,7 @@ func readFileToJsonvalue(packageFile *os.File) (*jsonvalue.V, error) {
 	return jsonvalue.Unmarshal(packageContent)
 }
 
-// package.json 没有任何内容的情况
+// package.json 没有任何内容的情况下直接写文件
 func newPackageFile(packageFile *os.File) error {
 	_, err := packageFile.Write(packageCfgJSON)
 	if err != nil {
@@ -210,6 +213,7 @@ func truncAndWrieFile(packageFile *os.File, root *jsonvalue.V) error {
 		return err
 	}
 
+	// 重置 offset 清空文件然后重新写入内容
 	return writeFile(packageFile, result)
 }
 
