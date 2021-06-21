@@ -2,7 +2,13 @@
 
 package js
 
-import _ "embed" // for go:embed file use
+import (
+	_ "embed" // for go:embed file use
+
+	"local/src/util"
+)
+
+var CreateFolders = []string{".vscode", "src"}
 
 var (
 	//go:embed cfgfiles/launch.json
@@ -15,13 +21,6 @@ var (
 	gitignoreContent []byte
 )
 
-var FilesAndContent = map[string][]byte{
-	".vscode/launch.json":   launchJSONContent,
-	".vscode/settings.json": settingsJSONContent,
-	"src/main.js":           mainFileContent,
-	".gitignore":            gitignoreContent,
-}
-
 // file content
 var mainFileContent = []byte(`main();
 
@@ -29,3 +28,22 @@ function main() {
   console.log('hello world');
 }
 `)
+
+var FilesAndContent = []util.FileContent{
+	{
+		Path:    ".vscode/launch.json",
+		Content: launchJSONContent,
+	},
+	{
+		Path:    ".vscode/settings.json",
+		Content: settingsJSONContent,
+	},
+	{
+		Path:    ".gitignore",
+		Content: gitignoreContent,
+	},
+	{
+		Path:    "src/main.js",
+		Content: mainFileContent,
+	},
+}

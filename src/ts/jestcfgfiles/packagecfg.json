@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test-c": "jest --coverage"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "preset": "ts-jest"
+  }
+}

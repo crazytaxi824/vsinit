@@ -16,7 +16,7 @@
     "experimentalDecorators": true, // 使用装饰器
     "emitDecoratorMetadata": true, // 为装饰器提供元数据的支持
     // 使用 tsc --importHelpers, 当 async/await 文件中有 import/export (自己是 module)的时候。
-    "importHelpers": true, // NOTE async/await 用, 需要安装 npm i -D tslib
+    "importHelpers": true, // NOTE import/export async/await function 用, 需要安装 npm i -D tslib
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

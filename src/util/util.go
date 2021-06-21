@@ -4,73 +4,86 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
-func WriteCfgFiles(fileContent map[string][]byte) error {
-	// create .vscode & src Dir
-	fmt.Printf("creating .vscode & src directories ... ")
-	err := createVsCodeDirs()
-	if err != nil {
-		fmt.Println("fail")
-		return err
-	}
-	fmt.Println("done")
-
-	for fp, fc := range fileContent {
-		err = createAndWriteFiles(fp, fc)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+type FileContent struct {
+	Path    string
+	Content []byte
 }
 
-// create .vscode & src dir,
-func createVsCodeDirs() error {
-	err := os.Mkdir(".vscode", 0750)
-	if err != nil && !errors.Is(err, os.ErrExist) {
-		return fmt.Errorf("create .vscode Dir error: %w", err)
+func WriteCfgFiles(folders []string, fileContents []FileContent) {
+	// create folders
+	for _, v := range folders {
+		err := createDir(v)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 
-	err = os.Mkdir("src", 0750)
-	if err != nil && !errors.Is(err, os.ErrExist) {
-		return fmt.Errorf("create src Dir error: %w", err)
+	// write files
+	for _, fc := range fileContents {
+		err := createAndWriteFile(fc.Path, fc.Content)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+}
+
+func createDir(folderPath string) error {
+	fmt.Printf("creating directories: %s ... ", folderPath)
+	err := os.Mkdir(folderPath, 0750)
+	if err != nil && !errors.Is(err, os.ErrExist) { // 判断 dir 是否已经存在
+		fmt.Println("failed")
+		return fmt.Errorf("create %s Dir error: %w", folderPath, err)
 	}
 
+	fmt.Println("done")
 	return nil
 }
 
 // create and write files.
-func createAndWriteFiles(fpath string, content []byte) error {
+func createAndWriteFile(fpath string, content []byte) error {
+	fmt.Printf("writing file: %s ... ", fpath)
 	f, err := os.OpenFile(fpath, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
+		fmt.Println("failed")
 		return fmt.Errorf("create %s Files error: %w", fpath, err)
 	}
-	defer func() {
-		if er := f.Close(); er != nil {
-			fmt.Println(er)
-			return
-		}
-	}()
+	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
+		fmt.Println("failed")
 		return fmt.Errorf("get %s File status error: %w", fpath, err)
 	}
 
 	// file is not empty, DO NOT TOUCH.
 	if fi.Size() != 0 {
+		fmt.Println("skip, file already exists.")
 		return nil
 	}
 
-	fmt.Printf("writing file: %s ... ", fpath)
 	// write file content
 	_, err = f.Write(content)
 	if err != nil {
-		fmt.Println("fail")
+		fmt.Println("failed")
 		return fmt.Errorf("write file %s error: %w", fpath, err)
 	}
-	fmt.Println("done")
 
+	fmt.Println("done")
 	return nil
+}
+
+// unescape \uxxxx in json string
+func UnescapeStringInJSON(src string) (string, error) {
+	// FIXME jsonvalue 的问题，等待更新
+	// 先处理 \/ 问题
+	tmp := strings.Replace(src, `\/`, "/", -1)
+
+	// NOTE 注意 repalce 的时候只能用 `` 符号，否则 \\ 在一起是转义的. 需要用 4 个 \\\\u
+	return strconv.Unquote(strings.Replace(strconv.Quote(tmp), `\\u`, `\u`, -1))
 }
