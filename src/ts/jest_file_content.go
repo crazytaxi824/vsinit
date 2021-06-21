@@ -25,49 +25,21 @@ import (
 // 项目根目录下生成 test 文件夹
 const JestFolder = "test"
 
-//go:embed jesttestfiles/example.test.ts
-var jestExampleTestFile []byte
+var (
+	//go:embed jesttestfiles/example.test.ts
+	jestExampleTestFile []byte
+
+	//go:embed jesttestfiles/packagecfg.json
+	packageCfgJSON []byte
+)
 
 var JestFileContent = util.FileContent{
 	Path:    "test/example.test.ts",
 	Content: jestExampleTestFile,
 }
 
-// package.json 文件中需要设置的参数
-var scriptsConfig = map[string]string{
-	"build":  "tsc",
-	"test":   "jest",
-	"test-c": "jest --coverage",
-}
-
-var jestConfig = map[string]string{
-	"testEnvironment": "node",
-	"preset":          "ts-jest",
-}
-
-var packageConfig = map[string]map[string]string{
-	"scripts": scriptsConfig,
-	"jest":    jestConfig,
-}
-
-var packageConfigInterface = map[string]interface{}{
-	"scripts": scriptsConfig,
-	"jest":    jestConfig,
-}
-
 // 查看 package.json devDependencies, dependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-// 查看 package.json 是否写了 "jest", "scripts" 字段
-//   "scripts": {
-//     "build": "tsc",
-//     "test": "jest",
-//     "test-c": "jest --coverage"
-//   },
-//   "jest": {
-//     "testEnvironment": "node",
-//     "preset": "ts-jest"
-//   },
-// add "scripts" and "jest" to package.json file
 func JestSetup() error {
 	// open package.json 文件
 	packageFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
@@ -97,7 +69,7 @@ func JestSetup() error {
 		return err
 	}
 
-	// // 检查 package.json 中是否有 "scripts" 和 "jest"
+	// 检查 package.json 中是否有 "scripts" 和 "jest"
 	err = setPackageFile(packageFile, packageRootV)
 	if err != nil {
 		return err
@@ -119,14 +91,29 @@ func checkDependencies(packageRootV *jsonvalue.V) error {
 	depV, err := packageRootV.Get("devDependencies")
 	if err != nil && !errors.Is(err, jsonvalue.ErrNotFound) {
 		return err
-	} else if !errors.Is(err, jsonvalue.ErrNotFound) && !depV.IsObject() {
+	} else if errors.Is(err, jsonvalue.ErrNotFound) {
+		// devDependencies 不存在, npm install ts-jest @types/jest
+		er := npmInstallDependencies("ts-jest", "@types/jest")
+		if er != nil {
+			return er
+		}
+		return nil
+	} else if !depV.IsObject() {
 		// devDependencies 存在, 但不是 object
 		er := packageRootV.Delete("devDependencies")
 		if er != nil {
 			return er
 		}
+
+		// npm install ts-jest @types/jest
+		er = npmInstallDependencies("ts-jest", "@types/jest")
+		if er != nil {
+			return er
+		}
+		return nil
 	}
 
+	// devDependencies 存在, 而且是 object
 	// 检查 dependencies 中的依赖是否存在 "ts-jest", "@types/jest"
 	tsjest, err := checkLib(depV, "ts-jest")
 	if err != nil {
@@ -180,26 +167,9 @@ func readFileToJsonvalue(packageFile *os.File) (*jsonvalue.V, error) {
 	return jsonvalue.Unmarshal(packageContent)
 }
 
-// npm install ts-jest @types/jest
-func npmInstallDependencies(libs ...string) error {
-	for _, lib := range libs {
-		cmd := exec.Command("npm", "i", "-D", lib)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err := cmd.Run()
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // package.json 没有任何内容的情况
 func newPackageFile(packageFile *os.File) error {
-	// 先将 "scripts" and "jest" 写入 packagefile
-	root := jsonvalue.NewObject(packageConfigInterface)
-
-	err := truncAndWrieFile(packageFile, root)
+	_, err := packageFile.Write(packageCfgJSON)
 	if err != nil {
 		return err
 	}
@@ -267,14 +237,20 @@ func writeFile(packageFile *os.File, content string) error {
 
 // 添加修改 package.json 中的 "scripts", "jest" 字段
 func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
+	// 反序列化 package.json 配置文件内容
+	packageConfig, err := jsonvalue.Unmarshal(packageCfgJSON)
+	if err != nil {
+		return err
+	}
+
 	// 修改 "jest" 字段
-	err := checkPackageFile(packageRootV, "jest")
+	err = checkPackageFile(packageRootV, packageConfig, "jest")
 	if err != nil {
 		return err
 	}
 
 	// 修改 "scripts" 字段
-	err = checkPackageFile(packageRootV, "scripts")
+	err = checkPackageFile(packageRootV, packageConfig, "scripts")
 	if err != nil {
 		return err
 	}
@@ -289,26 +265,50 @@ func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
 }
 
 // 将字段添加到 packageMap
-func checkPackageFile(packageRootV *jsonvalue.V, key string) error {
+func checkPackageFile(packageRootV, packageConfig *jsonvalue.V, key string) error {
 	// 判断 key 是否存在
 	value, err := packageRootV.Get(key)
 	if err != nil && !errors.Is(err, jsonvalue.ErrNotFound) {
 		return err
 	} else if !errors.Is(err, jsonvalue.ErrNotFound) && !value.IsObject() {
 		// 如果 jest | scripts 存在，但是不是 object 的情况
-		err = packageRootV.Delete(key)
-		if err != nil {
-			return err
+		er := packageRootV.Delete(key)
+		if er != nil {
+			return er
 		}
+	}
+
+	cfgV, err := packageConfig.Get(key)
+	if err != nil {
+		return err
 	}
 
 	// 插入数据
-	for k, v := range packageConfig[key] {
-		_, err = packageRootV.SetString(v).At(key, k)
+	cfgV.RangeObjects(func(k string, v *jsonvalue.V) bool {
+		_, er := packageRootV.Set(v).At(key, k)
+		if er != nil {
+			err = er
+			return false
+		}
+		return true
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// npm install ts-jest @types/jest
+func npmInstallDependencies(libs ...string) error {
+	for _, lib := range libs {
+		cmd := exec.Command("npm", "i", "-D", lib)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
