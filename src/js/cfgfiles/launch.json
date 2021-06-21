@@ -20,6 +20,24 @@
       "console": "integratedTerminal",
       "disableOptimisticBPs": true,
       "program": "${workspaceFolder}/src/main.js"
+    },
+    {
+      // 使用 jest 单元测试需要安装 jest 命令行工具, npm i jest -g
+      // 测试文件必须以 *.test.js 结尾
+
+      // 测试方法:
+      // npm run test *.test.js
+      // npm run test-c *.test.js
+      // npm run test-c **/*.test.js  测试所有 test 文件
+      // 或者 vscode debug 中选择的 Jest Current File
+      "name": "Jest Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "/usr/local/bin/jest", // jest 命令行工具位置
+      "args": ["--coverage", "${file}"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true
     }
   ]
 }
