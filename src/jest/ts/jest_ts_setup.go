@@ -30,7 +30,7 @@ var (
 	packageCfgJSON []byte
 )
 
-var TSJestFileContent = util.FileContent{
+var JestFileContent = util.FileContent{
 	Path:    "test/example.test.ts",
 	Content: exampleTestFile,
 }

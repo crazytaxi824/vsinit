@@ -10,6 +10,8 @@
 package js
 
 import (
+	_ "embed" // for go:embed file use
+
 	"local/src/jest"
 	"local/src/util"
 	"os"
@@ -18,14 +20,14 @@ import (
 )
 
 var (
-	//go:embed cfgfiles/example.test.ts
+	//go:embed cfgfiles/example.test.js
 	exampleTestFile []byte
 
 	//go:embed cfgfiles/packagecfg.json
 	packageCfgJSON []byte
 )
 
-var JSJestFileContent = util.FileContent{
+var JestFileContent = util.FileContent{
 	Path:    "test/example.test.js",
 	Content: exampleTestFile,
 }
