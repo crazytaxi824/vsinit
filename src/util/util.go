@@ -80,6 +80,9 @@ func createAndWriteFile(fpath string, content []byte) error {
 
 // unescape \uxxxx in json string
 func UnescapeStringInJSON(src string) (string, error) {
+	// 先处理 \/ 问题
+	tmp := strings.Replace(src, `\/`, "/", -1)
+
 	// NOTE 注意 repalce 的时候只能用 `` 符号，否则 \\ 在一起是转义的. 需要用 4 个 \\\\u
-	return strconv.Unquote(strings.Replace(strconv.Quote(src), `\\u`, `\u`, -1))
+	return strconv.Unquote(strings.Replace(strconv.Quote(tmp), `\\u`, `\u`, -1))
 }
