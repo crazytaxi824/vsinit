@@ -86,12 +86,12 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 
 	// NOTE write project files first
 	fmt.Println("init TypeScript project")
-	if err := util.WriteCfgFiles(folders, files); err != nil {
+	if err := util.WriteFoldersAndFiles(folders, files); err != nil {
 		return err
 	}
 
 	// then npm install after wirte package.json file
-	if err := util.NpmInstallDependencies(npmLibs...); err != nil {
+	if err := util.NpmInstallDependencies("", npmLibs...); err != nil {
 		return err
 	}
 

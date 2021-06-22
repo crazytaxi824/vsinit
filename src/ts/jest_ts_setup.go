@@ -32,7 +32,7 @@ var jestFileContent = util.FileContent{
 // TS 中 jest 所需要的依赖
 var jestDependencies = []string{"@types/jest", "ts-jest"}
 
-// 查看 package.json devDependencies, dependencies 是否下载了 @types/jest, ts-jest
+// 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
 func setupJest() (libs []string, err error) {
 	// open package.json 文件

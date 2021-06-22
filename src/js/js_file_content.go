@@ -75,5 +75,5 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	}
 
 	fmt.Println("init JavaScript project")
-	return util.WriteCfgFiles(folders, files)
+	return util.WriteFoldersAndFiles(folders, files)
 }

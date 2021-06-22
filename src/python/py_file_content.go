@@ -45,5 +45,5 @@ func InitProject() error {
 	files := filesAndContent
 
 	fmt.Println("init Python project")
-	return util.WriteCfgFiles(folders, files)
+	return util.WriteFoldersAndFiles(folders, files)
 }

@@ -46,5 +46,5 @@ func InitProject() error {
 	files := filesAndContent
 
 	fmt.Println("init Golang project")
-	return util.WriteCfgFiles(folders, files)
+	return util.WriteFoldersAndFiles(folders, files)
 }

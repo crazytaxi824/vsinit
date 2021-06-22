@@ -15,7 +15,7 @@ type FileContent struct {
 }
 
 // create folders and write project files.
-func WriteCfgFiles(folders []string, fileContents []FileContent) error {
+func WriteFoldersAndFiles(folders []string, fileContents []FileContent) error {
 	// create folders
 	for _, v := range folders {
 		err := createDir(v)
@@ -90,15 +90,23 @@ func UnescapeStringInJSON(src string) (string, error) {
 }
 
 // npm install libs to devDependencies
-func NpmInstallDependencies(libs ...string) error {
-	for _, lib := range libs {
-		cmd := exec.Command("npm", "i", "-D", lib)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err := cmd.Run()
-		if err != nil {
-			return err
-		}
+// 指定位置安装 eslint 所需依赖
+func NpmInstallDependencies(path string, libs ...string) error {
+	if len(libs) == 0 {
+		return nil
 	}
-	return nil
+
+	results := []string{"i", "-D"}
+
+	// 指定下载到什么地方
+	if path != "" {
+		results = append(results, "--prefix", path)
+	}
+
+	// 执行命令
+	results = append(results, libs...)
+	cmd := exec.Command("npm", results...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
