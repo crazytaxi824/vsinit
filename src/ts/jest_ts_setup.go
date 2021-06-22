@@ -12,203 +12,92 @@ package ts
 
 import (
 	_ "embed" // for go:embed file use
-
+	"encoding/json"
 	"errors"
+	"io"
+
 	"os"
-	"os/exec"
 
 	"local/src/util"
-
-	jsonvalue "github.com/Andrew-M-C/go.jsonvalue"
 )
 
-var (
-	//go:embed jestcfgfiles/example.test.ts
-	exampleTestFile []byte
+const testFolder = "test"
 
-	//go:embed jestcfgfiles/packagecfg.json
-	packageCfgJSON []byte
-)
-
-var JestFileContent = util.FileContent{
-	Path:    "test/example.test.ts",
-	Content: exampleTestFile,
+// jestFileContent add example of unit test
+var jestFileContent = util.FileContent{
+	Path:    testFolder + "/example.test.ts",
+	Content: exampleTestTS,
 }
 
-// 查看 package.json devDependencies, dependencies 是否下载了 @types/jest, ts-jest
+// TS 中 jest 所需要的依赖
+var jestDependencies = []string{"@types/jest", "ts-jest"}
+
+// 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func SetupTS() error {
+func setupJest() (libs []string, err error) {
 	// open package.json 文件
-	packageFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
+	pkgFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer packageFile.Close()
+	defer pkgFile.Close()
 
 	// 获取 file info
-	packageInfo, err := packageFile.Stat()
+	pkgInfo, err := pkgFile.Stat()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// package.json is empty
-	if packageInfo.Size() == 0 {
-		err = newPackageFile(packageFile)
-		if err != nil {
-			return err
-		}
-		return nil
+	if pkgInfo.Size() == 0 {
+		// NOTE package.json shouldn't be empty
+		return nil, errors.New("package.json shouldn't be empty, please re-initialize the project")
 	}
 
-	// package.json is not empty
-	// 反序列化读取 package.json 配置文件
-	packageRootV, err := util.ReadFileToJsonvalue(packageFile)
+	pkgMap, err := readFileToMap(pkgFile)
 	if err != nil {
-		return err
-	}
-
-	// 检查 package.json 中是否有 "scripts" 和 "jest"
-	err = setPackageFile(packageFile, packageRootV)
-	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// 查看 devDependencies 是否有下载
 	// npm install ts-jest @types/jest
-	err = checkDependencies(packageRootV)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return checkDependencies(pkgMap, jestDependencies)
 }
 
-// 检查 devDependencies and dependencies 是否有安装 "ts-jest", "@types/jest"
-func checkDependencies(packageRootV *jsonvalue.V) error {
+func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
+	byt, err := io.ReadAll(packageFile)
+	if err != nil {
+		return nil, err
+	}
+
+	m := make(map[string]interface{})
+	err = json.Unmarshal(byt, &m)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// 检查 devDependencies 是否有安装 "ts-jest", "@types/jest"
+func checkDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
+	var result []string
+
+	devDependencies, ok := pkgMap["devDependencies"]
+	if !ok {
+		return libs, nil
+	}
+
+	dev, ok := devDependencies.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("devDependencies assert error: is not an Object")
+	}
+
 	// 检查 dependencies 是否存在
-	depV, err := packageRootV.Get("devDependencies")
-	if err != nil && !errors.Is(err, jsonvalue.ErrNotFound) {
-		return err
-	} else if errors.Is(err, jsonvalue.ErrNotFound) {
-		// devDependencies 不存在, npm install ts-jest @types/jest
-		er := npmInstallDependencies("ts-jest", "@types/jest")
-		if er != nil {
-			return er
-		}
-		return nil
-	} else if !depV.IsObject() {
-		// devDependencies 存在, 但不是 object
-		// 删除后重新下载依赖
-		er := packageRootV.Delete("devDependencies")
-		if er != nil {
-			return er
-		}
-
-		// npm install ts-jest @types/jest
-		er = npmInstallDependencies("ts-jest", "@types/jest")
-		if er != nil {
-			return er
-		}
-		return nil
-	}
-
-	// devDependencies 存在, 而且是 object
-	// 检查 dependencies 中的依赖是否存在 "ts-jest", "@types/jest"
-	tsjest, err := checkLib(depV, "ts-jest")
-	if err != nil {
-		return err
-	}
-
-	typeJest, err := checkLib(depV, "@types/jest")
-	if err != nil {
-		return err
-	}
-
-	var libs []string
-	if !tsjest {
-		libs = append(libs, "ts-jest")
-	}
-
-	if !typeJest {
-		libs = append(libs, "@types/jest")
-	}
-
-	// npm install ts-jest @types/jest
-	err = npmInstallDependencies(libs...)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// 检查是否有安装 "ts-jest", "@types/jest"
-func checkLib(depV *jsonvalue.V, lib string) (bool, error) {
-	_, err := depV.Get(lib)
-	if err != nil && !errors.Is(err, jsonvalue.ErrNotFound) {
-		return false, err
-	} else if errors.Is(err, jsonvalue.ErrNotFound) {
-		return false, nil
-	}
-
-	return true, nil
-}
-
-// package.json 没有任何内容的情况下直接写文件
-func newPackageFile(packageFile *os.File) error {
-	_, err := packageFile.Write(packageCfgJSON)
-	if err != nil {
-		return err
-	}
-
-	// npm install ts-jest @types/jest
-	err = npmInstallDependencies("ts-jest", "@types/jest")
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// 添加修改 package.json 中的 "scripts", "jest" 字段
-func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
-	// 反序列化 package.json 配置文件内容
-	packageConfig, err := jsonvalue.Unmarshal(packageCfgJSON)
-	if err != nil {
-		return err
-	}
-
-	// 修改 "jest" 字段
-	err = util.CheckPackageFile(packageRootV, packageConfig, "jest")
-	if err != nil {
-		return err
-	}
-
-	// 修改 "scripts" 字段
-	err = util.CheckPackageFile(packageRootV, packageConfig, "scripts")
-	if err != nil {
-		return err
-	}
-
-	// 清空 package.json 文件写入新内容
-	err = util.WrieFile(packageFile, packageRootV)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// npm install ts-jest @types/jest
-func npmInstallDependencies(libs ...string) error {
 	for _, lib := range libs {
-		cmd := exec.Command("npm", "i", "-D", lib)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err := cmd.Run()
-		if err != nil {
-			return err
+		if _, ok := dev[lib]; !ok {
+			result = append(result, lib)
 		}
 	}
-	return nil
+
+	return result, nil
 }

@@ -2,90 +2,98 @@ package ts
 
 import (
 	_ "embed" // for go:embed file use
+	"flag"
+	"fmt"
+	"os"
 
 	"local/src/util"
 )
 
-var CreateFolders = []string{".vscode", "src"}
+var createFolders = []string{".vscode", "src"}
 
 var (
 	//go:embed cfgfiles/launch.json
-	launchJSONContent []byte
+	launchJSON []byte
 
 	//go:embed cfgfiles/settings.json
-	settingsJSONContent []byte
+	settingsJSON []byte
 
 	//go:embed cfgfiles/tasks.json
-	tasksJSONContent []byte
+	tasksJSON []byte
 
 	//go:embed cfgfiles/gitignore
-	gitignoreContent []byte
+	gitignore []byte
+
+	//go:embed cfgfiles/package.json
+	packageJSON []byte
 
 	//go:embed cfgfiles/tsconfig.json
-	tsConfigContent []byte
+	tsconfigJSON []byte
 
-	//go:embed reactcfgfiles/settings.json
-	reactSettingsJSONContent []byte
+	//go:embed cfgfiles/example.test.ts
+	exampleTestTS []byte
 )
 
-var mainFileContent = []byte(`main();
+var mainTS = []byte(`main();
 
 function main() {
   console.log('hello world');
 }
 `)
 
-var FilesAndContent = []util.FileContent{
-	{
-		Path:    ".vscode/launch.json",
-		Content: launchJSONContent,
-	},
-	{
-		Path:    ".vscode/tasks.json",
-		Content: tasksJSONContent,
-	},
-	{
-		Path:    ".vscode/settings.json",
-		Content: settingsJSONContent,
-	},
-	{
-		Path:    ".gitignore",
-		Content: gitignoreContent,
-	},
-	{
-		Path:    "tsconfig.json",
-		Content: tsConfigContent,
-	},
-	{
-		Path:    "src/main.ts",
-		Content: mainFileContent,
-	},
+var filesAndContent = []util.FileContent{
+	{Path: ".vscode/launch.json", Content: launchJSON},
+	{Path: ".vscode/tasks.json", Content: tasksJSON},
+	{Path: ".vscode/settings.json", Content: settingsJSON},
+	{Path: ".gitignore", Content: gitignore},
+	{Path: "package.json", Content: packageJSON},
+	{Path: "tsconfig.json", Content: tsconfigJSON},
+	{Path: "src/main.ts", Content: mainTS},
 }
 
-var ReactFilesAndContent = []util.FileContent{
-	{
-		Path:    ".vscode/launch.json",
-		Content: launchJSONContent,
-	},
-	{
-		Path:    ".vscode/tasks.json",
-		Content: tasksJSONContent,
-	},
-	{
-		// 主要修改是 setting，里面改变了 lint 的 config 文件地址
-		Path:    ".vscode/settings.json",
-		Content: reactSettingsJSONContent,
-	},
-	{
-		Path:    ".gitignore",
-		Content: gitignoreContent,
-	},
-	{
-		Path:    "tsconfig.json",
-		Content: tsConfigContent,
-	},
-	{
-		Path:    "src/main.ts",
-		Content: mainFileContent,
-	},
+func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
+	// 必须 node 和 typescript 都安装了.
+	if err := util.CheckCMDInstall("node", "tsc"); err != nil {
+		return err
+	}
+
+	// parse arges first
+	// nolint // flag.ExitOnError will do the os.Exit(2)
+	tsjsSet.Parse(os.Args[2:])
+
+	folders := createFolders
+	files := filesAndContent
+
+	var npmLibs []string // Dependencies needs to be downloaded
+
+	if *jestflag {
+		// 检查 jest 是否安装
+		if err := util.CheckCMDInstall("jest"); err != nil {
+			return err
+		}
+
+		// add jest example test file
+		folders = append(folders, testFolder)
+		files = append(files, jestFileContent)
+
+		// 设置 jest
+		var err error
+		npmLibs, err = setupJest()
+		if err != nil {
+			return err
+		}
+	}
+
+	// NOTE write project files first
+	fmt.Println("init TypeScript project")
+	if err := util.WriteFoldersAndFiles(folders, files); err != nil {
+		return err
+	}
+
+	// then npm install after wirte package.json file
+	if err := util.NpmInstallDependencies("", npmLibs...); err != nil {
+		return err
+	}
+
+	return nil
 }

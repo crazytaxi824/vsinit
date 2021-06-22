@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -13,13 +14,13 @@ type FileContent struct {
 	Content []byte
 }
 
-func WriteCfgFiles(folders []string, fileContents []FileContent) {
+// create folders and write project files.
+func WriteFoldersAndFiles(folders []string, fileContents []FileContent) error {
 	// create folders
 	for _, v := range folders {
 		err := createDir(v)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
 	}
 
@@ -27,10 +28,10 @@ func WriteCfgFiles(folders []string, fileContents []FileContent) {
 	for _, fc := range fileContents {
 		err := createAndWriteFile(fc.Path, fc.Content)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
 	}
+	return nil
 }
 
 func createDir(folderPath string) error {
@@ -86,4 +87,26 @@ func UnescapeStringInJSON(src string) (string, error) {
 
 	// NOTE 注意 repalce 的时候只能用 `` 符号，否则 \\ 在一起是转义的. 需要用 4 个 \\\\u
 	return strconv.Unquote(strings.Replace(strconv.Quote(tmp), `\\u`, `\u`, -1))
+}
+
+// npm install libs to devDependencies
+// 指定位置安装 eslint 所需依赖
+func NpmInstallDependencies(path string, libs ...string) error {
+	if len(libs) == 0 {
+		return nil
+	}
+
+	results := []string{"i", "-D"}
+
+	// 指定下载到什么地方
+	if path != "" {
+		results = append(results, "--prefix", path)
+	}
+
+	// 执行命令
+	results = append(results, libs...)
+	cmd := exec.Command("npm", results...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
