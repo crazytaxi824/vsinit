@@ -26,10 +26,9 @@
       // 测试文件必须以 *.test.js 结尾
 
       // 测试方法:
-      // npm run test  当前文件
-      // npm run test-c
-      // npm run test-c test/example.test.ts  指定文件
-      // npm run test-c **/*.test.ts  测试所有 test 文件
+      // jest                 // 所有文件
+      // jest test/*.test.js  // 指定文件
+      // jest --coverage xxx  // 显示 coverage
       // 或者 vscode debug 中选择的 Jest Current File
       "name": "Jest Current File",
       "type": "node",
