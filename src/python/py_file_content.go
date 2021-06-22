@@ -10,16 +10,16 @@ var CreateFolders = []string{".vscode", "src"}
 
 var (
 	//go:embed cfgfiles/launch.json
-	launchJSONContent []byte
+	launchJSON []byte
 
 	//go:embed cfgfiles/settings.json
-	settingsJSONContent []byte
+	settingsJSON []byte
 
 	//go:embed cfgfiles/gitignore
-	gitignoreContent []byte
+	gitignore []byte
 )
 
-var mainFileContent = []byte(`def main():
+var mainPY = []byte(`def main():
     print("hello world")
 
 
@@ -29,18 +29,18 @@ main()
 var FilesAndContent = []util.FileContent{
 	{
 		Path:    ".vscode/launch.json",
-		Content: launchJSONContent,
+		Content: launchJSON,
 	},
 	{
 		Path:    ".vscode/settings.json",
-		Content: settingsJSONContent,
+		Content: settingsJSON,
 	},
 	{
 		Path:    ".gitignore",
-		Content: gitignoreContent,
+		Content: gitignore,
 	},
 	{
 		Path:    "src/main.py",
-		Content: mainFileContent,
+		Content: mainPY,
 	},
 }

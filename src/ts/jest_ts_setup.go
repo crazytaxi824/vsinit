@@ -24,15 +24,15 @@ import (
 
 var (
 	//go:embed jestcfgfiles/example.test.ts
-	exampleTestFile []byte
+	exampleTestTS []byte
 
 	//go:embed jestcfgfiles/packagecfg.json
-	packageCfgJSON []byte
+	jestPackageJSON []byte
 )
 
 var JestFileContent = util.FileContent{
 	Path:    "test/example.test.ts",
-	Content: exampleTestFile,
+	Content: exampleTestTS,
 }
 
 // 查看 package.json devDependencies, dependencies 是否下载了 @types/jest, ts-jest
@@ -156,7 +156,7 @@ func checkLib(depV *jsonvalue.V, lib string) (bool, error) {
 
 // package.json 没有任何内容的情况下直接写文件
 func newPackageFile(packageFile *os.File) error {
-	_, err := packageFile.Write(packageCfgJSON)
+	_, err := packageFile.Write(jestPackageJSON)
 	if err != nil {
 		return err
 	}
@@ -173,7 +173,7 @@ func newPackageFile(packageFile *os.File) error {
 // 添加修改 package.json 中的 "scripts", "jest" 字段
 func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
 	// 反序列化 package.json 配置文件内容
-	packageConfig, err := jsonvalue.Unmarshal(packageCfgJSON)
+	packageConfig, err := jsonvalue.Unmarshal(jestPackageJSON)
 	if err != nil {
 		return err
 	}

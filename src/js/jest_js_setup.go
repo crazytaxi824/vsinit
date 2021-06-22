@@ -20,15 +20,15 @@ import (
 
 var (
 	//go:embed jestcfgfiles/example.test.js
-	exampleTestFile []byte
+	exampleTestJS []byte
 
 	//go:embed jestcfgfiles/packagecfg.json
-	packageCfgJSON []byte
+	jestPackageJSON []byte
 )
 
 var JestFileContent = util.FileContent{
 	Path:    "test/example.test.js",
-	Content: exampleTestFile,
+	Content: exampleTestJS,
 }
 
 func SetupJS() error {
@@ -71,7 +71,7 @@ func SetupJS() error {
 }
 
 func newPackageFile(packageFile *os.File) error {
-	_, err := packageFile.Write(packageCfgJSON)
+	_, err := packageFile.Write(jestPackageJSON)
 	if err != nil {
 		return err
 	}
@@ -82,7 +82,7 @@ func newPackageFile(packageFile *os.File) error {
 // 添加修改 package.json 中的 "scripts" 字段
 func setPackageFile(packageFile *os.File, packageRootV *jsonvalue.V) error {
 	// 反序列化 package.json 配置文件内容
-	packageConfig, err := jsonvalue.Unmarshal(packageCfgJSON)
+	packageConfig, err := jsonvalue.Unmarshal(jestPackageJSON)
 	if err != nil {
 		return err
 	}
