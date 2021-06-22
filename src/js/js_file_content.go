@@ -4,11 +4,14 @@ package js
 
 import (
 	_ "embed" // for go:embed file use
+	"flag"
+	"fmt"
+	"os"
 
 	"local/src/util"
 )
 
-var CreateFolders = []string{".vscode", "src"}
+var createFolders = []string{".vscode", "src"}
 
 var (
 	//go:embed cfgfiles/launch.json
@@ -36,35 +39,41 @@ function main() {
 }
 `)
 
-// FilesAndContent JS project files
-var FilesAndContent = []util.FileContent{
-	{
-		Path:    ".vscode/launch.json",
-		Content: launchJSON,
-	},
-	{
-		Path:    ".vscode/settings.json",
-		Content: settingsJSON,
-	},
-	{
-		Path:    ".gitignore",
-		Content: gitignore,
-	},
-	{
-		Path:    "package.json",
-		Content: packageJSON,
-	},
-	{
-		Path:    "src/main.js",
-		Content: mainJS,
-	},
+// filesAndContent JS project files
+var filesAndContent = []util.FileContent{
+	{Path: ".vscode/launch.json", Content: launchJSON},
+	{Path: ".vscode/settings.json", Content: settingsJSON},
+	{Path: ".gitignore", Content: gitignore},
+	{Path: "package.json", Content: packageJSON},
+	{Path: "src/main.js", Content: mainJS},
 }
 
 // for jest use only
 
-const TestFolder = "test"
+const testFolder = "test"
 
-var JestFileContent = util.FileContent{
-	Path:    TestFolder + "/example.test.js",
+var jestFileContent = util.FileContent{
+	Path:    testFolder + "/example.test.js",
 	Content: exampleTestJS,
+}
+
+func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
+	if err := util.CheckCMDInstall("node"); err != nil {
+		return err
+	}
+
+	// parse arges first
+	// nolint // flag.ExitOnError will do the os.Exit(2)
+	tsjsSet.Parse(os.Args[2:])
+
+	folders := createFolders
+	files := filesAndContent
+	if *jestflag {
+		// add jest example test file
+		folders = append(folders, testFolder)
+		files = append(files, jestFileContent)
+	}
+
+	fmt.Println("init JavaScript project")
+	return util.WriteCfgFiles(folders, files)
 }

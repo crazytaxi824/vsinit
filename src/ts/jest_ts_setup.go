@@ -12,7 +12,6 @@ package ts
 
 import (
 	_ "embed" // for go:embed file use
-
 	"encoding/json"
 	"errors"
 	"io"
@@ -22,11 +21,11 @@ import (
 	"local/src/util"
 )
 
-const TestFolder = "test"
+const testFolder = "test"
 
-// JestFileContent add example of unit test
-var JestFileContent = util.FileContent{
-	Path:    TestFolder + "/example.test.ts",
+// jestFileContent add example of unit test
+var jestFileContent = util.FileContent{
+	Path:    testFolder + "/example.test.ts",
 	Content: exampleTestTS,
 }
 
@@ -35,7 +34,7 @@ var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 查看 package.json devDependencies, dependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func SetupTS() (libs []string, err error) {
+func setupJest() (libs []string, err error) {
 	// open package.json 文件
 	pkgFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {

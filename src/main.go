@@ -25,78 +25,42 @@ func helpMsg() {
 }
 
 func main() {
+	if err := util.CheckCMDInstall("code"); err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
+
 	if len(os.Args) < 2 {
 		helpMsg()
 		os.Exit(2)
 	}
 
 	// flag.ExitOnError will os.Exit(2) if subcommand Parse() error.
-	tsjsCmd := flag.NewFlagSet("tsjs", flag.ExitOnError)
-	jestflag := tsjsCmd.Bool("jest", false, "add 'jest' - unit test components")
+	tsjsSet := flag.NewFlagSet("tsjs", flag.ExitOnError)
+	jestflag := tsjsSet.Bool("jest", false, "add 'jest' - unit test components")
 
+	var err error
 	switch os.Args[1] {
 	case "go":
-		folders := golang.CreateFolders
-		files := golang.FilesAndContent
-
-		fmt.Println("init Golang project")
-		util.WriteCfgFiles(folders, files)
+		// TODO golangci-lint config file
+		err = golang.InitProject()
 	case "py":
-		folders := python.CreateFolders
-		files := python.FilesAndContent
-
-		fmt.Println("init Python project")
-		util.WriteCfgFiles(folders, files)
+		err = python.InitProject()
 	case "ts":
-		// parse arges first
-		// nolint // flag.ExitOnError will do the os.Exit(2)
-		tsjsCmd.Parse(os.Args[2:])
-
-		folders := ts.CreateFolders
-		files := ts.FilesAndContent
-
-		var npmLibs []string // Dependencies needs to be downloaded
-
-		if *jestflag {
-			// add jest example test file
-			folders = append(folders, ts.TestFolder)
-			files = append(files, ts.JestFileContent)
-
-			// 设置 jest
-			var err error
-			npmLibs, err = ts.SetupTS()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(2)
-			}
-		}
-
-		// NOTE write project files first
-		fmt.Println("init TypeScript project")
-		util.WriteCfgFiles(folders, files)
-
-		// then npm install after wirte package.json file
-		if err := util.NpmInstallDependencies(npmLibs...); err != nil {
-			os.Exit(2)
-		}
-
+		err = ts.InitProject(tsjsSet, jestflag)
 	case "js":
-		// parse arges first
-		// nolint // flag.ExitOnError will do the os.Exit(2)
-		tsjsCmd.Parse(os.Args[2:])
-
-		folders := js.CreateFolders
-		files := js.FilesAndContent
-		if *jestflag {
-			// add jest example test file
-			folders = append(folders, js.TestFolder)
-			files = append(files, js.JestFileContent)
-		}
-
-		fmt.Println("init JavaScript project")
-		util.WriteCfgFiles(folders, files)
+		err = js.InitProject(tsjsSet, jestflag)
+	case "eslint":
+		// TODO install eslint in a global scale
+		// -eslint <path>
 	default:
 		helpMsg()
+		os.Exit(2)
+	}
+
+	// 统一打印 error
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(2)
 	}
 }

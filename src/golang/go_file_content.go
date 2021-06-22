@@ -2,11 +2,12 @@ package golang
 
 import (
 	_ "embed" // for go:embed file use
+	"fmt"
 
 	"local/src/util"
 )
 
-var CreateFolders = []string{".vscode", "src"}
+var createFolders = []string{".vscode", "src"}
 
 var (
 	//go:embed cfgfiles/launch.json
@@ -29,21 +30,21 @@ func main() {
 }
 `)
 
-var FilesAndContent = []util.FileContent{
-	{
-		Path:    ".vscode/launch.json",
-		Content: launchJSON,
-	},
-	{
-		Path:    ".vscode/settings.json",
-		Content: settingsJSON,
-	},
-	{
-		Path:    ".gitignore",
-		Content: gitignore,
-	},
-	{
-		Path:    "src/main.go",
-		Content: mainGO,
-	},
+var filesAndContent = []util.FileContent{
+	{Path: ".vscode/launch.json", Content: launchJSON},
+	{Path: ".vscode/settings.json", Content: settingsJSON},
+	{Path: ".gitignore", Content: gitignore},
+	{Path: "src/main.go", Content: mainGO},
+}
+
+func InitProject() error {
+	if err := util.CheckCMDInstall("go"); err != nil {
+		return err
+	}
+
+	folders := createFolders
+	files := filesAndContent
+
+	fmt.Println("init Golang project")
+	return util.WriteCfgFiles(folders, files)
 }

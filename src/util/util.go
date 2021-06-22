@@ -15,13 +15,12 @@ type FileContent struct {
 }
 
 // create folders and write project files.
-func WriteCfgFiles(folders []string, fileContents []FileContent) {
+func WriteCfgFiles(folders []string, fileContents []FileContent) error {
 	// create folders
 	for _, v := range folders {
 		err := createDir(v)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
 	}
 
@@ -29,10 +28,10 @@ func WriteCfgFiles(folders []string, fileContents []FileContent) {
 	for _, fc := range fileContents {
 		err := createAndWriteFile(fc.Path, fc.Content)
 		if err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
 	}
+	return nil
 }
 
 func createDir(folderPath string) error {
