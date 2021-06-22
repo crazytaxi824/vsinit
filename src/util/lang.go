@@ -60,9 +60,6 @@ func installMsg(cmdName string) error {
 
 	case "jest":
 		return errors.New("please install 'jest' first, 'npm i -g jest'")
-
-	case "eslint":
-		return errors.New("please install 'eslint' first, 'npm i -g eslint'")
 	}
 
 	return errors.New("command is not in the list, please contact author")

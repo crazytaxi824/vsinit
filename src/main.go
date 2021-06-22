@@ -42,7 +42,6 @@ func main() {
 	var err error
 	switch os.Args[1] {
 	case "go":
-		// TODO golangci-lint config file
 		err = golang.InitProject()
 	case "py":
 		err = python.InitProject()
@@ -50,9 +49,6 @@ func main() {
 		err = ts.InitProject(tsjsSet, jestflag)
 	case "js":
 		err = js.InitProject(tsjsSet, jestflag)
-	case "eslint":
-		// TODO install eslint in a global scale
-		// -eslint <path>
 	default:
 		helpMsg()
 		os.Exit(2)
