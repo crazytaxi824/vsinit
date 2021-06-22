@@ -47,12 +47,12 @@ var FilesAndContent = []util.FileContent{
 		Content: settingsJSON,
 	},
 	{
-		Path:    "package.json",
-		Content: packageJSON,
-	},
-	{
 		Path:    ".gitignore",
 		Content: gitignore,
+	},
+	{
+		Path:    "package.json",
+		Content: packageJSON,
 	},
 	{
 		Path:    "src/main.js",

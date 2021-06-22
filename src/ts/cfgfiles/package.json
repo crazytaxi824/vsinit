@@ -1,8 +1,8 @@
 // https://nodejs.dev/learn/the-package-json-guide
 // https://jestjs.io/docs/next/configuration#testenvironment-string
 {
-  "type": "module",
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "preset": "ts-jest"
   }
 }

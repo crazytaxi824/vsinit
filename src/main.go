@@ -16,7 +16,7 @@ import (
 	"local/src/util"
 )
 
-const languages = "go/py/ts/js/react"
+const languages = "go/py/ts/js"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -28,62 +28,71 @@ func main() {
 	tsjsCmd := flag.NewFlagSet("tsjs", flag.ExitOnError)
 	jestflag := tsjsCmd.Bool("jest", false, "add 'jest' - unit test components")
 
-	var folders []string
-	var files []util.FileContent
-
 	switch os.Args[1] {
 	case "go":
-		folders = golang.CreateFolders
-		files = golang.FilesAndContent
+		folders := golang.CreateFolders
+		files := golang.FilesAndContent
+
 		fmt.Println("init Golang project")
+		util.WriteCfgFiles(folders, files)
 	case "py":
-		folders = python.CreateFolders
-		files = python.FilesAndContent
+		folders := python.CreateFolders
+		files := python.FilesAndContent
+
 		fmt.Println("init Python project")
+		util.WriteCfgFiles(folders, files)
 	case "ts":
 		// parse arges first
 		// nolint // flag.ExitOnError will do the os.Exit(2)
 		tsjsCmd.Parse(os.Args[2:])
 
-		folders = ts.CreateFolders
-		files = ts.FilesAndContent
+		folders := ts.CreateFolders
+		files := ts.FilesAndContent
+
+		var npmLibs []string // Dependencies needs to be downloaded
+
 		if *jestflag {
-			folders = append(folders, ts.TestFolder)  // add "test" folder
-			files = append(files, ts.JestFileContent) // add jest example test file
+			// add jest example test file
+			folders = append(folders, ts.TestFolder)
+			files = append(files, ts.JestFileContent)
 
 			// 设置 jest
-			err := ts.SetupTS()
+			var err error
+			npmLibs, err = ts.SetupTS()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(2)
 			}
 		}
 
+		// write project files first
 		fmt.Println("init TypeScript project")
-	case "react":
-		folders = ts.CreateFolders
-		files = ts.ReactFilesAndContent
-		fmt.Println("init React - TypeScript project")
+		util.WriteCfgFiles(folders, files)
+
+		// then npm install after wirte package.json file
+		if err := util.NpmInstallDependencies(npmLibs...); err != nil {
+			os.Exit(2)
+		}
+
 	case "js":
 		// parse arges first
 		// nolint // flag.ExitOnError will do the os.Exit(2)
 		tsjsCmd.Parse(os.Args[2:])
 
-		folders = js.CreateFolders
-		files = js.FilesAndContent
+		folders := js.CreateFolders
+		files := js.FilesAndContent
 		if *jestflag {
-			folders = append(folders, js.TestFolder)  // add "test" folder,
-			files = append(files, js.JestFileContent) // add jest example test file
+			// add jest example test file
+			folders = append(folders, js.TestFolder)
+			files = append(files, js.JestFileContent)
 		}
 
 		fmt.Println("init JavaScript project")
+		util.WriteCfgFiles(folders, files)
 	default:
 		helpMsg()
 		os.Exit(2)
 	}
-
-	// create folders and write files
-	util.WriteCfgFiles(folders, files)
 }
 
 func helpMsg() {

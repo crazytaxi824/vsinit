@@ -1,6 +1,0 @@
-{
-  "jest": {
-    "testEnvironment": "node",
-    "preset": "ts-jest"
-  }
-}

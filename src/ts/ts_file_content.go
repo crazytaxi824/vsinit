@@ -21,11 +21,14 @@ var (
 	//go:embed cfgfiles/gitignore
 	gitignore []byte
 
+	//go:embed cfgfiles/package.json
+	packageJSON []byte
+
 	//go:embed cfgfiles/tsconfig.json
 	tsconfigJSON []byte
 
-	//go:embed reactcfgfiles/settings.json
-	reactSettingsJSON []byte
+	//go:embed cfgfiles/example.test.ts
+	exampleTestTS []byte
 )
 
 var mainTS = []byte(`main();
@@ -53,32 +56,8 @@ var FilesAndContent = []util.FileContent{
 		Content: gitignore,
 	},
 	{
-		Path:    "tsconfig.json",
-		Content: tsconfigJSON,
-	},
-	{
-		Path:    "src/main.ts",
-		Content: mainTS,
-	},
-}
-
-var ReactFilesAndContent = []util.FileContent{
-	{
-		Path:    ".vscode/launch.json",
-		Content: launchJSON,
-	},
-	{
-		Path:    ".vscode/tasks.json",
-		Content: tasksJSON,
-	},
-	{
-		// 主要修改是 setting，里面改变了 lint 的 config 文件地址
-		Path:    ".vscode/settings.json",
-		Content: reactSettingsJSON,
-	},
-	{
-		Path:    ".gitignore",
-		Content: gitignore,
+		Path:    "package.json",
+		Content: packageJSON,
 	},
 	{
 		Path:    "tsconfig.json",

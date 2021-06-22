@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -13,6 +14,7 @@ type FileContent struct {
 	Content []byte
 }
 
+// create folders and write project files.
 func WriteCfgFiles(folders []string, fileContents []FileContent) {
 	// create folders
 	for _, v := range folders {
@@ -86,4 +88,18 @@ func UnescapeStringInJSON(src string) (string, error) {
 
 	// NOTE 注意 repalce 的时候只能用 `` 符号，否则 \\ 在一起是转义的. 需要用 4 个 \\\\u
 	return strconv.Unquote(strings.Replace(strconv.Quote(tmp), `\\u`, `\u`, -1))
+}
+
+// npm install libs to devDependencies
+func NpmInstallDependencies(libs ...string) error {
+	for _, lib := range libs {
+		cmd := exec.Command("npm", "i", "-D", lib)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Run()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
