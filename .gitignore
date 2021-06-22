@@ -4,5 +4,6 @@
 **/*.gorun
 **/debug
 **/.history
+**/*.bak
 **/vendor
 **/go.sum

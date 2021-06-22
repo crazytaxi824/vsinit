@@ -30,6 +30,7 @@ var (
 	jestPackageJSON []byte
 )
 
+// JestFileContent add example of unit test
 var JestFileContent = util.FileContent{
 	Path:    "test/example.test.ts",
 	Content: exampleTestTS,

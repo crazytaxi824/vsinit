@@ -74,13 +74,6 @@ func main() {
 		if *jestflag {
 			folders = append(folders, util.JestFolder) // add "test" folder
 			files = append(files, js.JestFileContent)  // add jest example test file
-
-			// 设置 jest
-			err := js.SetupJS()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(2)
-			}
 		}
 
 		fmt.Println("init JavaScript project")
