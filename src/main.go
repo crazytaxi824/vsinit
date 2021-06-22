@@ -48,8 +48,8 @@ func main() {
 		folders = ts.CreateFolders
 		files = ts.FilesAndContent
 		if *jestflag {
-			folders = append(folders, util.JestFolder) // add "test" folder
-			files = append(files, ts.JestFileContent)  // add jest example test file
+			folders = append(folders, ts.TestFolder)  // add "test" folder
+			files = append(files, ts.JestFileContent) // add jest example test file
 
 			// 设置 jest
 			err := ts.SetupTS()
@@ -72,8 +72,8 @@ func main() {
 		folders = js.CreateFolders
 		files = js.FilesAndContent
 		if *jestflag {
-			folders = append(folders, util.JestFolder) // add "test" folder
-			files = append(files, js.JestFileContent)  // add jest example test file
+			folders = append(folders, js.TestFolder)  // add "test" folder,
+			files = append(files, js.JestFileContent) // add jest example test file
 		}
 
 		fmt.Println("init JavaScript project")

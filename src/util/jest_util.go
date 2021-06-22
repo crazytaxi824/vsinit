@@ -10,16 +10,16 @@ import (
 	jsonvalue "github.com/Andrew-M-C/go.jsonvalue"
 )
 
-// 项目根目录下生成 test 文件夹
-const JestFolder = "test"
-
 // json 序列化，写入文件
 func WrieFile(packageFile *os.File, root *jsonvalue.V) error {
+	// TODO find first '{' index, set IO offset, turncate till '{', then write file.
+	// avoid overwrite comments.
+
 	// json 写入字段顺序
 	orders := jsonvalue.Opt{
 		MarshalKeySequence: []string{"name", "version", "description",
-			"main", "directories", "scripts", "jest", "keywords", "author", "license",
-			"dependencies", "devDependencies"},
+			"main", "directories", "type", "scripts", "jest", "keywords",
+			"author", "license", "dependencies", "devDependencies"},
 	}
 
 	// json 序列化

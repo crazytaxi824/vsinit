@@ -60,8 +60,11 @@ var FilesAndContent = []util.FileContent{
 	},
 }
 
-// JestFileContent add example of unit test
+// for jest use only
+
+const TestFolder = "test"
+
 var JestFileContent = util.FileContent{
-	Path:    "test/example.test.js",
+	Path:    TestFolder + "/example.test.js",
 	Content: exampleTestJS,
 }
