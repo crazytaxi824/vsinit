@@ -57,5 +57,6 @@ func installMsg(cmdName string) error {
 		return errors.New(`please install 'python' first, https://www.python.org, and then
 		install python extension 'code --install-extension ms-python.python'`)
 	}
-	return nil
+
+	return errors.New("command is not in the list, please contact author")
 }
