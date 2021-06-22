@@ -18,6 +18,12 @@ import (
 
 const languages = "go/py/ts/js"
 
+func helpMsg() {
+	fmt.Println("please specify language -", languages)
+	fmt.Println("usage: vsinit <language> [<args>]")
+	fmt.Println("eg: vsinit go")
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		helpMsg()
@@ -65,7 +71,7 @@ func main() {
 			}
 		}
 
-		// write project files first
+		// NOTE write project files first
 		fmt.Println("init TypeScript project")
 		util.WriteCfgFiles(folders, files)
 
@@ -93,10 +99,4 @@ func main() {
 		helpMsg()
 		os.Exit(2)
 	}
-}
-
-func helpMsg() {
-	fmt.Println("please specify language -", languages)
-	fmt.Println("usage: vsinit <language> [<args>]")
-	fmt.Println("eg: vsinit go")
 }

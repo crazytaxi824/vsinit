@@ -12,6 +12,7 @@ package ts
 
 import (
 	_ "embed" // for go:embed file use
+
 	"encoding/json"
 	"errors"
 	"io"
@@ -61,7 +62,7 @@ func SetupTS() (libs []string, err error) {
 
 	// 查看 devDependencies 是否有下载
 	// npm install ts-jest @types/jest
-	return checkDependencies(pkgMap, jestDependencies), nil
+	return checkDependencies(pkgMap, jestDependencies)
 }
 
 func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
@@ -79,15 +80,25 @@ func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
 }
 
 // 检查 devDependencies 是否有安装 "ts-jest", "@types/jest"
-func checkDependencies(pkgMap map[string]interface{}, libs []string) []string {
+func checkDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
 	var result []string
+
+	devDependencies, ok := pkgMap["devDependencies"]
+	if !ok {
+		return libs, nil
+	}
+
+	dev, ok := devDependencies.(map[string]interface{})
+	if !ok {
+		return nil, errors.New("devDependencies assert error: is not an Object")
+	}
 
 	// 检查 dependencies 是否存在
 	for _, lib := range libs {
-		if _, ok := pkgMap[lib]; !ok {
+		if _, ok := dev[lib]; !ok {
 			result = append(result, lib)
 		}
 	}
 
-	return result
+	return result, nil
 }
