@@ -62,8 +62,8 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	var npmLibs []string // Dependencies needs to be downloaded
 
 	if *jestflag {
-		// 检查 jest 是否安装
-		if err := util.CheckCMDInstall("npm", "jest"); err != nil {
+		// 检查 npm 是否安装
+		if err := util.CheckCMDInstall("npm"); err != nil {
 			return err
 		}
 

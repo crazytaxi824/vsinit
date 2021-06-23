@@ -65,11 +65,6 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	folders := createFolders
 	files := filesAndContent
 	if *jestflag {
-		// 检查 jest 是否安装
-		if err := util.CheckCMDInstall("jest"); err != nil {
-			return err
-		}
-
 		// add jest example test file
 		folders = append(folders, testFolder)
 		files = append(files, jestFileContent)

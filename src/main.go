@@ -13,7 +13,6 @@ import (
 	"local/src/js"
 	"local/src/python"
 	"local/src/ts"
-	"local/src/util"
 )
 
 const languages = "go/py/ts/js"
@@ -25,11 +24,6 @@ func helpMsg() {
 }
 
 func main() {
-	if err := util.CheckCMDInstall("code"); err != nil {
-		fmt.Println(err)
-		os.Exit(2)
-	}
-
 	if len(os.Args) < 2 {
 		helpMsg()
 		os.Exit(2)
