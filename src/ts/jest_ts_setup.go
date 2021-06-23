@@ -34,7 +34,7 @@ var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func setupJest() (libs []string, err error) {
+func dependenciesNeedsToInstall() (libs []string, err error) {
 	// open package.json 文件
 	pkgFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {

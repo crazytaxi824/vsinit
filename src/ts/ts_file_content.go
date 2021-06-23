@@ -59,8 +59,6 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	folders := createFolders
 	files := filesAndContent
 
-	var npmLibs []string // Dependencies needs to be downloaded
-
 	if *jestflag {
 		// 检查 npm 是否安装
 		if err := util.CheckCMDInstall("npm"); err != nil {
@@ -70,13 +68,6 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 		// add jest example test file
 		folders = append(folders, testFolder)
 		files = append(files, jestFileContent)
-
-		// 设置 jest
-		var err error
-		npmLibs, err = setupJest()
-		if err != nil {
-			return err
-		}
 	}
 
 	// NOTE write project files first
@@ -85,9 +76,25 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 		return err
 	}
 
-	// then npm install after wirte package.json file
-	if err := util.NpmInstallDependencies("", npmLibs...); err != nil {
-		return err
+	// 安装依赖
+	if *jestflag {
+		// 安装 jest
+		if err := util.CheckCMDInstall("jest"); err != nil {
+			if er := util.NpmInstallGlobalDependencies("jest"); er != nil {
+				return er
+			}
+		}
+
+		// 设置 jest，检查依赖
+		npmLibs, err := dependenciesNeedsToInstall()
+		if err != nil {
+			return err
+		}
+
+		// 下载依赖到项目中
+		if err := util.NpmInstallDependencies("", npmLibs...); err != nil {
+			return err
+		}
 	}
 
 	return nil
