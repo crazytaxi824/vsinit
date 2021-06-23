@@ -52,11 +52,6 @@ var filesAndContent = []util.FileContent{
 }
 
 func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
-	// 必须 node 和 typescript 都安装了.
-	if err := util.CheckCMDInstall("node", "npm", "tsc"); err != nil {
-		return err
-	}
-
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
 	tsjsSet.Parse(os.Args[2:])
@@ -67,8 +62,8 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	var npmLibs []string // Dependencies needs to be downloaded
 
 	if *jestflag {
-		// 检查 jest 是否安装
-		if err := util.CheckCMDInstall("jest"); err != nil {
+		// 检查 npm 是否安装
+		if err := util.CheckCMDInstall("npm"); err != nil {
 			return err
 		}
 

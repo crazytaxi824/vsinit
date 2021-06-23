@@ -50,7 +50,7 @@ func installMsg(cmdName string) error {
 		install python extension 'code --install-extension ms-python.python'`)
 
 	case "node", "npm":
-		return errors.New("please install 'node' first, https://nodejs.org/")
+		return errors.New("please install 'nodejs' first, https://nodejs.org/")
 
 	case "tsc":
 		return errors.New("please install 'typescript' first, 'npm i -g typescript'")

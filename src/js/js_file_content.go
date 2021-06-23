@@ -58,10 +58,6 @@ var jestFileContent = util.FileContent{
 }
 
 func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
-	if err := util.CheckCMDInstall("node"); err != nil {
-		return err
-	}
-
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
 	tsjsSet.Parse(os.Args[2:])
