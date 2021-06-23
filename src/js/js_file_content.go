@@ -58,10 +58,6 @@ var jestFileContent = util.FileContent{
 }
 
 func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
-	if err := util.CheckCMDInstall("node"); err != nil {
-		return err
-	}
-
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
 	tsjsSet.Parse(os.Args[2:])
@@ -69,6 +65,11 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	folders := createFolders
 	files := filesAndContent
 	if *jestflag {
+		// 检查 jest 是否安装
+		if err := util.CheckCMDInstall("jest"); err != nil {
+			return err
+		}
+
 		// add jest example test file
 		folders = append(folders, testFolder)
 		files = append(files, jestFileContent)

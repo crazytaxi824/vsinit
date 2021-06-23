@@ -38,10 +38,6 @@ var filesAndContent = []util.FileContent{
 }
 
 func InitProject() error {
-	if err := util.CheckCMDInstall("go"); err != nil {
-		return err
-	}
-
 	folders := createFolders
 	files := filesAndContent
 

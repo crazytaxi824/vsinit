@@ -35,12 +35,6 @@ var filesAndContent = []util.FileContent{
 }
 
 func InitProject() error {
-	// 有 python python3 其中一个就行
-	if er, er3 := util.CheckCMDInstall("python"),
-		util.CheckCMDInstall("python3"); er != nil || er3 != nil {
-		return er
-	}
-
 	folders := createFolders
 	files := filesAndContent
 
