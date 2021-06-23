@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// flag.ExitOnError will os.Exit(2) if subcommand Parse() error.
-	tsjsSet := flag.NewFlagSet("tsjs", flag.ExitOnError)
+	tsjsSet := flag.NewFlagSet("ts/js", flag.ExitOnError)
 	jestflag := tsjsSet.Bool("jest", false, "add 'jest' - unit test components")
 
 	var err error
