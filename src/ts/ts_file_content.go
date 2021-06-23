@@ -78,13 +78,6 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 
 	// 安装依赖
 	if *jestflag {
-		// 安装 jest
-		if err := util.CheckCMDInstall("jest"); err != nil {
-			if er := util.NpmInstallGlobalDependencies("jest"); er != nil {
-				return er
-			}
-		}
-
 		// 设置 jest，检查依赖
 		npmLibs, err := dependenciesNeedsToInstall()
 		if err != nil {

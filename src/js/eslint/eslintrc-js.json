@@ -1,0 +1,70 @@
+/*
+https://eslint.org/docs/rules/
+https://www.npmjs.com/package/@typescript-eslint/eslint-plugin
+https://www.npmjs.com/package/eslint-config-airbnb
+https://www.npmjs.com/package/eslint-config-airbnb-typescript
+https://github.com/iamturns/create-exposed-app/blob/master/.eslintrc.js
+
+需要安装的 vscode 插件
+eslint
+prettier
+
+需要 npm 安装的库:
+eslint (npm i -g)
+jest (npm i -g)
+eslint-config-airbnb-base // js 专用 lint
+eslint-plugin-promise // promise 用法
+eslint-plugin-jest  // jest unit test
+eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 rules, 所以要放到最后
+*/
+{
+  "extends": [
+    // "eslint:recommended"
+    "airbnb-base", // js 专用
+    "plugin:jest/recommended",
+    "plugin:promise/recommended", // promise
+    "prettier" // prettier 必须放在最后
+  ],
+  "env": {
+    "node": true,
+    "browser": true,
+    "es6": true,
+    "jest/globals": true
+  },
+  "plugins": ["promise", "jest"],
+  // 不需要检查的文件
+  "ignorePatterns": [
+    ".vscode",
+    "node_modules",
+    "**/vendor/",
+    "/coverage", // jest --coverage
+    "**/*.config.js"
+  ],
+  "rules": {
+    "no-console": 0, // DEBUG use only.
+    "no-prototype-builtins": "off",
+    "import/extensions": ["error", "always", { "ignorePackages": true }], // import 文件需要后缀名。
+    "import/prefer-default-export": "off",
+    // "import/no-default-export": "error",
+    "curly": "error", // FIXME not working, 强制 if/for/do/while 使用一致的括号风格
+    "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
+    "complexity": "warn", // default 20
+    // NOTE lack of no-null-keyword checks.
+
+    // 功能检查
+    "max-len": ["warn", { "code": 120 }],
+    "max-lines": ["warn", 500], // 文件不超过 n 行
+
+    // js 专用
+    "no-use-before-define": [
+      "error",
+      { "functions": false, "classes": true, "variables": true }
+    ]
+  },
+  // VVI set jest version
+  "settings": {
+    "jest": {
+      "version": 27
+    }
+  }
+}
