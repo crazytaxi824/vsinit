@@ -1,6 +1,7 @@
 {
   // golangci-lint 单独设置
   // golangci-lint 的配置文件位置
+  // "go.lintFlags": ["--config=${workspaceRoot}/golangci.yml"],
   // "go.lintFlags": ["--config=~/.golangci/release-ci.yml"],
   // lint 单文件可能有引用问题导致报错
   // "go.lintOnSave": "file",

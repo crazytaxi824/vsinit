@@ -6,5 +6,4 @@
 **/.history
 **/*.bak
 **/vendor
-**/go.mod
 **/go.sum
