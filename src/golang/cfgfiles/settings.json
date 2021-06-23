@@ -1,10 +1,21 @@
 {
-  // golangci-lint 单独设置
-  // golangci-lint 的配置文件位置
-  // "go.lintFlags": ["--config=${workspaceRoot}/golangci.yml"],
-  // "go.lintFlags": ["--config=~/.golangci/release-ci.yml"],
-  // lint 单文件可能有引用问题导致报错
-  // "go.lintOnSave": "file",
+  // golangci-lint 设置
+  "go.lintTool": "golangci-lint",
+
+  // save 时执行 golangci-lint
+  "editor.formatOnSave": true, // save 的时候格式化文件
+
+  // NOTE lint 整个 package，使用 file 检查可能有引用问题导致报错。
+  "go.lintOnSave": "package",
+
+  "go.lintFlags": [
+    "--fast", // without --fast can freeze your editor.
+
+    // golangci-lint 配置文件地址
+    // "--config=${workspaceRoot}/golangci.yml" // 本地
+    // "--config=~/.golangci/prod-ci.yml" // production
+    "--config=~/.golangci/dev-ci.yml" // development
+  ],
 
   // search.exclude 用来忽略搜索的文件夹
   // files.exclude 用来忽略工程打开的文件夹
