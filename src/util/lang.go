@@ -45,9 +45,6 @@ func installMsg(cmdName string) error {
 		return errors.New(`please install 'go' first, https://golang.org/, and then
 		install go extension 'code --install-extension golang.go'`)
 
-	case "golangci-lint":
-		return errors.New("please install 'golangci-lint', https://golangci-lint.run/")
-
 	case "python", "python3":
 		return errors.New(`please install 'python' first, https://www.python.org, and then
 		install python extension 'code --install-extension ms-python.python'`)

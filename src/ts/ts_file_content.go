@@ -53,7 +53,7 @@ var filesAndContent = []util.FileContent{
 
 func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	// 必须 node 和 typescript 都安装了.
-	if err := util.CheckCMDInstall("node", "tsc"); err != nil {
+	if err := util.CheckCMDInstall("node", "npm", "tsc"); err != nil {
 		return err
 	}
 
