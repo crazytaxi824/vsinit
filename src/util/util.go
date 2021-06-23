@@ -110,3 +110,18 @@ func NpmInstallDependencies(path string, libs ...string) error {
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
+
+func NpmInstallGlobalDependencies(libs ...string) error {
+	if len(libs) == 0 {
+		return nil
+	}
+
+	results := []string{"i", "-g"}
+
+	// 执行命令
+	results = append(results, libs...)
+	cmd := exec.Command("npm", results...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
