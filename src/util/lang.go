@@ -4,7 +4,17 @@ import (
 	"errors"
 	"os/exec"
 	"runtime"
+	"strings"
 )
+
+type ErrorMsg struct {
+	Problem  string
+	Solution []string
+}
+
+func (e ErrorMsg) Error() string {
+	return Warn(">>>>>> "+e.Problem) + "\n" + strings.Join(e.Solution, "\n")
+}
 
 // 检查是否安装了语言
 func CheckCMDInstall(langs ...string) error {
