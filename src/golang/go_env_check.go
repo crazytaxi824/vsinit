@@ -4,17 +4,18 @@ package golang
 
 import (
 	"bytes"
+	"errors"
 	"local/src/util"
 	"os"
 	"os/exec"
 )
 
-func CheckGO() error {
-	return checkGOENV()
+func CheckGO(lintFlag bool) error {
+	return checkGOENV(lintFlag)
 }
 
 // $GOBIN 是否存在
-func checkGOENV() error {
+func checkGOENV(lintFlag bool) error {
 	var errs util.Erros
 
 	// 检查 SHELL 环境设置
@@ -50,6 +51,16 @@ func checkGOENV() error {
 	err = util.CheckCMDInstall(util.GoTools...)
 	if err != nil {
 		errs = append(errs, err)
+	}
+
+	// 检查 golangci-lint
+	if lintFlag {
+		if err = checkGolangciLint(); err != nil {
+			errs = append(errs, util.ErrorMsg{
+				Problem:  "golangci-lint setup error:",
+				Solution: []string{err.Error()},
+			})
+		}
 	}
 
 	// 检查返回是否为空
@@ -95,6 +106,25 @@ func checkGOPATH() error {
 	return nil
 }
 
-// TODO 检查 lint config file 位置。
-// func checkGolangciLint() {
-// }
+// TODO
+func checkGolangciLint() error {
+	cfg, err := util.ReadVscFile()
+	if err != nil {
+		return err
+	}
+
+	if cfg.Golangci == "" {
+		return errors.New("haven't setup golangci-lint yet, please set it:\n" + util.GolintciCmd)
+	}
+
+	gof, err := os.Open(cfg.Golangci)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	} else if errors.Is(err, os.ErrNotExist) {
+		return errors.New("golangci-lint config file is missing, please re-install it:\n" + util.GolintciCmd)
+	}
+	defer gof.Close()
+
+	// 能够打开说明已经设置成功
+	return nil
+}

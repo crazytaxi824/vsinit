@@ -1,8 +1,14 @@
 package util
 
-import "strings"
+import (
+	"strings"
+)
 
-const ErrInternalMsg = "CMD is not in the list, please contact author"
+const (
+	InternalErrMsg = "CMD is not in the list, please contact author"
+
+	GolintciCmd = "vsc setup go -golangci <path>"
+)
 
 type ErrorMsg struct {
 	Problem  string

@@ -75,7 +75,7 @@ func installMsg(cmdName string) string {
 		return checkGoTools(cmdName)
 	}
 
-	return ErrInternalMsg
+	return InternalErrMsg
 }
 
 func checkGoTools(tool string) string {
@@ -99,5 +99,5 @@ func checkGoTools(tool string) string {
 	case "debug-cmd":
 		return "this is a debug test solution."
 	}
-	return ErrInternalMsg
+	return InternalErrMsg
 }

@@ -44,7 +44,7 @@ func main() {
 	case "js":
 		err = js.InitProject(tsjsSet, jestflag)
 	case "envcheck":
-		err = golang.CheckGO()
+		err = golang.CheckGO(true) // FIXME
 	default:
 		helpMsg()
 		os.Exit(2)
