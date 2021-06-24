@@ -9,8 +9,9 @@ import (
 	"os/exec"
 )
 
-// NOTE 需要和 util 中的 case match.
-var goTools = []string{"gopkgs", "go-outline", "gotests", "gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
+func CheckGO() error {
+	return checkGOENV()
+}
 
 // $GOBIN 是否存在
 func checkGOENV() error {
@@ -46,12 +47,10 @@ func checkGOENV() error {
 	// plugins:gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
 	// 检查 vscode extension 工具链.
 	// go get xxxx 安装.
-	err = util.CheckCMDInstall(goTools...)
+	err = util.CheckCMDInstall(util.GoTools...)
 	if err != nil {
 		ers = append(ers, err)
 	}
-
-	// TODO 检查 settings，launch 设置.
 
 	// 检查返回是否为空
 	if len(ers) == 0 {
@@ -95,6 +94,6 @@ func checkGOPATH() error {
 	return nil
 }
 
-// // TODO 检查 lint config file 位置。
+// TODO 检查 lint config file 位置。
 // func checkGolangciLint() {
 // }

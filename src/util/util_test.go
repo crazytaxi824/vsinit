@@ -26,3 +26,7 @@ func Test_Errors(t *testing.T) {
 
 	fmt.Println(errs2)
 }
+
+func Test_CheckCmdInstall(t *testing.T) {
+	fmt.Println(CheckCMDInstall("vscode", "omg", "haha"))
+}

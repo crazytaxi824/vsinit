@@ -43,6 +43,8 @@ func main() {
 		err = ts.InitProject(tsjsSet, jestflag)
 	case "js":
 		err = js.InitProject(tsjsSet, jestflag)
+	case "envcheck":
+		err = golang.CheckGO()
 	default:
 		helpMsg()
 		os.Exit(2)
@@ -53,4 +55,6 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
+
+	fmt.Println("All Done! Happy Hunting.")
 }

@@ -1,10 +1,14 @@
 package util
 
 import (
+	"fmt"
 	"os/exec"
 	"runtime"
 	"strings"
 )
+
+var GoTools = []string{"gopkgs", "go-outline", "gotests",
+	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
 
 type ErrorMsg struct {
 	Problem  string
@@ -27,27 +31,34 @@ func (es Erros) Error() string {
 
 // 检查是否安装了语言
 func CheckCMDInstall(langs ...string) error {
-	var es Erros
+	var result []string
 	for _, lang := range langs {
-		if err := checkCommandExistence(lang); err != nil {
-			es = append(es, err)
+		if !checkCommandExist(lang) {
+			result = append(result, lang)
 		}
 	}
 
-	if len(es) == 0 {
+	if len(result) == 0 {
 		return nil
 	}
-	return es
+
+	var solutions []string
+	for _, v := range result {
+		solution := installMsg(v)
+		solutions = append(solutions, solution...)
+	}
+
+	return ErrorMsg{
+		Problem:  fmt.Sprintf("please intall '%s' first:", strings.Join(result, ", ")),
+		Solution: solutions,
+	}
 }
 
 // 'which <cmd>'
-func checkCommandExistence(cmdName string) error {
+func checkCommandExist(cmdName string) bool {
 	cmd := exec.Command(whichCmd(), cmdName)
 	err := cmd.Run()
-	if err != nil {
-		return installMsg(cmdName)
-	}
-	return nil
+	return err == nil
 }
 
 // linux & mac(darwin) using which, windows using where
@@ -58,55 +69,32 @@ func whichCmd() string {
 	return "which"
 }
 
-func installMsg(cmdName string) ErrorMsg {
+func installMsg(cmdName string) []string {
 	switch cmdName {
 	case "code":
-		return ErrorMsg{
-			Problem:  "please install 'vscode' first",
-			Solution: []string{"you can download it at https://code.visualstudio.com"},
-		}
+		return []string{"you can download it at https://code.visualstudio.com"}
 
 	case "go":
-		return ErrorMsg{
-			Problem:  "please install 'go' first",
-			Solution: []string{"you can download it at https://golang.org/"},
-		}
+		return []string{"you can download it at https://golang.org/"}
 
 	case "node", "npm":
-		return ErrorMsg{
-			Problem:  "please install 'nodejs' first",
-			Solution: []string{"you can download it at https://nodejs.org/"},
-		}
+		return []string{"you can download it at https://nodejs.org/"}
 
 	case "tsc":
-		return ErrorMsg{
-			Problem:  "please install 'typescript' first",
-			Solution: []string{"you can run 'npm i -g typescript' at terminal"},
-		}
+		return []string{"you can run 'npm i -g typescript' at terminal"}
 
 	case "jest":
-		return ErrorMsg{
-			Problem:  "please install 'jest' first",
-			Solution: []string{"you can run 'npm i -g jest' at terminal"},
-		}
+		return []string{"you can run 'npm i -g jest' at terminal"}
 
 	case "eslint":
-		return ErrorMsg{
-			Problem:  "please install 'eslint' first",
-			Solution: []string{"you can run 'npm i -g eslint' at terminal"},
-		}
+		return []string{"you can run 'npm i -g eslint' at terminal"}
 
-	case "gopkgs", "go-outline", "gotests", "gomodifytags", "impl", "dlv", "golangci-lint", "gopls":
-		return ErrorMsg{
-			Problem:  "please install following tools:",
-			Solution: checkGoTools(cmdName),
-		}
+	case "debug-cmd", "gopkgs", "go-outline", "gotests", "gomodifytags", "impl", "dlv", "golangci-lint", "gopls":
+		// DEBUG
+		return checkGoTools(cmdName)
 	}
 
-	return ErrorMsg{
-		Problem:  "command is not in the list",
-		Solution: []string{"please contact author"},
-	}
+	return []string{"please contact author"}
 }
 
 func checkGoTools(tool string) []string {
@@ -129,6 +117,8 @@ func checkGoTools(tool string) []string {
 		solutions = append(solutions, "go get github.com/golangci/golangci-lint/cmd/golangci-lint")
 	case "gomodifytags":
 		solutions = append(solutions, "go get github.com/fatih/gomodifytags")
+		// case "debug-cmd":
+		// 	solutions = append(solutions, "this is a debug test solution.")
 	}
 
 	return solutions
