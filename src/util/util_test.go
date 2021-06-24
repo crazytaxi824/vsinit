@@ -18,11 +18,12 @@ func Test_NilSlice(t *testing.T) {
 }
 
 func Test_Errors(t *testing.T) {
-	var errs Erros
-	errs = append(errs, ErrorMsg{"a", []string{"a", "b"}}, ErrorMsg{"a", []string{"a", "b"}})
+	var errs []*Suggestion
+	errs = append(errs, &Suggestion{"a", "a\nb"}, &Suggestion{"a", "a\nb"})
 
-	var errs2 Erros
-	errs2 = append(errs2, errs, ErrorMsg{"b", []string{"a", "b"}}, ErrorMsg{"b", []string{"a", "b"}})
+	var errs2 []*Suggestion
+	errs2 = append(errs2, errs...)
+	errs2 = append(errs2, &Suggestion{"b", "a\nb"}, &Suggestion{"b", "a\nb"})
 
 	fmt.Println(errs2)
 }

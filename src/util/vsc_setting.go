@@ -20,18 +20,21 @@ func getConfigDir() (string, error) {
 	return home + "/.vsc", nil
 }
 
-func ReadVscFile() (*VscSetting, error) {
-	vsc, err := getConfigDir()
+func ReadVscFile() (*VscSetting, *Suggestion, error) {
+	vscPath, err := getConfigDir()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// 检查 "~/.vsc/vsc-config.json" 文件，看是否存在 golangci-lint 配置文件位置。
-	vscf, err := os.Open(vsc)
+	vscf, err := os.Open(vscPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return nil, err
+		return nil, nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
-		return nil, errors.New("haven't setup golangci-lint yet, please set it:\n" + GolintciCmd)
+		return nil, &Suggestion{
+			Problem:  "haven't setup golangci-lint yet, please set it:",
+			Solution: GolintciCmd,
+		}, nil
 	}
 	defer vscf.Close()
 
@@ -40,8 +43,8 @@ func ReadVscFile() (*VscSetting, error) {
 	de := json.NewDecoder(vscf)
 	err = de.Decode(&cfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &cfg, nil
+	return &cfg, nil, nil
 }
