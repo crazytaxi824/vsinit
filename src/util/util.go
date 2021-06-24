@@ -131,5 +131,5 @@ func NpmInstallGlobalDependencies(libs ...string) error {
 }
 
 func Warn(m string) string {
-	return fmt.Sprintf("\033[0;33;41m%s\033[0m", m)
+	return fmt.Sprintf("\033[0;37;41m%s\033[0m", m)
 }

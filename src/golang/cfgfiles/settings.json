@@ -1,11 +1,54 @@
 {
+  "editor.formatOnSave": true, // save 的时候格式化文件
+  "[go]": {
+    "editor.defaultFormatter": "golang.go", // go 不使用 prettier 格式化代码
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+    // Optional: Disable snippets, as they conflict with completion ranking.
+    // "editor.snippetSuggestions": "none"
+  },
+  "[go.mod]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+
+  // gopls 设置, https://github.com/golang/tools/tree/master/gopls
+  "go.useLanguageServer": true, // 使用 gopls
+  "gopls": {
+    // Add parameter placeholders when completing a function.
+    "usePlaceholders": true,
+
+    // If true, enable additional analyses with staticcheck.
+    // Warning: This will significantly increase memory usage.
+    "staticcheck": false
+  },
+
+  // DEBUG 神器，可以通过访问 http://localhost:16060 查看性能参数
+  "go.languageServerFlags": [
+    "-rpc.trace", // for more detailed debug logging
+    "serve",
+    "--debug=localhost:16060" // to investigate memory usage, see profiles
+  ],
+
+  // gotests 打印详请
+  "go.testFlags": ["-v"],
+
+  // gomodifytags json 配置, 改之前看文档
+  // https://github.com/golang/vscode-go/blob/HEAD/docs/settings.md
+  "go.addTags": {
+    "tags": "json",
+    "options": "json=omitempty",
+    "promptForTags": true, // user tags
+    "template": "",
+    "transform": "snakecase"
+  },
+
   // golangci-lint 设置
   "go.lintTool": "golangci-lint",
 
-  // save 时执行 golangci-lint
-  "editor.formatOnSave": true, // save 的时候格式化文件
-
-  // NOTE lint 整个 package，使用 file 检查可能有引用问题导致报错。
+  // NOTE save 时 golangci-lint 整个 package，使用 'file' 检查可能有引用问题导致报错。
   "go.lintOnSave": "package",
 
   "go.lintFlags": [

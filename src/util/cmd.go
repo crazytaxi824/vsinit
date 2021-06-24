@@ -53,13 +53,13 @@ func whichCmd() string {
 func installMsg(cmdName string) string {
 	switch cmdName {
 	case "code":
-		return "download it at https://code.visualstudio.com, or run\nbrew install vscode"
+		return "download it at https://code.visualstudio.com, or run:\nbrew install vscode"
 
 	case "go":
-		return "download it at https://golang.org/, or run\nbrew install go"
+		return "download it at https://golang.org/, or run:\nbrew install go"
 
 	case "node", "npm":
-		return "download it at https://nodejs.org/, or run\nbrew install node"
+		return "download it at https://nodejs.org/, or run:\nbrew install node"
 
 	case "tsc":
 		return "npm i -g typescript"

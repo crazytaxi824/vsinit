@@ -4,6 +4,7 @@ package golang
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"local/src/util"
 	"os"
@@ -35,7 +36,7 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	if sug != nil {
 		suggs = append(suggs, sug, &util.Suggestion{ // 安装 vscode 插件 GO
 			Problem: "need to install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market, or run\n" +
+			Solution: "you can install it in the vscode extentsion market, or run:\n" +
 				"code --install-extension golang.go",
 		})
 	} else {
@@ -86,7 +87,7 @@ func checkVscodeExtensions() (*util.Suggestion, error) {
 	if !bytes.Contains(out, []byte("golang.go")) {
 		return &util.Suggestion{
 			Problem: "need to install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market, or run\n" +
+			Solution: "you can install it in the vscode extentsion market, or run:\n" +
 				"code --install-extension golang.go",
 		}, nil
 	}
@@ -107,29 +108,42 @@ func checkGOPATH() *util.Suggestion {
 	return nil
 }
 
-// TODO
 func checkGolangciLint() (*util.Suggestion, error) {
-	cfg, suggestion, err := util.ReadVscFile()
+	// 读取文件
+	vscf, err := util.ReadVscFile()
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, err
+	} else if errors.Is(err, os.ErrNotExist) {
+		return &util.Suggestion{
+			Problem:  "haven't setup golangci-lint yet, please run:",
+			Solution: util.GolintciCmd,
+		}, nil
+	}
+	defer vscf.Close()
+
+	// json 反序列化
+	var cfg util.VscSetting
+	de := json.NewDecoder(vscf)
+	err = de.Decode(&cfg)
 	if err != nil {
 		return nil, err
 	}
-	if suggestion != nil {
-		return suggestion, nil
-	}
 
+	// 查找 golangci 设置
 	if cfg.Golangci == "" {
 		return &util.Suggestion{
-			Problem:  "haven't setup golangci-lint yet, please set it:",
+			Problem:  "haven't setup golangci-lint yet, please run:",
 			Solution: util.GolintciCmd,
 		}, nil
 	}
 
+	// 寻找 golangci 配置文件
 	gof, err := os.Open(cfg.Golangci)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
 		return &util.Suggestion{
-			Problem:  "golangci-lint config file is missing, please re-install it:",
+			Problem:  "golangci-lint config file is missing, please run:",
 			Solution: util.GolintciCmd,
 		}, nil
 	}
