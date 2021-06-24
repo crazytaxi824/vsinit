@@ -30,7 +30,7 @@ func CheckCMDInstall(langs ...string) error {
 	}
 
 	return ErrorMsg{
-		Problem:  fmt.Sprintf("please intall '%s' first:", strings.Join(result, ", ")),
+		Problem:  fmt.Sprintf("need to intall '%s':", strings.Join(result, ", ")),
 		Solution: solutions,
 	}
 }
@@ -53,22 +53,22 @@ func whichCmd() string {
 func installMsg(cmdName string) string {
 	switch cmdName {
 	case "code":
-		return "you can download it at https://code.visualstudio.com"
+		return "download it at https://code.visualstudio.com, or \nbrew install vscode"
 
 	case "go":
-		return "you can download it at https://golang.org/"
+		return "download it at https://golang.org/, or \nbrew install go"
 
 	case "node", "npm":
-		return "you can download it at https://nodejs.org/"
+		return "download it at https://nodejs.org/, or\nbrew install node"
 
 	case "tsc":
-		return "you can run 'npm i -g typescript' at terminal"
+		return "npm i -g typescript"
 
 	case "jest":
-		return "you can run 'npm i -g jest' at terminal"
+		return "npm i -g jest"
 
 	case "eslint":
-		return "you can run 'npm i -g eslint' at terminal"
+		return "npm i -g eslint"
 
 	case "debug-cmd", "gopkgs", "go-outline", "gotests", "gomodifytags", "impl", "dlv", "golangci-lint", "gopls":
 		// DEBUG

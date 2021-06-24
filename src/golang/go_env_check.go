@@ -15,24 +15,24 @@ func CheckGO() error {
 
 // $GOBIN 是否存在
 func checkGOENV() error {
-	var ers util.Erros
+	var errs util.Erros
 
 	// 检查 SHELL 环境设置
 	err := checkGOPATH()
 	if err != nil {
-		ers = append(ers, err)
+		errs = append(errs, err)
 	}
 
 	// 检查 go 是否安装 // 检查 code 安装
 	err = util.CheckCMDInstall("go")
 	if err != nil {
-		ers = append(ers, err)
+		errs = append(errs, err)
 	}
 
 	// 检查 vscode and extensions,
 	err = util.CheckCMDInstall("code")
 	if err != nil {
-		ers = append(ers, err, util.ErrorMsg{ // 安装 vscode 插件 GO
+		errs = append(errs, err, util.ErrorMsg{ // 安装 vscode 插件 GO
 			Problem: "please install vscode extension 'golang.go'",
 			Solution: []string{"you can install it in the vscode extentsion market,",
 				"or run 'code --install-extension golang.go'"},
@@ -40,7 +40,7 @@ func checkGOENV() error {
 	} else {
 		er := checkVscodeExtensions()
 		if er != nil {
-			ers = append(ers, er)
+			errs = append(errs, er)
 		}
 	}
 
@@ -49,15 +49,15 @@ func checkGOENV() error {
 	// go get xxxx 安装.
 	err = util.CheckCMDInstall(util.GoTools...)
 	if err != nil {
-		ers = append(ers, err)
+		errs = append(errs, err)
 	}
 
 	// 检查返回是否为空
-	if len(ers) == 0 {
+	if len(errs) == 0 {
 		return nil
 	}
 
-	return ers
+	return errs
 }
 
 // 安装 vscode 插件 GO
