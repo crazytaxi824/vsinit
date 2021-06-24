@@ -32,7 +32,7 @@ func checkGOENV() error {
 	// 检查 vscode and extensions,
 	err = util.CheckCMDInstall("code")
 	if err != nil {
-		ers = append(ers, err, util.ErrorMsg{
+		ers = append(ers, err, util.ErrorMsg{ // 安装 vscode 插件 GO
 			Problem: "please install vscode extension 'golang.go'",
 			Solution: []string{"you can install it in the vscode extentsion market,",
 				"or run 'code --install-extension golang.go'"},
@@ -60,6 +60,7 @@ func checkGOENV() error {
 	return ers
 }
 
+// 安装 vscode 插件 GO
 func checkVscodeExtensions() error {
 	cmd := exec.Command("code", "--list-extensions")
 	out, err := cmd.Output()
