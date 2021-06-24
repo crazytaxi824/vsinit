@@ -1,0 +1,144 @@
+/*
+https://eslint.org/docs/rules/
+https://www.npmjs.com/package/@typescript-eslint/eslint-plugin
+https://www.npmjs.com/package/eslint-config-airbnb
+https://www.npmjs.com/package/eslint-config-airbnb-typescript
+https://github.com/iamturns/create-exposed-app/blob/master/.eslintrc.js
+
+需要安装的 vscode 插件
+eslint
+prettier
+
+需要 npm 安装的库:
+eslint (npm i -g)
+jest (npm i -g)
+eslint-plugin-import
+eslint-plugin-jsx-a11y
+eslint-plugin-react
+eslint-plugin-react-hooks
+eslint-plugin-jest  // jest unit test
+eslint-plugin-promise // promise 用法
+@typescript-eslint/eslint-plugin
+eslint-config-airbnb-typescript
+eslint-config-prettier  // 这个包主要是用来 disable 某些有冲突的 rules, 所以要放到最后
+eslint-config-airbnb-base // js 专用 lint
+// @typescript-eslint/parser    // parser
+
+如果需要使用 react:
+"extends": ["airbnb-typescript", "airbnb/hooks"]
+如果不需要使用 react:
+"extends": "airbnb-typescript/base"
+*/
+{
+  "extends": [
+    // "eslint:recommended",
+    // "airbnb-base", // js 专用
+    // "airbnb/hooks", // react 用
+    // "airbnb-typescript", // ts 用, with react
+    "airbnb-typescript/base", // ts 用
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:jest/recommended",
+    "plugin:promise/recommended",
+    "prettier" // prettier 必须放在最后
+  ],
+  "env": {
+    "node": true,
+    "browser": true,
+    "es6": true,
+    "jest": true
+  },
+  "plugins": ["@typescript-eslint", "jest", "promise"],
+  // parser config
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 6, // es6 = es2015
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "impliedStrict": true,
+    "sourceType": "module", // script | module
+    "project": "./tsconfig.json" // NOTE important, ts项目用
+  },
+  // 不需要 eslint 检查的文件
+  "ignorePatterns": [
+    ".vscode",
+    "out",
+    "dist",
+    "node_modules",
+    "**/vendor/",
+    "/coverage", // jest --coverage
+    "**/*.config.js", // config files
+    "**/*.config.ts"
+  ],
+  "rules": {
+    // DEBUG use only，Produce 模式需要注释掉。
+    "no-console": 0, // DEBUG use only.
+    "@typescript-eslint/no-unused-vars": "off", // DEBUG，未使用的 var 和 function
+
+    // 以下为常用 lint.
+    "no-prototype-builtins": "off",
+    "import/prefer-default-export": "off",
+    // "import/no-default-export": "error", // 没有 export default 在文件中。
+    "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
+    "complexity": "warn", // default 20
+    "no-param-reassign": "off", // 不能给函数入参赋值，引用类型应该可以赋值。
+
+    // NOTE react use only
+    // "react/destructuring-assignment": "off",
+    // "react/jsx-filename-extension": "off",
+
+    // 功能检查
+    "max-len": ["warn", { "code": 120 }],
+    "max-lines": ["warn", 500], // 文件不超过 n 行
+
+    // js 专用
+    // "no-use-before-define": [
+    //   "error",
+    //   { "functions": false, "classes": true, "variables": true }
+    // ],
+
+    // TS
+    // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/member-ordering.md
+    "@typescript-eslint/member-ordering": "warn", // class 中 member 排序
+    "@typescript-eslint/consistent-type-definitions": "error", // 使用统一的类型定义
+    "@typescript-eslint/lines-between-class-members": "off", // class 内属性必须空一行
+    "@typescript-eslint/no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "classes": true,
+        "variables": true,
+        "typedefs": true
+      }
+    ],
+    // interface 必须 I 开头
+    // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/naming-convention.md
+    "@typescript-eslint/naming-convention": [
+      "warn",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": true
+        }
+      }
+    ]
+  },
+  // VVI set jest version
+  "settings": {
+    "jest": {
+      "version": 27
+    }
+  },
+  "overrides": [
+    {
+      "files": ["*.js"],
+      "rules": {
+        // Allow require()
+        "@typescript-eslint/no-var-requires": "off" // 不允许使用 require，除非在 import 语句中.
+      }
+    }
+  ]
+}

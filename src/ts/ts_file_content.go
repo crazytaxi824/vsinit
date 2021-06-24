@@ -2,6 +2,7 @@ package ts
 
 import (
 	_ "embed" // for go:embed file use
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -61,8 +62,9 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 
 	if *jestflag {
 		// 检查 npm 是否安装
-		if err := util.CheckCMDInstall("npm"); err != nil {
-			return err
+		if sugg := util.CheckCMDInstall("npm"); sugg != nil {
+			// return util.Suggestions{sugg}, nil
+			return errors.New(sugg.String())
 		}
 
 		// add jest example test file
@@ -78,13 +80,6 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 
 	// 安装依赖
 	if *jestflag {
-		// 安装 jest
-		if err := util.CheckCMDInstall("jest"); err != nil {
-			if er := util.NpmInstallGlobalDependencies("jest"); er != nil {
-				return er
-			}
-		}
-
 		// 设置 jest，检查依赖
 		npmLibs, err := dependenciesNeedsToInstall()
 		if err != nil {

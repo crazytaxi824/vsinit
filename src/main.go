@@ -8,11 +8,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"local/src/golang"
 	"local/src/js"
 	"local/src/python"
 	"local/src/ts"
+	"local/src/util"
 )
 
 const languages = "go/py/ts/js"
@@ -33,7 +35,10 @@ func main() {
 	tsjsSet := flag.NewFlagSet("ts/js", flag.ExitOnError)
 	jestflag := tsjsSet.Bool("jest", false, "add 'jest' - unit test components")
 
-	var err error
+	var (
+		err         error
+		suggestions []*util.Suggestion
+	)
 	switch os.Args[1] {
 	case "go":
 		err = golang.InitProject()
@@ -43,6 +48,8 @@ func main() {
 		err = ts.InitProject(tsjsSet, jestflag)
 	case "js":
 		err = js.InitProject(tsjsSet, jestflag)
+	case "envcheck":
+		suggestions, err = golang.CheckGO(false) // FIXME
 	default:
 		helpMsg()
 		os.Exit(2)
@@ -53,4 +60,20 @@ func main() {
 		fmt.Println(err)
 		os.Exit(2)
 	}
+
+	// 打印提醒
+	printSuggestions(suggestions)
+}
+
+func printSuggestions(suggestions []*util.Suggestion) {
+	if len(suggestions) == 0 {
+		fmt.Println("All Done! Happy Hunting.")
+		return
+	}
+
+	var builder strings.Builder
+	for _, sug := range suggestions {
+		builder.WriteString(sug.String())
+	}
+	fmt.Print(builder.String()) // 这里用 println 会多空一行
 }

@@ -96,6 +96,8 @@ func NpmInstallDependencies(path string, libs ...string) error {
 		return nil
 	}
 
+	// TODO 是否需要安装？(y/n)
+
 	results := []string{"i", "-D"}
 
 	// 指定下载到什么地方
@@ -116,6 +118,8 @@ func NpmInstallGlobalDependencies(libs ...string) error {
 		return nil
 	}
 
+	// TODO 是否需要安装？(y/n)
+
 	results := []string{"i", "-g"}
 
 	// 执行命令
@@ -124,4 +128,8 @@ func NpmInstallGlobalDependencies(libs ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func Warn(m string) string {
+	return fmt.Sprintf("\033[0;37;41m%s\033[0m", m)
 }
