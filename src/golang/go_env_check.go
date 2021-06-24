@@ -34,9 +34,9 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	sug = util.CheckCMDInstall("code")
 	if sug != nil {
 		suggs = append(suggs, sug, &util.Suggestion{ // 安装 vscode 插件 GO
-			Problem: "please install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market,\n" +
-				"or run 'code --install-extension golang.go'",
+			Problem: "need to install vscode extension 'golang.go'",
+			Solution: "you can install it in the vscode extentsion market, or run\n" +
+				"code --install-extension golang.go",
 		})
 	} else {
 		su, er := checkVscodeExtensions()
@@ -85,9 +85,9 @@ func checkVscodeExtensions() (*util.Suggestion, error) {
 
 	if !bytes.Contains(out, []byte("golang.go")) {
 		return &util.Suggestion{
-			Problem: "please install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market,\n" +
-				"or run 'code --install-extension golang.go'",
+			Problem: "need to install vscode extension 'golang.go'",
+			Solution: "you can install it in the vscode extentsion market, or run\n" +
+				"code --install-extension golang.go",
 		}, nil
 	}
 	return nil, nil
@@ -96,14 +96,12 @@ func checkVscodeExtensions() (*util.Suggestion, error) {
 func checkGOPATH() *util.Suggestion {
 	if os.Getenv("GOPATH") == "" {
 		return &util.Suggestion{
-			Problem: "please setup $GOPATH in your environment, ~/.bash_profile OR ./zshrc",
-			Solution: "'''\n" +
-				"# golang setting\n" +
+			Problem: "need to setup $GOPATH in ~/.bash_profile OR ./zshrc",
+			Solution: "# golang setting\n" +
 				"export GOPATH=/Users/ray/gopath\n" +
 				"export GOBIN=$GOPATH/bin\n" +
 				"export PATH=$PATH:$GOBIN\n" +
-				"export GO111MODULE=on\n" +
-				"'''",
+				"export GO111MODULE=on",
 		}
 	}
 	return nil

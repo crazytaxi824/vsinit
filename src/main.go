@@ -75,5 +75,5 @@ func printSuggestions(suggestions []*util.Suggestion) {
 	for _, sug := range suggestions {
 		builder.WriteString(sug.String())
 	}
-	fmt.Println(builder.String())
+	fmt.Print(builder.String()) // 这里用 println 会多空一行
 }

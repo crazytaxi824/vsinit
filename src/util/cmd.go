@@ -31,7 +31,7 @@ func CheckCMDInstall(langs ...string) *Suggestion {
 
 	return &Suggestion{
 		Problem:  fmt.Sprintf("need to intall '%s':", strings.Join(result, ", ")),
-		Solution: strings.Join(solutions, "\n"),
+		Solution: strings.Join(solutions, "; \\\n"),
 	}
 }
 
@@ -53,13 +53,13 @@ func whichCmd() string {
 func installMsg(cmdName string) string {
 	switch cmdName {
 	case "code":
-		return "download it at https://code.visualstudio.com, or \nbrew install vscode"
+		return "download it at https://code.visualstudio.com, or run\nbrew install vscode"
 
 	case "go":
-		return "download it at https://golang.org/, or \nbrew install go"
+		return "download it at https://golang.org/, or run\nbrew install go"
 
 	case "node", "npm":
-		return "download it at https://nodejs.org/, or\nbrew install node"
+		return "download it at https://nodejs.org/, or run\nbrew install node"
 
 	case "tsc":
 		return "npm i -g typescript"
