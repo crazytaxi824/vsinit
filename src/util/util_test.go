@@ -1,32 +1,28 @@
 package util
 
 import (
-	"errors"
 	"fmt"
-	"strings"
 	"testing"
 )
 
-var src = ErrorMsg{
-	"you haven't install 'code'",
-	[]string{"solutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolution", "solutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolutionsolution"},
-}
-
-func Test_ErrorMsg(t *testing.T) {
-	fmt.Println(src)
-}
-
-func Benchmark_ErrorMsg(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		src.Error()
+func Test_NilSlice(t *testing.T) {
+	var ers []error
+	if ers != nil {
+		t.Log(ers)
 	}
-	b.ReportAllocs()
+
+	ers = append(ers, nil)
+	if ers != nil {
+		t.Log(ers)
+	}
 }
 
-func Benchmark_StringPlus(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		d := errors.New(src.Problem + "\n" + strings.Join(src.Solution, "\n"))
-		_ = d
-	}
-	b.ReportAllocs()
+func Test_Errors(t *testing.T) {
+	var errs Erros
+	errs = append(errs, ErrorMsg{"a", []string{"a", "b"}}, ErrorMsg{"a", []string{"a", "b"}})
+
+	var errs2 Erros
+	errs2 = append(errs2, errs, ErrorMsg{"b", []string{"a", "b"}}, ErrorMsg{"b", []string{"a", "b"}})
+
+	fmt.Println(errs2)
 }
