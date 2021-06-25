@@ -135,7 +135,7 @@ linters-settings:
     # 最小复杂性
     min-complexity: 15
 
-  # TODO, BUG and FIXME 标记
+  # TODO, DEBUG and FIXME 标记
   godox:
     # these can be overwritten by this setting
     keywords:

@@ -13,6 +13,12 @@ const (
 
 	// vsc 配置文件, ~/.vsc/vsc-config.json
 	VscConfigFilePath = "/vsc-config.json"
+
+	// golangci 文件夹
+	GolangciDirector = "/golangci"
+
+	// eslint 文件夹
+	EslintDirector = "/eslint"
 )
 
 // lint 类型
@@ -69,7 +75,7 @@ func (vs *VscSetting) writeToFile(file *os.File) error {
 	return nil
 }
 
-func getVscConfigDir() (string, error) {
+func GetVscConfigDir() (string, error) {
 	home := os.Getenv("HOME")
 	if home == "" {
 		return "", errors.New("$HOME is not exist, please set $HOME env")
@@ -79,7 +85,7 @@ func getVscConfigDir() (string, error) {
 }
 
 func ReadVscConfig() (*VscSetting, error) {
-	vscDir, err := getVscConfigDir()
+	vscDir, err := GetVscConfigDir()
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +106,7 @@ func ReadVscConfig() (*VscSetting, error) {
 }
 
 func SetVscSetting(lint Lint, cfgPath string) error {
-	vscDir, err := getVscConfigDir()
+	vscDir, err := GetVscConfigDir()
 	if err != nil {
 		return err
 	}

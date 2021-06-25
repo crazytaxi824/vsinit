@@ -18,6 +18,12 @@ var (
 
 	//go:embed cfgfiles/gitignore
 	gitignore []byte
+
+	//go:embed golangci-lint/dev-ci.yml
+	devci []byte
+
+	//go:embed golangci-lint/prod-ci.yml
+	prodci []byte
 )
 
 var mainGO = []byte(`package main
