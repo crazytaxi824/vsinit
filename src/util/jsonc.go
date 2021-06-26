@@ -5,21 +5,21 @@ import (
 	"errors"
 )
 
-func isComment(src []byte) bool {
-	tmp := bytes.TrimSpace(src)
-	l := len(tmp)
-	if l == 0 { // 空行, 算作 comment
-		return true
-	} else if l == 1 { // {} [] , 等情况
-		return false
-	}
+// func isComment(src []byte) bool {
+// 	tmp := bytes.TrimSpace(src)
+// 	l := len(tmp)
+// 	if l == 0 { // 空行, 算作 comment
+// 		return true
+// 	} else if l == 1 { // {} [] , 等情况
+// 		return false
+// 	}
 
-	if string(tmp[:2]) == "//" {
-		return true
-	}
+// 	if string(tmp[:2]) == "//" {
+// 		return true
+// 	}
 
-	return false
-}
+// 	return false
+// }
 
 func analyseJSONCstatement(src []byte) (lastCharIndex int, hasComments bool, err error) {
 	l := len(src)
@@ -93,15 +93,15 @@ func JSONCToJSON(jsonc []byte) ([]byte, error) {
 
 	var result [][]byte
 	for _, line := range lines {
-		if isComment(line) {
-			continue
-		}
-
 		lastIndex, _, er := analyseJSONCstatement(line)
 		if er != nil {
 			return nil, er
 		}
-		result = append(result, line[:lastIndex+1])
+
+		// lastIndex == -1, 表示整行都是 comment, 或者是空行
+		if lastIndex != -1 {
+			result = append(result, line[:lastIndex+1])
+		}
 	}
 
 	return bytes.Join(result, []byte("\n")), nil
