@@ -1,6 +1,8 @@
 package util
 
 import (
+	"bytes"
+	"encoding/json"
 	"strings"
 	"testing"
 )
@@ -21,7 +23,7 @@ func Test_FindLastChar(t *testing.T) {
 const totalsrc = `{
   // this is comment
   "s": "abc\" def\" \\\t \n /abc //notComment { } ~/omg/gg.json", // comment
-  /* haha */ "a": 1,
+  /* haha */ "a": /*dfsd*/ 1,
   "b */":/* omg */ "ok",
 
   "c": true, /* abc
@@ -31,14 +33,37 @@ const totalsrc = `{
     "b",
     "c" /*
 	sfsd
-	*/
-  ]
+	*/ // dfhskjf*/
+  ], /* dfhsf
+  fsdfdsf
+  */
   "sf":{
 	"d":"k",  // haha
 	"e":"o"
   }  // hahaha
 } // omg
+
+// this is the {comment} after setting
 `
+
+func Test_Json2(t *testing.T) {
+	r, err := JSONCToJSON2([]byte(totalsrc))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(r))
+
+	var buf bytes.Buffer
+	err = json.Indent(&buf, r, "", "  ")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(buf.String())
+}
 
 func Test_UnmarshalJSONC(t *testing.T) {
 	r, err := JSONCToJSON([]byte(totalsrc))
