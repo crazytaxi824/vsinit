@@ -2,6 +2,7 @@ package util
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -95,7 +96,7 @@ func analyseJSONCstatement2(src []byte, start int, buf *bytes.Buffer) (multiLine
 			continue
 		}
 
-		if src[i] == ' ' {
+		if src[i] == ' ' || src[i] == '\t' {
 			// 如果是空则不移动 lastIndex
 			continue
 		} else if src[i] == '"' {
@@ -176,6 +177,10 @@ func JSONCToJSON2(jsonc []byte) ([]byte, error) {
 		if er != nil {
 			return nil, er
 		}
+	}
+
+	if !json.Valid(buf.Bytes()) {
+		return nil, errors.New("not a legal json format")
 	}
 
 	return buf.Bytes(), nil
