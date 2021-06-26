@@ -1,7 +1,10 @@
 package util
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -30,4 +33,25 @@ func Test_Errors(t *testing.T) {
 
 func Test_CheckCmdInstall(t *testing.T) {
 	fmt.Println(CheckCMDInstall("vscode", "omg", "haha"))
+}
+
+func Test_MakeDirAlreadyExist(t *testing.T) {
+	err := os.Mkdir("/Users/ray/Desktop/test", 0750)
+	if err != nil && !errors.Is(err, os.ErrExist) {
+		t.Error(err)
+		return
+	} else if errors.Is(err, os.ErrExist) {
+		t.Log("ok")
+	}
+}
+
+func Test_ReadJSON(t *testing.T) {
+	var vs VscSetting
+	err := vs.readJSON(strings.NewReader(`{"golangci":"abc","eslint":"def"}`))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Logf("%+v", vs)
 }

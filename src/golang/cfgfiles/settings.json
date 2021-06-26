@@ -39,7 +39,7 @@
   // https://github.com/golang/vscode-go/blob/HEAD/docs/settings.md
   "go.addTags": {
     "tags": "json",
-    "options": "json=omitempty",
+    "options": /* omg*/ "json=omitempty",
     "promptForTags": true, // user tags
     "template": "",
     "transform": "snakecase"
@@ -48,7 +48,8 @@
   // golangci-lint 设置
   "go.lintTool": "golangci-lint",
 
-  // NOTE save 时 golangci-lint 整个 package，使用 'file' 检查可能有引用问题导致报错。
+  // NOTE save 时 golangci-lint 整个 package，使用 'file' 时，
+  // 如果变量定义在别的文件中会造成 undeclared 错误。
   "go.lintOnSave": "package",
 
   "go.lintFlags": [
@@ -56,8 +57,8 @@
 
     // golangci-lint 配置文件地址
     // "--config=${workspaceRoot}/golangci.yml" // 本地
-    // "--config=~/.golangci/prod-ci.yml" // production
-    "--config=~/.golangci/dev-ci.yml" // development
+    // "--config=~/.golangci/prod-ci.yml"
+    "--config=~/.golangci/dev-ci.yml"
   ],
 
   // search.exclude 用来忽略搜索的文件夹

@@ -4,7 +4,6 @@ package golang
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"local/src/util"
 	"os"
@@ -109,8 +108,8 @@ func checkGOPATH() *util.Suggestion {
 }
 
 func checkGolangciLint() (*util.Suggestion, error) {
-	// 读取文件
-	vscf, err := util.ReadVscFile()
+	// 读取 vsc setting
+	cfg, err := util.ReadVscConfig()
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
@@ -118,15 +117,6 @@ func checkGolangciLint() (*util.Suggestion, error) {
 			Problem:  "haven't setup golangci-lint yet, please run:",
 			Solution: util.GolintciCmd,
 		}, nil
-	}
-	defer vscf.Close()
-
-	// json 反序列化
-	var cfg util.VscSetting
-	de := json.NewDecoder(vscf)
-	err = de.Decode(&cfg)
-	if err != nil {
-		return nil, err
 	}
 
 	// 查找 golangci 设置
