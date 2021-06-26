@@ -39,7 +39,7 @@
   // https://github.com/golang/vscode-go/blob/HEAD/docs/settings.md
   "go.addTags": {
     "tags": "json",
-    "options": "json=omitempty",
+    "options": /* omg*/ "json=omitempty",
     "promptForTags": true, // user tags
     "template": "",
     "transform": "snakecase"

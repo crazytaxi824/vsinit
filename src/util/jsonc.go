@@ -3,39 +3,24 @@ package util
 import (
 	"bytes"
 	"errors"
+	"fmt"
 )
 
-// func isComment(src []byte) bool {
-// 	tmp := bytes.TrimSpace(src)
-// 	l := len(tmp)
-// 	if l == 0 { // 空行, 算作 comment
-// 		return true
-// 	} else if l == 1 { // {} [] , 等情况
-// 		return false
-// 	}
-
-// 	if string(tmp[:2]) == "//" {
-// 		return true
-// 	}
-
-// 	return false
-// }
-
-func analyseJSONCstatement(src []byte) (lastCharIndex int, hasComments bool, err error) {
+// multiLineComment 说明是否在多行注释中 /* */
+func analyseJSONCstatement(src []byte, start int) (lastValidCharIndex int, multiLineComment bool, err error) {
 	l := len(src)
 
 	// NOTE lastIndex = -1, 说明该行是空行。
-	var lastIndex = -1  // 最后一位有效 char 的 index。
-	var quote bool      // 在引号内还是引号外
-	var transfer bool   // 是否在转义状态
-	var hasComment bool // 是否有 comment
-	// var multiLineCommentMark bool // FIXME 多行注释 /* */
+	lastValidCharIndex = -1 // 最后一位有效 char 的 index。
+
+	var quote bool    // 在引号内还是引号外
+	var transfer bool // 是否在转义状态
 
 	// 逐字判断
-	for i := 0; i < l; i++ {
+	for i := start; i < l; i++ {
 		if transfer { // 如果转义了，忽略后面一个char
 			transfer = false
-			lastIndex = i
+			lastValidCharIndex = i
 			continue
 		}
 
@@ -49,7 +34,7 @@ func analyseJSONCstatement(src []byte) (lastCharIndex int, hasComments bool, err
 			} else {
 				quote = true
 			}
-			lastIndex = i // 移动 lastIndex
+			lastValidCharIndex = i // 移动 lastIndex
 		} else if src[i] == '\\' {
 			// 如果是转义符，则标记转义
 			if !quote {
@@ -60,22 +45,31 @@ func analyseJSONCstatement(src []byte) (lastCharIndex int, hasComments bool, err
 		} else if src[i] == '/' {
 			if quote {
 				// 如果 ‘/’ 在引号内，不需要特殊处理
-				lastIndex = i
+				lastValidCharIndex = i
 				continue
 			}
 
 			// 如果 '/' 在引号外面，判断后一位是否也是 '/'，说明后面是 comments.
 			if i+1 < l && src[i+1] == '/' {
-				hasComment = true // 标记 comments
-				break             // 结束循环
+				break // 结束循环
+			} else if i+1 < l && src[i+1] == '*' { // /* */ 多行注释的情况
+				// NOTE /* */ 多行注释问题
+				ci := bytes.Index(src[i+2:], []byte("*/")) // 查看该 line 有没有 */
+				if ci == -1 {
+					multiLineComment = true
+					break // 结束循环
+				} else {
+					i = i + 2 + ci + 1 // NOTE 跳过检查
+					lastValidCharIndex = i
+					continue
+				}
 			}
-			// FIXME /* */ 多行注释问题
 
 			// 如果 ‘/’ 在引号外面而且后面不是 ‘/’ ，ERROR
-			return 0, false, errors.New("error: '/' out side quote")
+			return 0, false, fmt.Errorf("error: '/' out side quote %s", string(src))
 		} else {
 			// 其他正常情况下直接向后处理。
-			lastIndex = i
+			lastValidCharIndex = i
 		}
 	}
 
@@ -84,22 +78,38 @@ func analyseJSONCstatement(src []byte) (lastCharIndex int, hasComments bool, err
 		return 0, false, errors.New("error: statement is Unquoted")
 	}
 
-	return lastIndex, hasComment, nil
+	return lastValidCharIndex, multiLineComment, nil
 }
 
 // NOTE JSONC must be formatted, otherwise cannot be read.
 func JSONCToJSON(jsonc []byte) ([]byte, error) {
 	lines := bytes.Split(jsonc, []byte("\n"))
 
-	var result [][]byte
+	var (
+		result       [][]byte
+		lastIndex    int
+		multiComment bool
+		er           error
+	)
 	for _, line := range lines {
-		lastIndex, _, er := analyseJSONCstatement(line)
+		start := 0
+		if multiComment {
+			ci := bytes.Index(line, []byte("*/"))
+			if ci == -1 {
+				continue
+			} else {
+				start = ci + 2
+			}
+		}
+
+		lastIndex, multiComment, er = analyseJSONCstatement(line, start)
 		if er != nil {
 			return nil, er
 		}
 
 		// lastIndex == -1, 表示整行都是 comment, 或者是空行
 		if lastIndex != -1 {
+			// result = append(result, line[start:lastIndex+1])
 			result = append(result, line[:lastIndex+1])
 		}
 	}
@@ -107,4 +117,45 @@ func JSONCToJSON(jsonc []byte) ([]byte, error) {
 	return bytes.Join(result, []byte("\n")), nil
 }
 
-// TODO 插入数据到 JSONC 中
+// TODO find second last line and lastCharIndex
+func findSecondLastLine(jsonc []byte) (lastLine, lastCharIndex int, err error) {
+	lines := bytes.Split(jsonc, []byte("\n"))
+
+	var (
+		result       [][2]int
+		lastIndex    int
+		multiComment bool
+		er           error
+	)
+
+	for i, line := range lines {
+		start := 0
+		if multiComment {
+			ci := bytes.Index(line, []byte("*/"))
+			if ci == -1 {
+				continue
+			} else {
+				start = ci + 2
+			}
+		}
+
+		lastIndex, multiComment, er = analyseJSONCstatement(line, start)
+		if er != nil {
+			return 0, 0, er
+		}
+
+		// lastIndex == -1, 表示整行都是 comment, 或者是空行
+		if lastIndex != -1 {
+			// result = append(result, line[start:lastIndex+1])
+			result = append(result, [2]int{i, lastIndex})
+		}
+	}
+
+	l := len(result)
+	var r [2]int
+	if l > 1 {
+		r = result[l-2]
+	}
+
+	return r[0], r[1], nil
+}
