@@ -1,7 +1,6 @@
 package golang
 
 import (
-	_ "embed" // for go:embed file use
 	"local/src/util"
 )
 
