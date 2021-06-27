@@ -82,6 +82,14 @@ func analyseJSONCstatement(src []byte, start int) (lastValidCharIndex int, multi
 	return lastValidCharIndex, multiLineComment, nil
 }
 
+func toggle(b *bool) {
+	if *b {
+		*b = false
+	} else {
+		*b = true
+	}
+}
+
 func analyseJSONCstatement2(src []byte, start int, buf *bytes.Buffer) (multiLineComment bool, err error) {
 	l := len(src)
 
@@ -100,18 +108,13 @@ func analyseJSONCstatement2(src []byte, start int, buf *bytes.Buffer) (multiLine
 			// 如果是空则不移动 lastIndex
 			continue
 		} else if src[i] == '"' {
-			// 标记是 opening quote 还是 closing quote.
-			if quote {
-				quote = false
-			} else {
-				quote = true
-			}
+			toggle(&quote) // 标记是 opening quote 还是 closing quote.
 			buf.WriteByte(src[i])
 		} else if src[i] == '\\' {
 			// 如果是转义符，则标记转义
 			if !quote {
 				// 如果转义符在引号外面，ERROR
-				return false, errors.New("error: '\\' out side quote")
+				return false, errors.New("format error: '\\' out side quote")
 			}
 			buf.WriteByte(src[i])
 			transfer = true
@@ -129,16 +132,18 @@ func analyseJSONCstatement2(src []byte, start int, buf *bytes.Buffer) (multiLine
 				// NOTE /* */ 多行注释问题
 				ci := bytes.Index(src[i+2:], []byte("*/")) // 查看该 line 有没有 */
 				if ci == -1 {
-					multiLineComment = true
-					break // 结束循环
+					// 如果不存在 */
+					multiLineComment = true // 标记多行注释
+					break                   // 结束循环
 				} else {
+					// 如果 */ 存在，直接移动读取位置到 */ 后面
 					i = i + 2 + ci + 1 // NOTE 跳过检查
 					continue
 				}
 			}
 
 			// 如果 ‘/’ 在引号外面而且后面不是 ‘/’ ，ERROR
-			return false, fmt.Errorf("error: '/' out side quote %s", string(src))
+			return false, fmt.Errorf("format error: '/' out side quote %s", string(src))
 		} else {
 			// 其他正常情况下直接向后处理。
 			buf.WriteByte(src[i])
@@ -147,7 +152,76 @@ func analyseJSONCstatement2(src []byte, start int, buf *bytes.Buffer) (multiLine
 
 	// 如果 line 结束，单引号没有关闭则，Error
 	if quote {
-		return false, errors.New("error: statement is Unquoted")
+		return false, errors.New("format error: statement is Unquoted")
+	}
+
+	return multiLineComment, nil
+}
+
+func analyseJSONCstatement3(src []byte, start int, buf *bytes.Buffer) (multiLineComment bool, err error) {
+	l := len(src)
+
+	var quote bool    // 在引号内还是引号外
+	var transfer bool // 是否在转义状态
+
+	// 逐字判断
+ForLoop:
+	for i := start; i < l; i++ {
+		if transfer { // 如果转义了，后面一个char不做特殊处理，// TODO 判断是否合法
+			transfer = false
+			buf.WriteByte(src[i])
+			continue
+		}
+
+		switch src[i] {
+		case ' ', '\t':
+			break // break switch
+		case '"':
+			toggle(&quote)
+			buf.WriteByte(src[i])
+		case '\\':
+			// 如果是转义符，则标记转义
+			if !quote {
+				// 如果转义符在引号外面，ERROR
+				return false, errors.New("format error: '\\' out side quote")
+			}
+			buf.WriteByte(src[i])
+			transfer = true
+		case '/':
+			if quote {
+				// 如果 ‘/’ 在引号内，不需要特殊处理
+				buf.WriteByte(src[i])
+				break // break switch
+			}
+
+			// 如果 '/' 在引号外面，判断后一位是否也是 '/'，说明后面是 comments.
+			if i+1 < l && src[i+1] == '/' {
+				break ForLoop // 结束循环 break for loop
+			} else if i+1 < l && src[i+1] == '*' { // /* */ 多行注释的情况
+				// NOTE /* */ 多行注释问题
+				ci := bytes.Index(src[i+2:], []byte("*/")) // 查看该 line 有没有 */
+				if ci == -1 {
+					// 如果不存在 */
+					multiLineComment = true // 标记多行注释
+					break ForLoop           // 结束循环 break for loop
+				} else {
+					// 如果 */ 存在，直接移动读取位置到 */ 后面
+					i = i + 2 + ci + 1 // NOTE 跳过检查
+					break              // break switch
+				}
+			}
+
+			// 如果 ‘/’ 在引号外面而且后面不是 ‘/’ ，ERROR
+			return false, fmt.Errorf("format error: '/' out side quote %s", string(src))
+		default:
+			// 其他正常情况下直接向后处理。
+			buf.WriteByte(src[i])
+		}
+	}
+
+	// 如果 line 结束，单引号没有关闭则，Error
+	if quote {
+		return false, errors.New("format error: statement is Unquoted")
 	}
 
 	return multiLineComment, nil
@@ -173,7 +247,7 @@ func JSONCToJSON2(jsonc []byte) ([]byte, error) {
 			}
 		}
 
-		multiComment, er = analyseJSONCstatement2(line, start, &buf)
+		multiComment, er = analyseJSONCstatement3(line, start, &buf)
 		if er != nil {
 			return nil, er
 		}
