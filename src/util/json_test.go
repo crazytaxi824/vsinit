@@ -75,6 +75,17 @@ func Test_FindSecondLast(t *testing.T) {
 	t.Log(a, b)
 }
 
+func Test_AppendJSONC(t *testing.T) {
+	n, err := appendTOjsonc([]byte(totalsrc), []byte(`  "o":1,
+  "k":2`))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(n))
+}
+
 func Test_Index(t *testing.T) {
 	s := "abcbcbc"
 	t.Log(strings.Index(s, "d"))

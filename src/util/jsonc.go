@@ -237,4 +237,56 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 	return r.LineIndex, r.LastValidCharIndex, nil
 }
 
+func appendTOjsonc(jsonc, content []byte) ([]byte, error) {
+	lines := bytes.Split(jsonc, []byte("\n"))
+
+	var (
+		result       []JSONCstatment
+		lastIndex    int
+		multiComment bool
+		er           error
+	)
+
+	for i, line := range lines {
+		start := 0
+		if multiComment {
+			ci := bytes.Index(line, []byte("*/"))
+			if ci == -1 {
+				continue
+			} else {
+				start = ci + 2
+			}
+		}
+
+		lastIndex, multiComment, er = lastValidChatInJSONCline(line, start)
+		if er != nil {
+			return nil, er
+		}
+
+		// lastIndex == -1, 表示整行都是 comment, 或者是空行
+		if lastIndex != -1 {
+			result = append(result, JSONCstatment{i, lastIndex})
+		}
+	}
+
+	l := len(result)
+	var r JSONCstatment
+	if l > 1 { // FIXME 其他情况
+		r = result[l-2]
+	}
+
+	tmp := make([]byte, 0, len(lines[r.LineIndex])+1)
+	tmp = append(tmp, lines[r.LineIndex][:r.LastValidCharIndex+1]...)
+	tmp = append(tmp, ',')
+	tmp = append(tmp, lines[r.LineIndex][r.LastValidCharIndex+1:]...)
+	lines[r.LineIndex] = tmp
+
+	newJSONC := make([][]byte, len(lines)+1)
+	newJSONC = append(newJSONC, lines[:r.LineIndex+1]...)
+	newJSONC = append(newJSONC, content)
+	newJSONC = append(newJSONC, lines[r.LineIndex+1:]...)
+
+	return bytes.Join(newJSONC, []byte("\n")), nil
+}
+
 // TODO find "go.lintFlags" "--config="
