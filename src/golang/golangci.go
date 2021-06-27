@@ -37,16 +37,18 @@ var golangciConfig = []byte(`
   ],
 `)
 
+// 替换 settings_template.txt 模板中的 place holder
 func replaceLintPlaceHolder(setting []byte) []byte {
 	return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), setting)
 }
 
+// 替换模板中的 --config 行
 func replaceLintConfig(file []byte, cilintCfgPath string) (settings []byte, sug *util.Suggestion, err error) {
 	var (
 		multiComment bool
 		er           error
 		found        bool // 是否找到了设置
-		cfg          = "\"--config=" + cilintCfgPath + "\"" + configPlaceHolder + " DON'T EDIT"
+		cfg          = "\"--config=" + cilintCfgPath + "\" " + configPlaceHolder + " DON'T EDIT"
 	)
 
 	lines := bytes.Split(file, []byte("\n"))
