@@ -237,7 +237,7 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 	return r.LineIndex, r.LastValidCharIndex, nil
 }
 
-func appendTOjsonc(jsonc, content []byte) ([]byte, error) {
+func appendToJSONC(jsonc, content []byte) ([]byte, error) {
 	lines := bytes.Split(jsonc, []byte("\n"))
 
 	var (
@@ -271,20 +271,40 @@ func appendTOjsonc(jsonc, content []byte) ([]byte, error) {
 
 	l := len(result)
 	var r JSONCstatment
-	if l > 1 { // FIXME 其他情况
+	var newJSONC [][]byte
+
+	last := result[l-1]
+	if last.LastValidCharIndex == 0 { // 最后一行只有一个 '}' || ']' 的情况
 		r = result[l-2]
+
+		tmp := make([]byte, 0, len(lines[r.LineIndex])+1)
+		tmp = append(tmp, lines[r.LineIndex][:r.LastValidCharIndex+1]...)
+		tmp = append(tmp, ',')
+		tmp = append(tmp, lines[r.LineIndex][r.LastValidCharIndex+1:]...)
+		lines[r.LineIndex] = tmp
+
+		newJSONC = append(newJSONC, lines[:r.LineIndex+1]...)
+		newJSONC = append(newJSONC, content)
+		newJSONC = append(newJSONC, lines[r.LineIndex+1:]...)
+	} else {
+		r.LineIndex = last.LineIndex
+		r.LastValidCharIndex = last.LastValidCharIndex - 1
+
+		char := lines[r.LineIndex][r.LastValidCharIndex]
+
+		tmp := make([]byte, 0, 100)
+		tmp = append(tmp, lines[r.LineIndex][:r.LastValidCharIndex+1]...)
+
+		if char != '{' && char != '[' { // 判断是否应该添加 ','
+			tmp = append(tmp, ',')
+		}
+
+		tmp = append(tmp, content...)
+		tmp = append(tmp, lines[r.LineIndex][r.LastValidCharIndex+1:]...)
+		lines[r.LineIndex] = tmp
+
+		newJSONC = lines
 	}
-
-	tmp := make([]byte, 0, len(lines[r.LineIndex])+1)
-	tmp = append(tmp, lines[r.LineIndex][:r.LastValidCharIndex+1]...)
-	tmp = append(tmp, ',')
-	tmp = append(tmp, lines[r.LineIndex][r.LastValidCharIndex+1:]...)
-	lines[r.LineIndex] = tmp
-
-	newJSONC := make([][]byte, len(lines)+1)
-	newJSONC = append(newJSONC, lines[:r.LineIndex+1]...)
-	newJSONC = append(newJSONC, content)
-	newJSONC = append(newJSONC, lines[r.LineIndex+1:]...)
 
 	return bytes.Join(newJSONC, []byte("\n")), nil
 }

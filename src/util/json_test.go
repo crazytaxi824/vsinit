@@ -20,6 +20,32 @@ func Test_findLastChar(t *testing.T) {
 	t.Log(multiLineComment)
 }
 
+func Test_findLastChar2(t *testing.T) {
+	src := `{`
+
+	lastIndex, multiLineComment, err := lastValidChatInJSONCline([]byte(src), 0)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(lastIndex)
+	t.Log(src[:lastIndex+1])
+	t.Log(multiLineComment)
+}
+
+func Test_findLastChar3(t *testing.T) {
+	src := `{ "a": "c" }`
+
+	lastIndex, multiLineComment, err := lastValidChatInJSONCline([]byte(src), 0)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(lastIndex)
+	t.Log(src[:lastIndex+1])
+	t.Log(multiLineComment)
+}
+
 const totalsrc = `{
   // this is comment
   "s": "abc\" def\" \\\t \n /abc //notComment { } ~/omg/gg.json", // comment
@@ -79,7 +105,7 @@ func Test_FindSecondLast(t *testing.T) {
 }
 
 func Test_AppendJSONC(t *testing.T) {
-	n, err := appendTOjsonc([]byte(totalsrc), []byte(`  "o":1,
+	n, err := appendToJSONC([]byte(totalsrc), []byte(`  "o":1,
   "k":2`))
 	if err != nil {
 		t.Error(err)
@@ -89,6 +115,27 @@ func Test_AppendJSONC(t *testing.T) {
 	t.Log(string(n))
 }
 
+func Test_AppendJSONC2(t *testing.T) {
+	n, err := appendToJSONC([]byte("{}"), []byte(`  "o":1,
+  "k":2`))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(n))
+}
+
+func Test_AppendJSONC3(t *testing.T) {
+	n, err := appendToJSONC([]byte(`{"a":"b"}`), []byte(`  "o":1,
+  "k":2`))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(n))
+}
 func Test_Index(t *testing.T) {
 	s := "abcbcbc"
 	t.Log(strings.Index(s, "d"))
