@@ -30,3 +30,28 @@ func Test_StringFormat(t *testing.T) {
 		fmt.Println(err)
 	}
 }
+
+func Test_replaceLintConfig(t *testing.T) {
+	t.Log(string(golangciConfig))
+	ns, _, err := replaceLintConfig(golangciConfig, "abc/def.yml")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(ns))
+}
+
+func Test_replaceHolder(t *testing.T) {
+	ns, _, err := replaceLintConfig(golangciConfig, "abc/def.yml")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(replaceLintPlaceHolder(ns)))
+}
+
+func Test_replaceHolderNil(t *testing.T) {
+	t.Log(string(replaceLintPlaceHolder(nil)))
+}

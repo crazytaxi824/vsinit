@@ -88,7 +88,7 @@ func toggle(b *bool) {
 }
 
 // multiLineComment 说明是否在多行注释中 /* */
-func jsoncLineTojson(src []byte, start int, buf *bytes.Buffer) (multiLineComment bool, err error) {
+func JsoncLineTojson(src []byte, start int, buf *bytes.Buffer) (multiLineComment bool, err error) {
 	l := len(src)
 
 	var quote bool    // 在引号内还是引号外
@@ -177,7 +177,7 @@ func JSONCToJSON(jsonc []byte) ([]byte, error) {
 			}
 		}
 
-		multiComment, er = jsoncLineTojson(line, start, &buf)
+		multiComment, er = JsoncLineTojson(line, start, &buf)
 		if er != nil {
 			return nil, er
 		}
@@ -288,5 +288,3 @@ func appendTOjsonc(jsonc, content []byte) ([]byte, error) {
 
 	return bytes.Join(newJSONC, []byte("\n")), nil
 }
-
-// TODO find "go.lintFlags" "--config="

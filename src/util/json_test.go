@@ -25,6 +25,9 @@ const totalsrc = `{
   "s": "abc\" def\" \\\t \n /abc //notComment { } ~/omg/gg.json", // comment
   /* haha */ "a": /*dfsd*/ 1,
   "b */":/* omg */ "ok",
+  /*omg
+  hahaha
+  */
 
   "c": true, /* abc
   sfdsfsfs

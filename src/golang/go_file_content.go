@@ -16,6 +16,9 @@ var (
 	//go:embed cfgfiles/settings.json
 	settingsJSON []byte
 
+	//go:embed cfgfiles/settings_template.txt
+	settingTemplate []byte
+
 	//go:embed cfgfiles/gitignore
 	gitignore []byte
 
