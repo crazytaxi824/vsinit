@@ -7,17 +7,17 @@ import (
 	"testing"
 )
 
-func Test_FindLastChar(t *testing.T) {
+func Test_findLastChar(t *testing.T) {
 	src := `"s": "abc\" def\" \\\t \n /abc //notComment { } ~/omg/gg.json", // comment`
 
-	lastIndex, hasComments, err := analyseJSONCstatement([]byte(src), 0)
+	lastIndex, multiLineComment, err := lastValidChatInJSONCline([]byte(src), 0)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
 	t.Log(src[:lastIndex+1])
-	t.Log(hasComments)
+	t.Log(multiLineComment)
 }
 
 const totalsrc = `{
@@ -46,8 +46,8 @@ const totalsrc = `{
 // this is the {comment} after setting
 `
 
-func Test_Json2(t *testing.T) {
-	r, err := JSONCToJSON2([]byte(totalsrc))
+func Test_JSONCToJSON(t *testing.T) {
+	r, err := JSONCToJSON([]byte(totalsrc))
 	if err != nil {
 		t.Error(err)
 		return
@@ -63,16 +63,6 @@ func Test_Json2(t *testing.T) {
 	}
 
 	t.Log(buf.String())
-}
-
-func Test_UnmarshalJSONC(t *testing.T) {
-	r, err := JSONCToJSON([]byte(totalsrc))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	t.Log(string(r))
 }
 
 func Test_FindSecondLast(t *testing.T) {
