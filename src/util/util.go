@@ -8,8 +8,9 @@ import (
 )
 
 type FileContent struct {
-	Path    string
-	Content []byte
+	Path      string
+	Content   []byte
+	Overwrite bool
 }
 
 // create folders and write project files.
@@ -24,7 +25,7 @@ func WriteFoldersAndFiles(folders []string, fileContents []FileContent) error {
 
 	// write files
 	for _, fc := range fileContents {
-		err := createAndWriteFile(fc.Path, fc.Content)
+		err := createAndWriteFile(fc)
 		if err != nil {
 			return err
 		}
@@ -45,32 +46,32 @@ func createDir(folderPath string) error {
 }
 
 // create and write files.
-func createAndWriteFile(fpath string, content []byte) error {
-	fmt.Printf("writing file: %s ... ", fpath)
-	f, err := os.OpenFile(fpath, os.O_CREATE|os.O_WRONLY, 0600)
+func createAndWriteFile(fc FileContent) error {
+	fmt.Printf("writing file: %s ... ", fc.Path)
+	f, err := os.OpenFile(fc.Path, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Println("failed")
-		return fmt.Errorf("create %s Files error: %w", fpath, err)
+		return fmt.Errorf("create %s Files error: %w", fc.Path, err)
 	}
 	defer f.Close()
 
 	fi, err := f.Stat()
 	if err != nil {
 		fmt.Println("failed")
-		return fmt.Errorf("get %s File status error: %w", fpath, err)
+		return fmt.Errorf("get %s File status error: %w", fc.Path, err)
 	}
 
-	// file is not empty, DO NOT TOUCH.
-	if fi.Size() != 0 {
+	// file is not empty, DO NOT TOUCH. Unless Overwrite
+	if fi.Size() != 0 && !fc.Overwrite {
 		fmt.Println("skip, file already exists.")
 		return nil
 	}
 
 	// write file content
-	_, err = f.Write(content)
+	_, err = f.Write(fc.Content)
 	if err != nil {
 		fmt.Println("failed")
-		return fmt.Errorf("write file %s error: %w", fpath, err)
+		return fmt.Errorf("write file %s error: %w", fc.Path, err)
 	}
 
 	fmt.Println("done")
