@@ -237,7 +237,7 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 	return r.LineIndex, r.LastValidCharIndex, nil
 }
 
-func appendToJSONC(jsonc, content []byte) ([]byte, error) {
+func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 	lines := bytes.Split(jsonc, []byte("\n"))
 
 	var (

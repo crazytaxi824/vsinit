@@ -2,6 +2,7 @@ package golang
 
 import (
 	"fmt"
+	"local/src/util"
 	"os"
 	"path/filepath"
 	"testing"
@@ -32,7 +33,7 @@ func Test_StringFormat(t *testing.T) {
 }
 
 func Test_replaceLintConfig(t *testing.T) {
-	ns, sug, err := replaceLintConfig(golangciConfig, "abc/def.yml")
+	ns, sug, err := replaceCilintConfigPath(lintFlags, "abc/def.yml")
 	if err != nil {
 		t.Error(err)
 		return
@@ -43,7 +44,7 @@ func Test_replaceLintConfig(t *testing.T) {
 }
 
 func Test_replaceLintConfig2(t *testing.T) {
-	ns, sug, err := replaceLintConfig([]byte(""), "abc/def.yml")
+	ns, sug, err := replaceCilintConfigPath([]byte(""), "abc/def.yml")
 	if err != nil {
 		t.Error(err)
 		return
@@ -53,16 +54,19 @@ func Test_replaceLintConfig2(t *testing.T) {
 	t.Log(string(ns))
 }
 
-func Test_replaceHolder(t *testing.T) {
-	ns, _, err := replaceLintConfig(golangciConfig, "abc/def.yml")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	t.Log(string(replaceLintPlaceHolder(ns)))
+func Test_replaceHolderNil(t *testing.T) {
+	t.Log(string(replaceCilintPlaceHolder(nil)))
 }
 
-func Test_replaceHolderNil(t *testing.T) {
-	t.Log(string(replaceLintPlaceHolder(nil)))
+func Test_writeNewSettingFile(t *testing.T) {
+	t.Log(string(writeNewSettingsFile("")))
+	t.Log(string(writeNewSettingsFile("abc/def.yml")))
+}
+
+func Test_cilintFilePath(t *testing.T) {
+	vscDir, _ := util.GetVscConfigDir()
+
+	t.Log(vscDir + util.VscConfigFilePath)
+	t.Log(vscDir + golangciDirector + devciFilePath)
+	t.Log(vscDir + golangciDirector + prodciFilePath)
 }

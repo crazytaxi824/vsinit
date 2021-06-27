@@ -23,10 +23,10 @@ var (
 	gitignore []byte
 
 	//go:embed golangci-lint/dev-ci.yml
-	devci []byte // TODO
+	devci []byte
 
 	//go:embed golangci-lint/prod-ci.yml
-	prodci []byte // TODO
+	prodci []byte
 )
 
 var mainGO = []byte(`package main

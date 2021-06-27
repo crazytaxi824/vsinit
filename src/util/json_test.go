@@ -105,7 +105,7 @@ func Test_FindSecondLast(t *testing.T) {
 }
 
 func Test_AppendJSONC(t *testing.T) {
-	n, err := appendToJSONC([]byte(totalsrc), []byte(`  "o":1,
+	n, err := AppendToJSONC([]byte(totalsrc), []byte(`  "o":1,
   "k":2`))
 	if err != nil {
 		t.Error(err)
@@ -116,7 +116,7 @@ func Test_AppendJSONC(t *testing.T) {
 }
 
 func Test_AppendJSONC2(t *testing.T) {
-	n, err := appendToJSONC([]byte("{}"), []byte(`  "o":1,
+	n, err := AppendToJSONC([]byte("{}"), []byte(`  "o":1,
   "k":2`))
 	if err != nil {
 		t.Error(err)
@@ -127,7 +127,7 @@ func Test_AppendJSONC2(t *testing.T) {
 }
 
 func Test_AppendJSONC3(t *testing.T) {
-	n, err := appendToJSONC([]byte(`{"a":"b"}`), []byte(`  "o":1,
+	n, err := AppendToJSONC([]byte(`{"a":"b"}`), []byte(`  "o":1,
   "k":2`))
 	if err != nil {
 		t.Error(err)

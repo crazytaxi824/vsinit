@@ -14,11 +14,8 @@ const (
 	// vsc 配置文件, ~/.vsc/vsc-config.json
 	VscConfigFilePath = "/vsc-config.json"
 
-	// golangci 文件夹
-	GolangciDirector = "/golangci"
-
 	// eslint 文件夹
-	EslintDirector = "/eslint"
+	EslintDirector = "/eslint" // TODO 移动到 js/ts 文件中
 )
 
 // lint 类型
