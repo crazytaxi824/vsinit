@@ -76,9 +76,7 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 		})
 	} else {
 		var (
-			fos    []string
-			fis    []util.FileContent
-			cipath string
+			gls *golangciLintStruct
 		)
 
 		if local { // 设置项目 golangci lint
@@ -87,22 +85,22 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 				return nil, er
 			}
 			// 设置需要创建的文件夹和要写的 golangci.yml 文件
-			fos, fis, cipath = setupLocalCilint(projectPath)
+			gls = setupLocalCilint(projectPath)
 		} else { // 设置 global lint
 			// 设置需要创建的文件夹和要写的 golangci.yml 文件
-			fos, fis, cipath, err = setupGlobleCilint()
+			gls, err = setupGlobleCilint()
 			if err != nil {
 				return nil, err
 			}
 		}
 
 		// 将 dev-ci.yml prod-ci.yml 配置文件都设为需要创建和写入
-		folders = append(folders, fos...)
-		files = append(files, fis...)
+		folders = append(folders, gls.Folders...)
+		files = append(files, gls.Files...)
 
 		// 设置 cipath 到 setting.json 中
 		// settingJSON, overwrite, sug, er := checkSettingsJSONfileExist(cipath)
-		settingJSON, sug, er := checkSettingJSONExist(cipath)
+		settingJSON, sug, er := checkSettingJSONExist(gls.Cipath)
 		if er != nil {
 			return nil, er
 		}

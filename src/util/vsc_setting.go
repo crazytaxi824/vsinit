@@ -32,44 +32,35 @@ type VscSetting struct {
 	Eslint   string `json:"eslint,omitempty"`
 }
 
-func (vs *VscSetting) ReadJSON(reader io.Reader) error {
-	de := json.NewDecoder(reader)
-	return de.Decode(vs)
-}
-
-func (vs *VscSetting) SetLintConfig(lint Lint, cfgPath string) {
-	switch lint {
-	case Golangci:
-		vs.Golangci = cfgPath
-	case Eslint:
-		vs.Eslint = cfgPath
-	}
-}
-
-func (vs *VscSetting) writeToFile(file *os.File) error {
-	r, err := json.Marshal(vs)
+func (vs *VscSetting) ReadFromFile() error {
+	vscDir, err := GetVscConfigDir()
 	if err != nil {
 		return err
 	}
 
-	// 重置 I/O offset
-	_, err = file.Seek(0, io.SeekStart)
+	// read vsc config file
+	f, err := os.Open(vscDir + VscConfigFilePath)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	// 清空文件
-	err = file.Truncate(0)
-	if err != nil {
-		return err
-	}
-
-	_, err = file.Write(r)
+	// ~/.vsc/vsc-config 文件存在, 读取文件
+	err = vs.ReadJSON(f)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (vs *VscSetting) ReadJSON(reader io.Reader) error {
+	de := json.NewDecoder(reader)
+	return de.Decode(vs)
+}
+
+func (vs *VscSetting) JSONIndentFormat() ([]byte, error) {
+	return json.MarshalIndent(vs, "", "  ")
 }
 
 func GetVscConfigDir() (string, error) {
@@ -102,56 +93,56 @@ func ReadVscConfig() (*VscSetting, error) {
 	return &vscSetting, nil
 }
 
-func SetVscSetting(lint Lint, cfgPath string) error {
-	vscDir, err := GetVscConfigDir()
-	if err != nil {
-		return err
-	}
+// func SetVscSetting(lint Lint, cfgPath string) error {
+// 	vscDir, err := GetVscConfigDir()
+// 	if err != nil {
+// 		return err
+// 	}
 
-	vscf, err := os.OpenFile(vscDir+VscConfigFilePath, os.O_RDWR, 0600)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return err
-	} else if errors.Is(err, os.ErrNotExist) {
-		// 文件不存在, 写入新文件
-		er := writeNewSettingFile(vscDir, cfgPath, lint)
-		if er != nil {
-			return er
-		}
-		return nil
-	}
-	defer vscf.Close()
+// 	vscf, err := os.OpenFile(vscDir+VscConfigFilePath, os.O_RDWR, 0600)
+// 	if err != nil && !errors.Is(err, os.ErrNotExist) {
+// 		return err
+// 	} else if errors.Is(err, os.ErrNotExist) {
+// 		// 文件不存在, 写入新文件
+// 		er := writeNewSettingFile(vscDir, cfgPath, lint)
+// 		if er != nil {
+// 			return er
+// 		}
+// 		return nil
+// 	}
+// 	defer vscf.Close()
 
-	// json 反序列化
-	var vscSetting VscSetting
-	err = vscSetting.ReadJSON(vscf)
-	if err != nil {
-		return err
-	}
+// 	// json 反序列化
+// 	var vscSetting VscSetting
+// 	err = vscSetting.ReadJSON(vscf)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// 修改设置然后写入
-	vscSetting.SetLintConfig(lint, cfgPath)
+// 	// 修改设置然后写入
+// 	vscSetting.SetLintConfig(lint, cfgPath)
 
-	// 写入文件
-	return vscSetting.writeToFile(vscf)
-}
+// 	// 写入文件
+// 	return vscSetting.writeToFile(vscf)
+// }
 
-func writeNewSettingFile(dirPath, cfgPath string, lint Lint) error {
-	// 创建文件夹
-	err := os.Mkdir(dirPath, 0750)
-	if err != nil && !errors.Is(err, os.ErrExist) {
-		return err
-	}
+// func writeNewSettingFile(dirPath, cfgPath string, lint Lint) error {
+// 	// 创建文件夹
+// 	err := os.Mkdir(dirPath, 0750)
+// 	if err != nil && !errors.Is(err, os.ErrExist) {
+// 		return err
+// 	}
 
-	// 写入文件
-	vscf, err := os.OpenFile(dirPath+VscConfigFilePath, os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
-	defer vscf.Close()
+// 	// 写入文件
+// 	vscf, err := os.OpenFile(dirPath+VscConfigFilePath, os.O_CREATE|os.O_WRONLY, 0600)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer vscf.Close()
 
-	var vscSetting VscSetting
-	vscSetting.SetLintConfig(lint, cfgPath)
+// 	var vscSetting VscSetting
+// 	vscSetting.SetLintConfig(lint, cfgPath)
 
-	// 写入文件
-	return vscSetting.writeToFile(vscf)
-}
+// 	// 写入文件
+// 	return vscSetting.writeToFile(vscf)
+// }

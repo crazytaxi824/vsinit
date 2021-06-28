@@ -2,7 +2,6 @@ package golang
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"local/src/util"
 	"os"
@@ -45,67 +44,98 @@ var (
 `)
 )
 
+type golangciLintStruct struct {
+	Folders []string
+	Files   []util.FileContent
+	Cipath  string
+}
+
 // 设置全局 golangci-lint, 如果第一次写入，则生成新文件，
 // 如果之前已经设置过，则直接返回 golangci lint config 的文件地址.
-func setupGlobleCilint() (folders []string, files []util.FileContent, cipath string, err error) {
+func setupGlobleCilint() (*golangciLintStruct, error) {
 	vscDir, err := util.GetVscConfigDir()
 	if err != nil {
-		return nil, nil, "", err
+		return nil, err
 	}
-
-	var vsSetting util.VscSetting
 
 	// read vsc config file
 	f, err := os.Open(vscDir + util.VscConfigFilePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return nil, nil, "", err
+		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsc/vsc-config 文件不存在，创建文件夹，创建文件
-		folders, files, cipath = writeCilintFiles(vscDir)
+		return newGlobalCilintSetup(vscDir)
+	}
+	defer f.Close()
 
-		// 创建 ~/.vsc/vsc-config 文件
-		vsSetting.SetLintConfig(util.Golangci, cipath)
-		b, er := json.MarshalIndent(vsSetting, "", "  ")
+	// ~/.vsc/vsc-config 文件存在, 读取文件
+	var vsSetting util.VscSetting
+	err = vsSetting.ReadJSON(f)
+	if err != nil {
+		return nil, err
+	}
+
+	// 检查 golangci 设置
+	if vsSetting.Golangci == "" {
+		// 没有设置 golangci-lint 的情况
+		gls := writeCilintFiles(vscDir)
+
+		vsSetting.Golangci = gls.Cipath
+
+		// json 格式化
+		b, er := vsSetting.JSONIndentFormat()
 		if er != nil {
-			return nil, nil, "", err
+			return nil, err
 		}
 
-		files = append(files, util.FileContent{
+		gls.Files = append(gls.Files, util.FileContent{
 			Path:      vscDir + util.VscConfigFilePath,
 			Content:   b,
 			Overwrite: true,
 		})
 
-		return folders, files, cipath, nil
-	}
-	defer f.Close()
-
-	// ~/.vsc/vsc-config 文件存在, 读取文件
-	err = vsSetting.ReadJSON(f)
-	if err != nil {
-		return nil, nil, "", err
-	}
-
-	// 检查 golangci 设置
-	if vsSetting.Golangci == "" { // 没有设置 golangci-lint
-		folders, files, cipath = writeCilintFiles(vscDir)
-		return folders, files, cipath, nil
+		return &gls, nil
 	}
 
 	// 已经设置 golangci-lint
-	return nil, nil, vsSetting.Golangci, nil
+	return &golangciLintStruct{Cipath: vsSetting.Golangci}, nil
+}
+
+func newGlobalCilintSetup(vscDir string) (*golangciLintStruct, error) {
+	gls := writeCilintFiles(vscDir)
+
+	// 创建 ~/.vsc/vsc-config 文件
+	vsSetting := util.VscSetting{
+		Golangci: gls.Cipath,
+	}
+
+	// json 格式化
+	b, er := vsSetting.JSONIndentFormat()
+	if er != nil {
+		return nil, er
+	}
+
+	gls.Files = append(gls.Files, util.FileContent{
+		Path:      vscDir + util.VscConfigFilePath,
+		Content:   b,
+		Overwrite: true,
+	})
+
+	return &gls, nil
 }
 
 // 设置项目 golangci-lint, 写入文件，返回 golangci lint config 的文件地址.
-func setupLocalCilint(projectPath string) (folders []string, files []util.FileContent, cipath string) {
-	folders, files, _ = writeCilintFiles(projectPath)
-	return folders, files, vsWorkspace + golangciDirector + devciFilePath
+func setupLocalCilint(projectPath string) *golangciLintStruct {
+	gls := writeCilintFiles(projectPath)
+	return &golangciLintStruct{gls.Folders, gls.Files, vsWorkspace + golangciDirector + devciFilePath}
 }
 
 // 在指定路径下写入 dev-ci.yml 和 prod-ci.yml 文件.
-func writeCilintFiles(dir string) (folders []string, files []util.FileContent, cipath string) {
-	folders = append(folders, dir, dir+golangciDirector)
-	files = append(files, util.FileContent{
+func writeCilintFiles(dir string) golangciLintStruct {
+	var gls golangciLintStruct
+
+	gls.Folders = append(gls.Folders, dir, dir+golangciDirector)
+	gls.Files = append(gls.Files, util.FileContent{
 		Path:    dir + golangciDirector + devciFilePath,
 		Content: devci,
 	}, util.FileContent{
@@ -113,9 +143,11 @@ func writeCilintFiles(dir string) (folders []string, files []util.FileContent, c
 		Content: prodci,
 	})
 
+	gls.Cipath = dir + golangciDirector + devciFilePath
+
 	// TODO 检查 $HOME 路径和 ${workspaceRoot} 路径
 
-	return folders, files, dir + golangciDirector + devciFilePath
+	return gls
 }
 
 // 生成一个 settings.json 文件
