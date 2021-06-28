@@ -7,6 +7,7 @@ import (
 	"fmt"
 )
 
+// 单行处理 jsonc 语句，不会改变原语句，只会指出原语句中最后一个有效字符的 index.
 // multiLineComment 说明是否在多行注释中 /* */
 func lastValidChatInJSONCline(src []byte, start int) (lastValidCharIndex int, multiLineComment bool, err error) {
 	l := len(src)
@@ -87,6 +88,7 @@ func toggle(b *bool) {
 	}
 }
 
+// 单行处理 jsonc 语句，将有效字符写入 buf 中。会改变原本的语句。
 // multiLineComment 说明是否在多行注释中 /* */
 func JsoncLineTojson(src []byte, start int, buf *bytes.Buffer) (multiLineComment bool, err error) {
 	l := len(src)
@@ -157,6 +159,7 @@ ForLoop:
 	return multiLineComment, nil
 }
 
+// 将整个 jsonc 转成 json
 func JSONCToJSON(jsonc []byte) ([]byte, error) {
 	lines := bytes.Split(jsonc, []byte("\n"))
 
@@ -190,7 +193,7 @@ func JSONCToJSON(jsonc []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-type JSONCstatment struct {
+type jsoncStatment struct {
 	LineIndex          int // 行号
 	LastValidCharIndex int // 最后一个有效字符的 index，后面的 // comments 不算在内
 }
@@ -200,7 +203,7 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 	lines := bytes.Split(jsonc, []byte("\n"))
 
 	var (
-		result       []JSONCstatment
+		result       []jsoncStatment
 		lastIndex    int
 		multiComment bool
 		er           error
@@ -224,12 +227,12 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 
 		// lastIndex == -1, 表示整行都是 comment, 或者是空行
 		if lastIndex != -1 {
-			result = append(result, JSONCstatment{i, lastIndex})
+			result = append(result, jsoncStatment{i, lastIndex})
 		}
 	}
 
 	l := len(result)
-	var r JSONCstatment
+	var r jsoncStatment
 	if l > 1 {
 		r = result[l-2]
 	}
@@ -237,11 +240,12 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 	return r.LineIndex, r.LastValidCharIndex, nil
 }
 
+// 向 jsonc 最后添加设置
 func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 	lines := bytes.Split(jsonc, []byte("\n"))
 
 	var (
-		result       []JSONCstatment
+		result       []jsoncStatment
 		lastIndex    int
 		multiComment bool
 		er           error
@@ -265,12 +269,12 @@ func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 
 		// lastIndex == -1, 表示整行都是 comment, 或者是空行
 		if lastIndex != -1 {
-			result = append(result, JSONCstatment{i, lastIndex})
+			result = append(result, jsoncStatment{i, lastIndex})
 		}
 	}
 
 	l := len(result)
-	var r JSONCstatment
+	var r jsoncStatment
 	var newJSONC [][]byte
 
 	last := result[l-1]

@@ -50,7 +50,10 @@ var (
   ]`)
 )
 
-// local 表示是否本地设置
+// TODO golangci setup
+
+// 设置全局 golangci-lint, 如果第一次写入，则生成新文件，
+// 如果之前已经设置过，则直接返回 golangci lint config 的文件地址.
 func setupGlobleCilint() (folders []string, files []util.FileContent, cipath string, err error) {
 	vscDir, err := util.GetVscConfigDir()
 	if err != nil {
@@ -86,11 +89,13 @@ func setupGlobleCilint() (folders []string, files []util.FileContent, cipath str
 	return nil, nil, vsSetting.Golangci, nil
 }
 
+// 设置项目 golangci-lint, 写入文件，返回 golangci lint config 的文件地址.
 func setupLocalCilint(projectPath string) (folders []string, files []util.FileContent, cipath string) {
 	folders, files, _ = writeCilintFiles(projectPath)
 	return folders, files, vsWorkspace + golangciDirector + devciFilePath
 }
 
+// 写入 dev-ci.yml 和 prod-ci.yml 文件
 func writeCilintFiles(dir string) (folders []string, files []util.FileContent, cipath string) {
 	folders = append(folders, dir, dir+golangciDirector)
 	files = append(files, util.FileContent{
@@ -103,16 +108,16 @@ func writeCilintFiles(dir string) (folders []string, files []util.FileContent, c
 	return folders, files, dir + golangciDirector + devciFilePath
 }
 
+// 组合 lintTool, lintOnSave, lintFlags 设置
 func golangciSettings(settings ...[]byte) []byte {
 	if len(settings) == 0 {
 		return nil
 	}
-
 	return bytes.Join(settings, []byte(",\n"))
 }
 
-// 新写入一个 settings.json 文件
-func writeNewSettingsFile(ciPath string) []byte {
+// 生成一个 settings.json 文件
+func genNewSettingsFile(ciPath string) []byte {
 	if ciPath == "" {
 		return replaceCilintPlaceHolder(nil)
 	}
@@ -167,7 +172,8 @@ func replaceCilintConfigPath(settingsJSON []byte, ciPath string) (newSettings []
 	return bytes.Join(lines, []byte("\n")), nil, nil
 }
 
-// 替换 settings_template.txt 模板中的 place holder, 添加整个 golangci-lint setting
+// 替换 settings_template.txt 模板中的 place holder, ${golangcilintPlaceHolder}
+// 添加整个 golangci-lint setting.
 func replaceCilintPlaceHolder(content []byte) []byte {
 	return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), content)
 }

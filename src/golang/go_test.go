@@ -59,8 +59,8 @@ func Test_replaceHolderNil(t *testing.T) {
 }
 
 func Test_writeNewSettingFile(t *testing.T) {
-	t.Log(string(writeNewSettingsFile("")))
-	t.Log(string(writeNewSettingsFile("abc/def.yml")))
+	t.Log(string(genNewSettingsFile("")))
+	t.Log(string(genNewSettingsFile("abc/def.yml")))
 }
 
 func Test_cilintFilePath(t *testing.T) {
