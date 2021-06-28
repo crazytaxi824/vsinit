@@ -1,12 +1,11 @@
 package golang
 
 import (
+	"bytes"
 	_ "embed" // for go:embed file use
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -20,7 +19,7 @@ var (
 	launchJSON []byte
 
 	//go:embed cfgfiles/settings.json
-	settingsJSON []byte
+	// settingsJSON []byte
 
 	//go:embed cfgfiles/settings_template.txt
 	settingTemplate []byte
@@ -44,21 +43,6 @@ func main() {
     // need to run "go mod init <name>" first.
 }
 `)
-
-// var filesAndContent = []util.FileContent{
-// 	{Path: ".vscode/launch.json", Content: launchJSON},
-// 	{Path: ".vscode/settings.json", Content: settingsJSON},
-// 	{Path: ".gitignore", Content: gitignore},
-// 	{Path: "src/main.go", Content: mainGO},
-// }
-
-// func InitProject() error {
-// 	folders := createFolders
-// 	files := filesAndContent
-
-// 	fmt.Println("init Golang project")
-// 	return util.WriteFoldersAndFiles(folders, files)
-// }
 
 var filesAndContent = []util.FileContent{
 	{Path: ".vscode/launch.json", Content: launchJSON},
@@ -118,20 +102,21 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 		files = append(files, fis...)
 
 		// 设置 cipath 到 setting.json 中
-		settingJSON, overwrite, sug, er := checkSettingsJSONfileExist(cipath)
+		// settingJSON, overwrite, sug, er := checkSettingsJSONfileExist(cipath)
+		settingJSON, sug, er := checkSettingJSONExist(cipath)
 		if er != nil {
 			return nil, er
 		}
 		if sug != nil {
 			suggs = append(suggs, sug)
 		}
-
 		// 添加 settings.json 文件
-		files = append(files, util.FileContent{
-			Path:      ".vscode/settings.json",
-			Content:   settingJSON,
-			Overwrite: overwrite,
-		})
+		if settingJSON != nil {
+			files = append(files, util.FileContent{
+				Path:    ".vscode/settings.json",
+				Content: settingJSON,
+			})
+		}
 	}
 
 	fmt.Println("init Golang project")
@@ -148,73 +133,27 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 	return suggs, nil
 }
 
-// 查看 .vscode/settings.json 文件是否存在
-func checkSettingsJSONfileExist(cipath string) (newSetting []byte, overwrite bool, sug *util.Suggestion, err error) {
+func checkSettingJSONExist(ciPath string) (newSetting []byte, sug *util.Suggestion, err error) {
 	settingsPath, err := filepath.Abs(".vscode/settings.json")
 	if err != nil {
-		return nil, false, nil, err
+		return nil, nil, err
 	}
 
 	sf, err := os.Open(settingsPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return nil, false, nil, err
+		return nil, nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// settings.json 不存在, 生成新的 settings.json 文件
-		return genNewSettingsFile(cipath), false, nil, nil
+		return genNewSettingsFile(ciPath), nil, nil
 	}
 	defer sf.Close()
 
-	// 如果 settings.json 文件存在，需要 overwrite
-	overwrite = true
+	// 如果 settings.json 文件存在，需要 suggestion
+	golangciConfig := golangciSettings(lintTool, lintOnSave, lintFlags)
+	r := bytes.ReplaceAll(golangciConfig, []byte(configPlaceHolder), []byte(ciPath))
 
-	// 查看 lint 设置是否存在
-	jsonc, err := io.ReadAll(sf)
-	if err != nil {
-		return nil, false, nil, err
-	}
-
-	// 读取 setting.json 文件
-	js, err := util.JSONCToJSON(jsonc)
-	if err != nil {
-		return nil, false, nil, err
-	}
-
-	var m map[string]interface{}
-	err = json.Unmarshal(js, &m)
-	if err != nil {
-		return nil, false, nil, err
-	}
-
-	// 查看 lintTool, lintOnSave, lintFlags 设置是否存在
-	var lints [][]byte
-	if _, ok := m["go.lintFlags"]; !ok {
-		lints = append(lints, lintFlags)
-	} else {
-		// 如果已经设置了 go.lintFlags, 修改 --config 设置。
-		// 如果 --config 不存在，通过 suggestion 提示。
-		newSetting, sug, err = replaceCilintConfigPath(jsonc, cipath)
-		if err != nil {
-			return nil, false, sug, err
-		}
-	}
-
-	if _, ok := m["go.lintTool"]; !ok {
-		lints = append(lints, lintTool)
-	}
-	if _, ok := m["go.lintOnSave"]; !ok {
-		lints = append(lints, lintOnSave)
-	}
-
-	// append 到 setting.json 中
-	newSetting, err = util.AppendToJSONC(newSetting, golangciSettings(lints...))
-	if err != nil {
-		return nil, false, nil, err
-	}
-
-	// 如果 setting 没有变，不需要 overwrite.
-	if string(newSetting) == string(jsonc) {
-		overwrite = false
-	}
-
-	return newSetting, overwrite, sug, nil
+	return nil, &util.Suggestion{
+		Problem:  "please add following in '.vscode/settings.json':",
+		Solution: string(r),
+	}, nil
 }

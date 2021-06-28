@@ -126,52 +126,6 @@ func genNewSettingsFile(ciPath string) []byte {
 	return replaceCilintPlaceHolder(r)
 }
 
-// 替换模板中的 go.lintFlags --config 设置，只替换 cipath
-func replaceCilintConfigPath(settingsJSON []byte, ciPath string) (newSettings []byte, sug *util.Suggestion, err error) {
-	var (
-		multiComment bool
-		found        bool // 是否找到了设置
-		newCiPath    = "\"--config=" + ciPath + "\" " + configVSComments + " DON'T EDIT"
-	)
-
-	lines := bytes.Split(settingsJSON, []byte("\n"))
-	for i := range lines {
-		start := 0
-		var buf bytes.Buffer
-		if multiComment {
-			ci := bytes.Index(lines[i], []byte("*/"))
-			if ci == -1 {
-				continue
-			} else {
-				start = ci + 2
-			}
-		}
-
-		multiComment, err = util.JsoncLineTojson(lines[i], start, &buf)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		// 修改同时有 --config= 和 //vsc:cilint 的行
-		if bytes.Contains(buf.Bytes(), []byte("\"--config=")) && bytes.Contains(lines[i], []byte(configVSComments)) {
-			space := bytes.Index(lines[i], []byte("\"")) // 计算空格数量
-			lines[i] = append(lines[i][:space], newCiPath...)
-			found = true // 标记找到了 --config 设置
-			break
-		}
-	}
-
-	if !found { // 如果没有找到 cilint 设置, 将 settings 原封不动的返回
-		r := bytes.ReplaceAll(lintFlags, []byte(configPlaceHolder), []byte(ciPath))
-		return settingsJSON, &util.Suggestion{
-			Problem:  "can't find golangci-lint config, please add following in '.vscode/settings.json'",
-			Solution: string(r),
-		}, nil
-	}
-
-	return bytes.Join(lines, []byte("\n")), nil, nil
-}
-
 // 替换 settings_template.txt 模板中的 place holder, ${golangcilintPlaceHolder}
 // 添加整个 golangci-lint setting.
 func replaceCilintPlaceHolder(content []byte) []byte {

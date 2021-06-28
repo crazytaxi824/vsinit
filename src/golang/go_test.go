@@ -32,28 +32,6 @@ func Test_StringFormat(t *testing.T) {
 	}
 }
 
-func Test_replaceLintConfig(t *testing.T) {
-	ns, sug, err := replaceCilintConfigPath(lintFlags, "abc/def.yml")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	t.Log(sug)
-	t.Log(string(ns))
-}
-
-func Test_replaceLintConfig2(t *testing.T) {
-	ns, sug, err := replaceCilintConfigPath([]byte(""), "abc/def.yml")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	t.Log(sug)
-	t.Log(string(ns))
-}
-
 func Test_replaceHolderNil(t *testing.T) {
 	t.Log(string(replaceCilintPlaceHolder(nil)))
 }

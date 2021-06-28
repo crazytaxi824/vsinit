@@ -1,5 +1,6 @@
 {
   "editor.formatOnSave": true, // save 的时候格式化文件
+
   "[go]": {
     "editor.defaultFormatter": "golang.go", // go 不使用 prettier 格式化代码
     "editor.codeActionsOnSave": {
@@ -8,6 +9,7 @@
     // Optional: Disable snippets, as they conflict with completion ranking.
     // "editor.snippetSuggestions": "none"
   },
+
   "[go.mod]": {
     "editor.codeActionsOnSave": {
       "source.organizeImports": true
@@ -16,6 +18,7 @@
 
   // gopls 设置, https://github.com/golang/tools/tree/master/gopls
   "go.useLanguageServer": true, // 使用 gopls
+
   "gopls": {
     // Add parameter placeholders when completing a function.
     "usePlaceholders": true,
