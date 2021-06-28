@@ -150,28 +150,13 @@ func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, e
 	defer sf.Close()
 
 	// json 反序列化 settings.json
-	jsonc, err := io.ReadAll(sf)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	js, err := util.JSONCToJSON(jsonc)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	type settingsStruct struct {
-		GolingFlags []string `json:"go.lintFlags,omitempty"`
-	}
-
-	var settings settingsStruct
-	err = json.Unmarshal(js, &settings)
+	golingFlags, err := readSettingJSON(sf)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	// 判断 --config 地址是否和要设置的 cipath 相同, 如果相同则不更新 setting 文件。
-	for _, v := range settings.GolingFlags {
+	for _, v := range golingFlags {
 		if v == "--config="+ciPath { // 相同的路径
 			return nil, nil, nil
 		}
@@ -184,4 +169,29 @@ func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, e
 		Problem:  "please add following in '.vscode/settings.json':",
 		Solution: string(cilintConfig),
 	}, nil
+}
+
+func readSettingJSON(file *os.File) ([]string, error) {
+	// json 反序列化 settings.json
+	jsonc, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	js, err := util.JSONCToJSON(jsonc)
+	if err != nil {
+		return nil, err
+	}
+
+	type settingsStruct struct {
+		GolingFlags []string `json:"go.lintFlags,omitempty"`
+	}
+
+	var settings settingsStruct
+	err = json.Unmarshal(js, &settings)
+	if err != nil {
+		return nil, err
+	}
+
+	return settings.GolingFlags, nil
 }
