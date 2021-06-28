@@ -242,6 +242,10 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 
 // 向 jsonc 最后添加设置
 func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
+	if len(content) == 0 {
+		return jsonc, nil
+	}
+
 	lines := bytes.Split(jsonc, []byte("\n"))
 
 	var (
@@ -276,6 +280,11 @@ func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 	l := len(result)
 	var r jsoncStatment
 	var newJSONC [][]byte
+
+	// TODO if l == 0 表示整个文件中连 {} 都没有，只有 comments
+	if l == 0 {
+		return nil, errors.New("append to nil valid jsonc file")
+	}
 
 	last := result[l-1]
 	if last.LastValidCharIndex == 0 { // 最后一行只有一个 '}' || ']' 的情况

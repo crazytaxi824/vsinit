@@ -45,7 +45,6 @@ var (
     "--fast", // without --fast can freeze your editor.
 
     // golangci-lint 配置文件地址
-    // "--config=${workspaceRoot}/golangci.yml" // 本地
     "--config=` + configPlaceHolder + `" ` + configVSComments + ` DON'T EDIT
   ]`)
 )
@@ -153,19 +152,19 @@ func replaceCilintConfigPath(settingsJSON []byte, ciPath string) (newSettings []
 			return nil, nil, err
 		}
 
-		if bytes.Contains(buf.Bytes(), []byte("\"--config=")) &&
-			bytes.Contains(lines[i], []byte(configVSComments)) {
+		if bytes.Contains(buf.Bytes(), []byte("\"--config=")) && bytes.Contains(lines[i], []byte(configVSComments)) {
 			space := bytes.Index(lines[i], []byte("\"")) // 计算空格数量
 			lines[i] = append(lines[i][:space], newCiPath...)
-			found = true
+			found = true // 标记找到了 --config 设置
 			break
 		}
 	}
 
-	if !found { // 如果没有找到 cilint 设置
-		return nil, &util.Suggestion{
-			Problem:  "can't find golangci-lint config, please add following settings to 'go.lintFlags'",
-			Solution: newCiPath,
+	if !found { // 如果没有找到 cilint 设置, 将 settings 原封不动的返回
+		r := bytes.ReplaceAll(lintFlags, []byte(configPlaceHolder), []byte(ciPath))
+		return settingsJSON, &util.Suggestion{
+			Problem:  "can't find golangci-lint config, please add following in '.vscode/settings.json'",
+			Solution: string(r),
 		}, nil
 	}
 

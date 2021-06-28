@@ -190,7 +190,7 @@ func checkSettingsJSONfileExist(cipath string) (newSetting []byte, overwrite boo
 		// 如果 --config 不存在，通过 suggestion 提示。
 		newSetting, sug, err = replaceCilintConfigPath(jsonc, cipath)
 		if err != nil {
-			return nil, false, nil, err
+			return nil, false, sug, err
 		}
 	}
 

@@ -3,6 +3,7 @@ package util
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 )
@@ -48,7 +49,7 @@ func createDir(folderPath string) error {
 // create and write files.
 func createAndWriteFile(fc FileContent) error {
 	fmt.Printf("writing file: %s ... ", fc.Path)
-	f, err := os.OpenFile(fc.Path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(fc.Path, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Println("failed")
 		return fmt.Errorf("create %s Files error: %w", fc.Path, err)
@@ -65,6 +66,16 @@ func createAndWriteFile(fc FileContent) error {
 	if fi.Size() != 0 && !fc.Overwrite {
 		fmt.Println("skip, file already exists.")
 		return nil
+	}
+
+	if fc.Overwrite { // 如果重写文件需要 truncate
+		if _, er := f.Seek(0, io.SeekStart); er != nil {
+			return er
+		}
+
+		if er := f.Truncate(0); er != nil {
+			return er
+		}
 	}
 
 	// write file content
