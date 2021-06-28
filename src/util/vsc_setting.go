@@ -32,12 +32,12 @@ type VscSetting struct {
 	Eslint   string `json:"eslint,omitempty"`
 }
 
-func (vs *VscSetting) readJSON(reader io.Reader) error {
+func (vs *VscSetting) ReadJSON(reader io.Reader) error {
 	de := json.NewDecoder(reader)
 	return de.Decode(vs)
 }
 
-func (vs *VscSetting) setLintConfig(lint Lint, cfgPath string) {
+func (vs *VscSetting) SetLintConfig(lint Lint, cfgPath string) {
 	switch lint {
 	case Golangci:
 		vs.Golangci = cfgPath
@@ -94,7 +94,7 @@ func ReadVscConfig() (*VscSetting, error) {
 	defer vscConfigFile.Close()
 
 	var vscSetting VscSetting
-	err = vscSetting.readJSON(vscConfigFile)
+	err = vscSetting.ReadJSON(vscConfigFile)
 	if err != nil {
 		return nil, err
 	}
@@ -123,13 +123,13 @@ func SetVscSetting(lint Lint, cfgPath string) error {
 
 	// json 反序列化
 	var vscSetting VscSetting
-	err = vscSetting.readJSON(vscf)
+	err = vscSetting.ReadJSON(vscf)
 	if err != nil {
 		return err
 	}
 
 	// 修改设置然后写入
-	vscSetting.setLintConfig(lint, cfgPath)
+	vscSetting.SetLintConfig(lint, cfgPath)
 
 	// 写入文件
 	return vscSetting.writeToFile(vscf)
@@ -150,7 +150,7 @@ func writeNewSettingFile(dirPath, cfgPath string, lint Lint) error {
 	defer vscf.Close()
 
 	var vscSetting VscSetting
-	vscSetting.setLintConfig(lint, cfgPath)
+	vscSetting.SetLintConfig(lint, cfgPath)
 
 	// 写入文件
 	return vscSetting.writeToFile(vscf)

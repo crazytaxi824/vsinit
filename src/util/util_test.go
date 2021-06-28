@@ -47,7 +47,7 @@ func Test_MakeDirAlreadyExist(t *testing.T) {
 
 func Test_ReadJSON(t *testing.T) {
 	var vs VscSetting
-	err := vs.readJSON(strings.NewReader(`{"golangci":"abc","eslint":"def"}`))
+	err := vs.ReadJSON(strings.NewReader(`{"golangci":"abc","eslint":"def"}`))
 	if err != nil {
 		t.Error(err)
 		return

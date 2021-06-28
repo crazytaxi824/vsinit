@@ -53,6 +53,8 @@ func setupGlobleCilint() (folders []string, files []util.FileContent, cipath str
 		return nil, nil, "", err
 	}
 
+	var vsSetting util.VscSetting
+
 	// read vsc config file
 	f, err := os.Open(vscDir + util.VscConfigFilePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -60,14 +62,26 @@ func setupGlobleCilint() (folders []string, files []util.FileContent, cipath str
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsc/vsc-config 文件不存在，创建文件夹，创建文件
 		folders, files, cipath = writeCilintFiles(vscDir)
+
+		// 创建 ~/.vsc/vsc-config 文件
+		vsSetting.SetLintConfig(util.Golangci, cipath)
+		b, er := json.MarshalIndent(vsSetting, "", "  ")
+		if er != nil {
+			return nil, nil, "", err
+		}
+
+		files = append(files, util.FileContent{
+			Path:      vscDir + util.VscConfigFilePath,
+			Content:   b,
+			Overwrite: true,
+		})
+
 		return folders, files, cipath, nil
 	}
 	defer f.Close()
 
 	// ~/.vsc/vsc-config 文件存在, 读取文件
-	var vsSetting util.VscSetting
-	de := json.NewDecoder(f)
-	err = de.Decode(&vsSetting)
+	err = vsSetting.ReadJSON(f)
 	if err != nil {
 		return nil, nil, "", err
 	}
@@ -98,6 +112,9 @@ func writeCilintFiles(dir string) (folders []string, files []util.FileContent, c
 		Path:    dir + golangciDirector + prodciFilePath,
 		Content: prodci,
 	})
+
+	// TODO 检查 $HOME 路径和 ${workspaceRoot} 路径
+
 	return folders, files, dir + golangciDirector + devciFilePath
 }
 
