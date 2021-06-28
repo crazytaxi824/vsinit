@@ -32,12 +32,7 @@ type VscSetting struct {
 	Eslint   string `json:"eslint,omitempty"`
 }
 
-func (vs *VscSetting) ReadFromFile() error {
-	vscDir, err := GetVscConfigDir()
-	if err != nil {
-		return err
-	}
-
+func (vs *VscSetting) ReadFromFile(vscDir string) error {
 	// read vsc config file
 	f, err := os.Open(vscDir + VscConfigFilePath)
 	if err != nil {
@@ -46,7 +41,7 @@ func (vs *VscSetting) ReadFromFile() error {
 	defer f.Close()
 
 	// ~/.vsc/vsc-config 文件存在, 读取文件
-	err = vs.ReadJSON(f)
+	err = vs.readJSON(f)
 	if err != nil {
 		return err
 	}
@@ -54,7 +49,7 @@ func (vs *VscSetting) ReadFromFile() error {
 	return nil
 }
 
-func (vs *VscSetting) ReadJSON(reader io.Reader) error {
+func (vs *VscSetting) readJSON(reader io.Reader) error {
 	de := json.NewDecoder(reader)
 	return de.Decode(vs)
 }
@@ -85,7 +80,7 @@ func ReadVscConfig() (*VscSetting, error) {
 	defer vscConfigFile.Close()
 
 	var vscSetting VscSetting
-	err = vscSetting.ReadJSON(vscConfigFile)
+	err = vscSetting.readJSON(vscConfigFile)
 	if err != nil {
 		return nil, err
 	}

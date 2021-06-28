@@ -59,20 +59,13 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 	}
 
 	// read vsc config file
-	f, err := os.Open(vscDir + util.VscConfigFilePath)
+	var vsSetting util.VscSetting
+	err = vsSetting.ReadFromFile(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsc/vsc-config 文件不存在，创建文件夹，创建文件
 		return newGlobalCilintSetup(vscDir)
-	}
-	defer f.Close()
-
-	// ~/.vsc/vsc-config 文件存在, 读取文件
-	var vsSetting util.VscSetting
-	err = vsSetting.ReadJSON(f)
-	if err != nil {
-		return nil, err
 	}
 
 	// 检查 golangci 设置
