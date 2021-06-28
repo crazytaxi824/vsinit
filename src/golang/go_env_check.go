@@ -14,7 +14,7 @@ func CheckGO(lintFlag bool) ([]*util.Suggestion, error) {
 	return checkGOENV(lintFlag)
 }
 
-// $GOBIN 是否存在
+// 检查所有 GO 运行环境
 func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	var suggs []*util.Suggestion
 
@@ -93,6 +93,7 @@ func checkVscodeExtensions() (*util.Suggestion, error) {
 	return nil, nil
 }
 
+// 检查 $GOPATH 设置
 func checkGOPATH() *util.Suggestion {
 	if os.Getenv("GOPATH") == "" {
 		return &util.Suggestion{
@@ -107,6 +108,7 @@ func checkGOPATH() *util.Suggestion {
 	return nil
 }
 
+// 检查 golang-ci lint 设置
 func checkGolangciLint() (*util.Suggestion, error) {
 	// 读取 vsc setting
 	cfg, err := util.ReadVscConfig()

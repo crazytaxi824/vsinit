@@ -7,17 +7,43 @@ import (
 	"testing"
 )
 
-func Test_FindLastChar(t *testing.T) {
+func Test_findLastChar(t *testing.T) {
 	src := `"s": "abc\" def\" \\\t \n /abc //notComment { } ~/omg/gg.json", // comment`
 
-	lastIndex, hasComments, err := analyseJSONCstatement([]byte(src), 0)
+	lastIndex, multiLineComment, err := lastValidChatInJSONCline([]byte(src), 0)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
 	t.Log(src[:lastIndex+1])
-	t.Log(hasComments)
+	t.Log(multiLineComment)
+}
+
+func Test_findLastChar2(t *testing.T) {
+	src := `{`
+
+	lastIndex, multiLineComment, err := lastValidChatInJSONCline([]byte(src), 0)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(lastIndex)
+	t.Log(src[:lastIndex+1])
+	t.Log(multiLineComment)
+}
+
+func Test_findLastChar3(t *testing.T) {
+	src := `{ "a": "c" }`
+
+	lastIndex, multiLineComment, err := lastValidChatInJSONCline([]byte(src), 0)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	t.Log(lastIndex)
+	t.Log(src[:lastIndex+1])
+	t.Log(multiLineComment)
 }
 
 const totalsrc = `{
@@ -25,6 +51,9 @@ const totalsrc = `{
   "s": "abc\" def\" \\\t \n /abc //notComment { } ~/omg/gg.json", // comment
   /* haha */ "a": /*dfsd*/ 1,
   "b */":/* omg */ "ok",
+  /*omg
+  hahaha
+  */
 
   "c": true, /* abc
   sfdsfsfs
@@ -46,8 +75,8 @@ const totalsrc = `{
 // this is the {comment} after setting
 `
 
-func Test_Json2(t *testing.T) {
-	r, err := JSONCToJSON2([]byte(totalsrc))
+func Test_JSONCToJSON(t *testing.T) {
+	r, err := JSONCToJSON([]byte(totalsrc))
 	if err != nil {
 		t.Error(err)
 		return
@@ -65,16 +94,6 @@ func Test_Json2(t *testing.T) {
 	t.Log(buf.String())
 }
 
-func Test_UnmarshalJSONC(t *testing.T) {
-	r, err := JSONCToJSON([]byte(totalsrc))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	t.Log(string(r))
-}
-
 func Test_FindSecondLast(t *testing.T) {
 	a, b, err := findSecondLastLine([]byte(totalsrc))
 	if err != nil {
@@ -85,6 +104,38 @@ func Test_FindSecondLast(t *testing.T) {
 	t.Log(a, b)
 }
 
+func Test_AppendJSONC(t *testing.T) {
+	n, err := AppendToJSONC([]byte(totalsrc), []byte(`  "o":1,
+  "k":2`))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(n))
+}
+
+func Test_AppendJSONC2(t *testing.T) {
+	n, err := AppendToJSONC([]byte("{}"), []byte(`  "o":1,
+  "k":2`))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(n))
+}
+
+func Test_AppendJSONC3(t *testing.T) {
+	n, err := AppendToJSONC([]byte(`{"a":"b"}`), []byte(`  "o":1,
+  "k":2`))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(string(n))
+}
 func Test_Index(t *testing.T) {
 	s := "abcbcbc"
 	t.Log(strings.Index(s, "d"))
