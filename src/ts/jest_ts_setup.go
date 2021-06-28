@@ -11,7 +11,6 @@
 package ts
 
 import (
-	_ "embed" // for go:embed file use
 	"encoding/json"
 	"errors"
 	"io"

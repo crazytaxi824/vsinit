@@ -1,4 +1,7 @@
 {
+  // NOTE important, ts string 单引号
+  "prettier.singleQuote": true,
+
   // 单独设置 eslint 配置文件
   "eslint.options": {
     // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用.
@@ -15,9 +18,6 @@
     // "javascriptreact",
     "javascript"
   ],
-
-  // NOTE important, ts string 单引号
-  "prettier.singleQuote": true,
 
   // search.exclude 用来忽略搜索的文件夹
   // files.exclude 用来忽略工程打开的文件夹
