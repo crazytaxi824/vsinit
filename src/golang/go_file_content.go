@@ -3,9 +3,11 @@ package golang
 import (
 	"bytes"
 	_ "embed" // for go:embed file use
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -146,6 +148,33 @@ func checkSettingJSONExist(ciPath string) (newSetting []byte, sug *util.Suggesti
 	defer sf.Close()
 
 	// 如果 settings.json 文件存在，需要 suggestion
+	jsonc, err := io.ReadAll(sf)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	js, err := util.JSONCToJSON(jsonc)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	type settingsStruct struct {
+		GolingFlags []string `json:"go.lintFlags,omitempty"`
+	}
+
+	var settings settingsStruct
+	err = json.Unmarshal(js, &settings)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// 判断 --config 地址是否和要设置的 cipath 相同
+	for _, v := range settings.GolingFlags {
+		if v == "--config="+ciPath { // 相同的路径
+			return nil, nil, nil
+		}
+	}
+
 	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
 
 	return nil, &util.Suggestion{

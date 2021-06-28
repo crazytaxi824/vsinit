@@ -45,8 +45,6 @@ var (
 `)
 )
 
-// TODO golangci setup
-
 // 设置全局 golangci-lint, 如果第一次写入，则生成新文件，
 // 如果之前已经设置过，则直接返回 golangci lint config 的文件地址.
 func setupGlobleCilint() (folders []string, files []util.FileContent, cipath string, err error) {
