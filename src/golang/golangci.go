@@ -69,11 +69,12 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 		return newGlobalCilintSetup(vscDir)
 	}
 
+	// 生成 folders 和 files
+	gls := writeCilintFiles(vscDir)
+
 	// 检查 golangci 设置
 	if vscSetting.Golangci == "" {
 		// 没有设置 golangci-lint 的情况
-		gls := writeCilintFiles(vscDir)
-
 		vscSetting.Golangci = gls.Cipath
 
 		// json 格式化
@@ -93,7 +94,8 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 	}
 
 	// 已经设置 golangci-lint
-	return &golangciLintStruct{Cipath: vscSetting.Golangci}, nil
+	gls.Cipath = vscSetting.Golangci
+	return &gls, nil
 }
 
 // 新写入 global golangci lint 设置
@@ -124,6 +126,8 @@ func newGlobalCilintSetup(vscDir string) (*golangciLintStruct, error) {
 // 设置项目 golangci-lint, 写入文件，返回 golangci lint config 的文件地址.
 func setupLocalCilint(projectPath string) *golangciLintStruct {
 	gls := writeCilintFiles(projectPath)
+
+	// 使用 ${workspaceRoot} 替代绝对路径
 	return &golangciLintStruct{gls.Folders, gls.Files, vsWorkspace + golangciDirector + devciFilePath}
 }
 

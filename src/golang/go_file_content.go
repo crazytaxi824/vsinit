@@ -54,8 +54,8 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 	goSet.Parse(os.Args[2:])
 
 	var (
-		folder []string
-		files  []util.FileContent
+		folders []string
+		files   []util.FileContent
 	)
 
 	if *cilintflag && *cilintProjflag {
@@ -63,23 +63,23 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 		return nil, errors.New("can not setup golangci-lint globally and locally at same time")
 	} else if *cilintflag && !*cilintProjflag {
 		// 设置 global golangci-lint
-		folder, files, suggs, err = initProjectWithGlobalLint()
+		folders, files, suggs, err = initProjectWithGlobalLint()
 		if err != nil {
 			return nil, err
 		}
 	} else if !*cilintflag && *cilintProjflag {
 		// 设置 project golangci-lint
-		folder, files, suggs, err = initProjectWithLocalLint()
+		folders, files, suggs, err = initProjectWithLocalLint()
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		// 不设置 golangci-lint
-		folder, files = initProjectWithoutLint()
+		folders, files = initProjectWithoutLint()
 	}
 
 	fmt.Println("init Golang project")
-	err = util.WriteFoldersAndFiles(folder, files)
+	err = util.WriteFoldersAndFiles(folders, files)
 	if err != nil {
 		return nil, err
 	}
