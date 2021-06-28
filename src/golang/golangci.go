@@ -152,6 +152,7 @@ func replaceCilintConfigPath(settingsJSON []byte, ciPath string) (newSettings []
 			return nil, nil, err
 		}
 
+		// 修改同时有 --config= 和 //vsc:cilint 的行
 		if bytes.Contains(buf.Bytes(), []byte("\"--config=")) && bytes.Contains(lines[i], []byte(configVSComments)) {
 			space := bytes.Index(lines[i], []byte("\"")) // 计算空格数量
 			lines[i] = append(lines[i][:space], newCiPath...)

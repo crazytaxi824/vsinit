@@ -40,6 +40,10 @@ func createDir(folderPath string) error {
 	if err != nil && !errors.Is(err, os.ErrExist) { // 判断 dir 是否已经存在
 		fmt.Println("failed")
 		return fmt.Errorf("create %s Dir error: %w", folderPath, err)
+	} else if errors.Is(err, os.ErrExist) {
+		// 如果文件夹已经存在
+		fmt.Println("skip, already exists")
+		return nil
 	}
 
 	fmt.Println("done")
@@ -64,7 +68,7 @@ func createAndWriteFile(fc FileContent) error {
 
 	// file is not empty, DO NOT TOUCH. Unless Overwrite
 	if fi.Size() != 0 && !fc.Overwrite {
-		fmt.Println("skip, file already exists.")
+		fmt.Println("skip, already exists")
 		return nil
 	}
 

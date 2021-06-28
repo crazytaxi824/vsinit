@@ -41,7 +41,7 @@ import "fmt"
 
 func main() {
 	fmt.Println("hello world")
-    // need to run "go mod init" first.
+    // need to run "go mod init <name>" first.
 }
 `)
 
@@ -103,14 +103,17 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 			if er != nil {
 				return nil, er
 			}
+			// 设置需要创建的文件夹和要写的 golangci.yml 文件
 			fos, fis, cipath = setupLocalCilint(projectPath)
 		} else { // 设置 global lint
+			// 设置需要创建的文件夹和要写的 golangci.yml 文件
 			fos, fis, cipath, err = setupGlobleCilint()
 			if err != nil {
 				return nil, err
 			}
 		}
 
+		// 将 dev-ci.yml prod-ci.yml 配置文件都设为需要创建和写入
 		folders = append(folders, fos...)
 		files = append(files, fis...)
 
@@ -123,6 +126,7 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 			suggs = append(suggs, sug)
 		}
 
+		// 添加 settings.json 文件
 		files = append(files, util.FileContent{
 			Path:      ".vscode/settings.json",
 			Content:   settingJSON,
@@ -205,6 +209,11 @@ func checkSettingsJSONfileExist(cipath string) (newSetting []byte, overwrite boo
 	newSetting, err = util.AppendToJSONC(newSetting, golangciSettings(lints...))
 	if err != nil {
 		return nil, false, nil, err
+	}
+
+	// 如果 setting 没有变，不需要 overwrite.
+	if string(newSetting) == string(jsonc) {
+		overwrite = false
 	}
 
 	return newSetting, overwrite, sug, nil
