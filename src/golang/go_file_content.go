@@ -45,7 +45,6 @@ func main() {
 
 var filesAndContent = []util.FileContent{
 	{Path: ".vscode/launch.json", Content: launchJSON},
-	// {Path: ".vscode/settings.json", Content: settingsJSON},
 	{Path: ".gitignore", Content: gitignore},
 	{Path: "src/main.go", Content: mainGO},
 }
@@ -55,12 +54,17 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 	goSet.Parse(os.Args[2:])
 
 	if *cilintflag && *cilintProjflag {
+		// 如果两个选项都有，则报错
 		return nil, errors.New("can not setup golangci-lint globally and locally at same time")
 	} else if *cilintflag && !*cilintProjflag {
+		// 设置 global golangci-lint
 		return initProject(true, false)
 	} else if !*cilintflag && *cilintProjflag {
+		// 设置 project golangci-lint
 		return initProject(true, true)
 	}
+
+	// 不设置 golangci-lint
 	return initProject(false, false)
 }
 
@@ -68,26 +72,26 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 	folders := createFolders
 	files := filesAndContent
 
-	if !cilint { // 如果不需要设置 cilint
+	if !cilint {
+		// 不需要设置 cilint 的情况，直接写 setting
 		settingJSON := genNewSettingsFile("")
 		files = append(files, util.FileContent{
 			Path:    ".vscode/settings.json",
 			Content: settingJSON,
 		})
 	} else {
-		var (
-			gls *golangciLintStruct
-		)
+		// 需要设置 cilint 的情况
+		var gls *golangciLintStruct
 
-		if local { // 设置项目 golangci lint
+		if local { // 设置 project golangci lint
 			projectPath, er := filepath.Abs(".")
 			if er != nil {
 				return nil, er
 			}
-			// 设置需要创建的文件夹和要写的 golangci.yml 文件
+			// 添加 <project>/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
 			gls = setupLocalCilint(projectPath)
 		} else { // 设置 global lint
-			// 设置需要创建的文件夹和要写的 golangci.yml 文件
+			// 添加 ~/.vsc/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
 			gls, err = setupGlobleCilint()
 			if err != nil {
 				return nil, err
@@ -98,17 +102,16 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 		folders = append(folders, gls.Folders...)
 		files = append(files, gls.Files...)
 
-		// 设置 cipath 到 setting.json 中
-		// settingJSON, overwrite, sug, er := checkSettingsJSONfileExist(cipath)
-		settingJSON, sug, er := checkSettingJSONExist(gls.Cipath)
+		// 设置 settings.json 文件, 将 --config 设置为 cipath
+		settingJSON, sug, er := checkSettingJSON(gls.Cipath)
 		if er != nil {
 			return nil, er
 		}
 		if sug != nil {
 			suggs = append(suggs, sug)
 		}
-		// 添加 settings.json 文件
 		if settingJSON != nil {
+			// 添加 settings.json 文件到写入队列中
 			files = append(files, util.FileContent{
 				Path:    ".vscode/settings.json",
 				Content: settingJSON,
@@ -130,7 +133,8 @@ func initProject(cilint, local bool) (suggs []*util.Suggestion, err error) {
 	return suggs, nil
 }
 
-func checkSettingJSONExist(ciPath string) (newSetting []byte, sug *util.Suggestion, err error) {
+// 检查 .vscode/settings.json 是否存在
+func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, err error) {
 	settingsPath, err := filepath.Abs(".vscode/settings.json")
 	if err != nil {
 		return nil, nil, err
@@ -145,7 +149,7 @@ func checkSettingJSONExist(ciPath string) (newSetting []byte, sug *util.Suggesti
 	}
 	defer sf.Close()
 
-	// 如果 settings.json 文件存在，需要 suggestion
+	// json 反序列化 settings.json
 	jsonc, err := io.ReadAll(sf)
 	if err != nil {
 		return nil, nil, err
@@ -166,17 +170,18 @@ func checkSettingJSONExist(ciPath string) (newSetting []byte, sug *util.Suggesti
 		return nil, nil, err
 	}
 
-	// 判断 --config 地址是否和要设置的 cipath 相同
+	// 判断 --config 地址是否和要设置的 cipath 相同, 如果相同则不更新 setting 文件。
 	for _, v := range settings.GolingFlags {
 		if v == "--config="+ciPath { // 相同的路径
 			return nil, nil, nil
 		}
 	}
 
-	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
-
+	// 如果 settings.json 文件存在，而且 config != cipath, 则需要 suggestion
+	// 建议手动添加设置到 .vscode/settings.json 中
+	cilintConfig := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
 	return nil, &util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
-		Solution: string(r),
+		Solution: string(cilintConfig),
 	}, nil
 }
