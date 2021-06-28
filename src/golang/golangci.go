@@ -79,7 +79,7 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 		// json 格式化
 		b, er := vscSetting.JSONIndentFormat()
 		if er != nil {
-			return nil, err
+			return nil, er
 		}
 
 		// NOTE vsc-config.json 标记 overwrite, 否则不会重写文件
