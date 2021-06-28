@@ -18,9 +18,6 @@ var (
 	//go:embed cfgfiles/launch.json
 	launchJSON []byte
 
-	//go:embed cfgfiles/settings.json
-	// settingsJSON []byte
-
 	//go:embed cfgfiles/settings_template.txt
 	settingTemplate []byte
 
@@ -149,8 +146,7 @@ func checkSettingJSONExist(ciPath string) (newSetting []byte, sug *util.Suggesti
 	defer sf.Close()
 
 	// 如果 settings.json 文件存在，需要 suggestion
-	golangciConfig := golangciSettings(lintTool, lintOnSave, lintFlags)
-	r := bytes.ReplaceAll(golangciConfig, []byte(configPlaceHolder), []byte(ciPath))
+	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
 
 	return nil, &util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",

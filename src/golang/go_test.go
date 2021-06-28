@@ -32,10 +32,6 @@ func Test_StringFormat(t *testing.T) {
 	}
 }
 
-func Test_replaceHolderNil(t *testing.T) {
-	t.Log(string(replaceCilintPlaceHolder(nil)))
-}
-
 func Test_writeNewSettingFile(t *testing.T) {
 	t.Log(string(genNewSettingsFile("")))
 	t.Log(string(genNewSettingsFile("abc/def.yml")))

@@ -15,9 +15,6 @@ const (
 	// go.lintFlags --config 的占位符
 	configPlaceHolder = "${configPlaceHolder}"
 
-	// go.lintFlags --config 的占位符
-	configVSComments = "//vsc:cilint"
-
 	// golangci 文件夹
 	golangciDirector = "/golangci"
 
@@ -31,22 +28,21 @@ const (
 
 // golangci-lint setting
 var (
-	lintTool = []byte(`
+	golangcilintconfig = []byte(`
   // golangci-lint 设置
-  "go.lintTool": "golangci-lint"`)
+  "go.lintTool": "golangci-lint",
 
-	lintOnSave = []byte(`
   // NOTE save 时 golangci-lint 整个 package，使用 'file' 时，
   // 如果变量定义在别的文件中会造成 undeclared 错误。
-  "go.lintOnSave": "package"`)
+  "go.lintOnSave": "package",
 
-	lintFlags = []byte(`
   "go.lintFlags": [
     "--fast", // without --fast can freeze your editor.
 
     // golangci-lint 配置文件地址
-    "--config=` + configPlaceHolder + `" ` + configVSComments + ` DON'T EDIT
-  ]`)
+    "--config=` + configPlaceHolder + `"
+  ],
+`)
 )
 
 // TODO golangci setup
@@ -94,7 +90,7 @@ func setupLocalCilint(projectPath string) (folders []string, files []util.FileCo
 	return folders, files, vsWorkspace + golangciDirector + devciFilePath
 }
 
-// 写入 dev-ci.yml 和 prod-ci.yml 文件
+// 在指定路径下写入 dev-ci.yml 和 prod-ci.yml 文件.
 func writeCilintFiles(dir string) (folders []string, files []util.FileContent, cipath string) {
 	folders = append(folders, dir, dir+golangciDirector)
 	files = append(files, util.FileContent{
@@ -107,27 +103,12 @@ func writeCilintFiles(dir string) (folders []string, files []util.FileContent, c
 	return folders, files, dir + golangciDirector + devciFilePath
 }
 
-// 组合 lintTool, lintOnSave, lintFlags 设置
-func golangciSettings(settings ...[]byte) []byte {
-	if len(settings) == 0 {
-		return nil
-	}
-	return bytes.Join(settings, []byte(",\n"))
-}
-
 // 生成一个 settings.json 文件
 func genNewSettingsFile(ciPath string) []byte {
 	if ciPath == "" {
-		return replaceCilintPlaceHolder(nil)
+		return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil)
 	}
 
-	golangciConfig := append(golangciSettings(lintTool, lintOnSave, lintFlags), ',', '\n')
-	r := bytes.ReplaceAll(golangciConfig, []byte(configPlaceHolder), []byte(ciPath))
-	return replaceCilintPlaceHolder(r)
-}
-
-// 替换 settings_template.txt 模板中的 place holder, ${golangcilintPlaceHolder}
-// 添加整个 golangci-lint setting.
-func replaceCilintPlaceHolder(content []byte) []byte {
-	return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), content)
+	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
+	return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r)
 }
