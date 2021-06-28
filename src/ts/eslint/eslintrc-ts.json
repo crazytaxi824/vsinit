@@ -46,7 +46,7 @@ eslint-config-airbnb-base // js 专用 lint
     "node": true,
     "browser": true,
     "es6": true,
-    "jest": true
+    "jest/globals": true
   },
   "plugins": ["@typescript-eslint", "jest", "promise"],
   // parser config

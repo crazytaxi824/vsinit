@@ -11,6 +11,6 @@ function add(a, b) {
   return a + b;
 }
 
-test("add function test", () => {
+test('add function test', () => {
   expect(add(1, 2)).toBe(3);
 });
