@@ -120,7 +120,7 @@ func initProjectWithLocalLint() (folders []string, files []util.FileContent, sug
 	// 添加 <project>/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
 	gls := setupLocalCilint(projectPath)
 
-	// 将 dev-ci.yml prod-ci.yml 配置文件都设为需要创建和写入
+	// 将 createFolders, filesAndContent 文件都设为需要创建和写入
 	gls.Folders = append(gls.Folders, createFolders...)
 	gls.Files = append(gls.Files, filesAndContent...)
 
@@ -181,7 +181,7 @@ func initProjectWithGlobalLint() (folders []string, files []util.FileContent, su
 	return gls.Folders, gls.Files, suggs, nil
 }
 
-// 检查 .vscode/settings.json 是否存在
+// 检查 .vscode/settings.json 是否存在, 是否需要修改
 func _checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, err error) {
 	settingsPath, err := filepath.Abs(".vscode/settings.json")
 	if err != nil {

@@ -57,7 +57,8 @@ func setupLocalCilint(projectPath string) *golangciLintStruct {
 }
 
 // 设置全局 golangci-lint, 如果第一次写入，则生成新文件 dev-ci.yml prod-ci.yml
-// 如果之前已经设置过，则直接返回 golangci lint config 的文件地址.
+// 如果 .vsc/vsc-config.json 设置过，则直接返回 golangci lint config 的文件地址
+// 如果 .vsc/vsc-config.json 没有设置过，则需要写入 .vsc/vsc-config.json 文件
 func setupGlobleCilint() (*golangciLintStruct, error) {
 	// 获取 .vsc 文件夹地址
 	vscDir, err := util.GetVscConfigDir()
@@ -67,7 +68,7 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 
 	// 读取 ~/.vsc/vsc-config.yml 文件
 	var vscCfgYML util.VscConfigYML
-	err = vscCfgYML.ReadFromFile(vscDir)
+	err = vscCfgYML.ReadFromDir(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {

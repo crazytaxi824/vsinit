@@ -24,7 +24,7 @@ type VscConfigYML struct {
 	} `json:"eslint,omitempty"`
 }
 
-func (vs *VscConfigYML) ReadFromFile(vscDir string) error {
+func (vs *VscConfigYML) ReadFromDir(vscDir string) error {
 	// read vsc config file
 	f, err := os.Open(vscDir + VscConfigFilePath)
 	if err != nil {

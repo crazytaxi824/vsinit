@@ -89,7 +89,7 @@ func setupGlobleEslint() (*esLintStruct, error) {
 
 	// 读取 ~/.vsc/vsc-config.yml 文件
 	var vscCfgYML util.VscConfigYML
-	err = vscCfgYML.ReadFromFile(vscDir)
+	err = vscCfgYML.ReadFromDir(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
