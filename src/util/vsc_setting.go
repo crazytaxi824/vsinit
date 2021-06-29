@@ -15,14 +15,6 @@ const (
 	VscConfigFilePath = "/vsc-config.json"
 )
 
-// lint 类型
-type Lint byte
-
-const (
-	Golangci Lint = 1
-	Eslint   Lint = 2
-)
-
 // config 文件设置
 type VscConfigYML struct {
 	Golangci string `json:"golangci,omitempty"`
