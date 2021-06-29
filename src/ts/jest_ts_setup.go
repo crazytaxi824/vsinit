@@ -33,7 +33,7 @@ var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func dependenciesNeedsToInstall() (libs []string, err error) {
+func dependenciesNeedsToInstall(dependencies []string) (libs []string, err error) {
 	// open package.json 文件
 	pkgFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
@@ -60,7 +60,7 @@ func dependenciesNeedsToInstall() (libs []string, err error) {
 
 	// 查看 devDependencies 是否有下载
 	// npm install ts-jest @types/jest
-	return checkDependencies(pkgMap, jestDependencies)
+	return _checkDependencies(pkgMap, dependencies)
 }
 
 func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
@@ -78,7 +78,7 @@ func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
 }
 
 // 检查 devDependencies 是否有安装 "ts-jest", "@types/jest"
-func checkDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
+func _checkDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
 	var result []string
 
 	devDependencies, ok := pkgMap["devDependencies"]
