@@ -162,14 +162,14 @@ func _genEslintCfgFilesAndEspath(dir string) esLintStruct {
 	return esl
 }
 
-// 生成一个 settings.json 文件, 填入设置的 golangci lint path
+// 生成一个 settings.json 文件, 填入设置的 eslint path
 func genSettingsJSONwith(esPath string) []byte {
 	if esPath == "" {
-		// 如果 cipath 为空，则不设置 go.lint 到 settings.json 中
+		// 如果 espath 为空，则不设置 eslint 到 settings.json 中
 		return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil)
 	}
 
-	// 设置 go.lint 到 settings.json 中，同时添加 cipath
+	// 设置 eslint 到 settings.json 中，同时添加 espath
 	r := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(esPath))
 	return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r)
 }

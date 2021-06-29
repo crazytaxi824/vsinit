@@ -58,7 +58,7 @@ var filesAndContent = []util.FileContent{
 	{Path: "src/main.ts", Content: mainTS},
 }
 
-func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
+func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (suggs []*util.Suggestion, err error) {
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
 	tsjsSet.Parse(os.Args[2:])
@@ -69,7 +69,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	if *jestflag {
 		// 检查 npm 是否安装
 		if sugg := util.CheckCMDInstall("npm"); sugg != nil {
-			return errors.New(sugg.String())
+			return nil, errors.New(sugg.String())
 		}
 
 		// add jest example test file
@@ -77,10 +77,22 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 		files = append(files, jestFileContent)
 	}
 
+	if *eslint && *eslintLocal {
+		return nil, errors.New("can not setup eslint globally and locally at same time")
+	} else if *eslint && !*eslintLocal {
+		// 设置 global eslint
+	} else if !*eslint && *eslintLocal {
+		// 设置 local eslint
+	} else {
+		// 不设置 eslint
+		// 只需要设置 settings.json 文件
+		files = append(files, initProjectWithoutLint())
+	}
+
 	// NOTE write project files first
 	fmt.Println("init TypeScript project")
 	if err := util.WriteFoldersAndFiles(folders, files); err != nil {
-		return err
+		return nil, err
 	}
 
 	// 安装依赖
@@ -88,14 +100,30 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 		// 设置 jest，检查依赖
 		npmLibs, err := dependenciesNeedsToInstall()
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		// 下载依赖到项目中
 		if err := util.NpmInstallDependencies("", npmLibs...); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	// 检查返回是否为空
+	if len(suggs) == 0 {
+		return nil, nil
+	}
+
+	return suggs, nil
+}
+
+// 不设置 eslint
+func initProjectWithoutLint() (files util.FileContent) {
+	// 不需要设置 cilint 的情况，直接写 setting
+	settingJSON := genSettingsJSONwith("")
+	files = util.FileContent{
+		Path:    ".vscode/settings.json",
+		Content: settingJSON,
+	}
+	return
 }

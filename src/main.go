@@ -34,6 +34,8 @@ func main() {
 	// flag.ExitOnError will os.Exit(2) if subcommand Parse() error.
 	tsjsSet := flag.NewFlagSet("ts/js", flag.ExitOnError)
 	jestflag := tsjsSet.Bool("jest", false, "add 'jest' - unit test components")
+	eslintflag := tsjsSet.Bool("eslint", false, "setup eslint globally")
+	eslintProjectflag := tsjsSet.Bool("eslint-proj", false, "setup eslint in project")
 
 	goSet := flag.NewFlagSet("go", flag.ExitOnError)
 	cilintflag := goSet.Bool("cilint", false, "setup golangci-lint globally")
@@ -49,7 +51,7 @@ func main() {
 	case "py":
 		err = python.InitProject()
 	case "ts":
-		err = ts.InitProject(tsjsSet, jestflag)
+		suggestions, err = ts.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 	case "js":
 		err = js.InitProject(tsjsSet, jestflag)
 	case "envcheck":
