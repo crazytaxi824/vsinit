@@ -20,6 +20,9 @@ const (
 	// golangci-lint config file path
 	devciFilePath  = "/dev-ci.yml"
 	prodciFilePath = "/prod-ci.yml"
+
+	// setting.json 文件地址
+	settingJSONPath = ".vscode/settings.json"
 )
 
 // golangci-lint setting
@@ -46,6 +49,28 @@ type golangciLintStruct struct {
 	Folders []string
 	Files   []util.FileContent
 	Cipath  string // dev-ci.yml 的文件地址
+}
+
+// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
+func _genCilintCfgFilesAndCipath(dir string) golangciLintStruct {
+	var gls golangciLintStruct
+
+	// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml, prod-ci.yml 文件
+	gls.Folders = append(gls.Folders, dir, dir+golangciDirector)
+
+	// 创建 dev-ci.yml, prod-ci.yml 文件
+	gls.Files = append(gls.Files, util.FileContent{
+		Path:    dir + golangciDirector + devciFilePath,
+		Content: devci,
+	}, util.FileContent{
+		Path:    dir + golangciDirector + prodciFilePath,
+		Content: prodci,
+	})
+
+	// ci.yml 的文件路径
+	gls.Cipath = dir + golangciDirector + devciFilePath
+
+	return gls
 }
 
 // 设置 local golangci-lint, 生成文件 dev-ci.yml prod-ci.yml，
@@ -133,36 +158,21 @@ func _newGlobalCilintSetup(vscDir string) (*golangciLintStruct, error) {
 	return &gls, nil
 }
 
-// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
-func _genCilintCfgFilesAndCipath(dir string) golangciLintStruct {
-	var gls golangciLintStruct
-
-	// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml, prod-ci.yml 文件
-	gls.Folders = append(gls.Folders, dir, dir+golangciDirector)
-
-	// 创建 dev-ci.yml, prod-ci.yml 文件
-	gls.Files = append(gls.Files, util.FileContent{
-		Path:    dir + golangciDirector + devciFilePath,
-		Content: devci,
-	}, util.FileContent{
-		Path:    dir + golangciDirector + prodciFilePath,
-		Content: prodci,
-	})
-
-	// ci.yml 的文件路径
-	gls.Cipath = dir + golangciDirector + devciFilePath
-
-	return gls
-}
-
 // 生成一个 settings.json 文件, 填入设置的 golangci lint path
-func genSettingsJSONwith(ciPath string) []byte {
+func genSettingsJSONwith(ciPath string) util.FileContent {
 	if ciPath == "" {
 		// 如果 cipath 为空，则不设置 go.lint 到 settings.json 中
-		return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil)
+		return util.FileContent{
+			Path:    settingJSONPath,
+			Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil),
+		}
 	}
 
 	// 设置 go.lint 到 settings.json 中，同时添加 cipath
 	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
-	return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r)
+	// return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r)
+	return util.FileContent{
+		Path:    settingJSONPath,
+		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
+	}
 }
