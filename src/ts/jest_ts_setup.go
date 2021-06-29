@@ -34,19 +34,6 @@ var jestDependencies = []string{"@types/jest", "ts-jest"}
 // 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
 func dependenciesNeedsToInstall(dependencies []string, pkgFilePath string) (libs []string, err error) {
-	// var pkgFilePath string
-
-	// if global {
-	// 	vscDir, er := util.GetVscConfigDir()
-	// 	if er != nil {
-	// 		return nil, er
-	// 	}
-
-	// 	pkgFilePath = vscDir + util.EslintDirector + "/package.json"
-	// } else {
-	// 	pkgFilePath = "package.json"
-	// }
-
 	// open package.json 文件
 	pkgFile, err := os.Open(pkgFilePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {

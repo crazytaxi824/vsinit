@@ -148,12 +148,13 @@ func installAllDependencies(jestflag, eslint, eslintLocal *bool) error {
 		eslintFolder := vscDir + util.EslintDirector
 		pkgFilePath := eslintFolder + "/package.json"
 
+		// NOTE 读取 ~/.vsc/eslint/package.json 文件
 		eslibs, err := dependenciesNeedsToInstall(eslintDependencies, pkgFilePath)
 		if err != nil {
 			return err
 		}
 
-		// 下载依赖到 ~/.vsc/eslint 中，
+		// NOTE 下载依赖到 ~/.vsc/eslint 中，而不是 'npm i -g' 全局下载
 		if err := util.NpmInstallDependencies(eslintFolder, false, eslibs...); err != nil {
 			return err
 		}
@@ -187,7 +188,7 @@ func initProjectWithoutLint() (files util.FileContent) {
 // 需要写的文件:
 // <project>/eslint/eslintrc-ts.json
 // <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
-// npm install dependencies // FIXME
+// npm install dependencies
 func initProjectWithLocalLint() (folders []string, files []util.FileContent, suggs []*util.Suggestion, err error) {
 	// 获取绝对地址
 	projectPath, er := filepath.Abs(".")
@@ -222,7 +223,7 @@ func initProjectWithLocalLint() (folders []string, files []util.FileContent, sug
 // ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml, 全局地址。
 // ~/.vsc/vsc-config.json 全局配置文件。
 // <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
-// npm install dependencies // FIXME
+// npm install dependencies
 func initProjectWithGlobalLint() (folders []string, files []util.FileContent, suggs []*util.Suggestion, err error) {
 	// 添加 ~/.vsc/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
 	// 添加 ~/.vsc/vsc-config.json 文件
