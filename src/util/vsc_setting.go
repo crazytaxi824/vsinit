@@ -29,7 +29,10 @@ const (
 // config 文件设置
 type VscConfigYML struct {
 	Golangci string `json:"golangci,omitempty"`
-	Eslint   string `json:"eslint,omitempty"`
+	Eslint   struct {
+		TS string `json:"ts,omitempty"`
+		JS string `json:"js,omitempty"`
+	} `json:"eslint,omitempty"`
 }
 
 func (vs *VscConfigYML) ReadFromFile(vscDir string) error {

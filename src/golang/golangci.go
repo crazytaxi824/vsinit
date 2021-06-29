@@ -82,6 +82,7 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 	}
 
 	// ~/.vsc/vsc-config 文件存在
+	// 生成 folders & files
 	gls := _genCilintCfgFilesAndCipath(vscDir)
 
 	// 检查 golangci 设置

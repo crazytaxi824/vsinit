@@ -1,16 +1,34 @@
 package ts
 
 import (
+	"bytes"
 	_ "embed" // for go:embed file use
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 
 	"local/src/util"
 )
 
 var createFolders = []string{".vscode", "src"}
+
+var dependencies = []string{
+	"eslint-plugin-import",
+	"eslint-plugin-jsx-a11y",
+	"eslint-plugin-react",
+	"eslint-plugin-react-hooks",
+	"@typescript-eslint/parser", // parser
+	"@typescript-eslint/eslint-plugin",
+	"eslint-plugin-jest",              // jest unit test
+	"eslint-plugin-promise",           // promise 用法
+	"eslint-config-airbnb-typescript", // ts 用
+	"eslint-config-prettier",          // 解决 vscode 插件中 prettier 造成的代码问题
+	"eslint-config-airbnb-base",       // js 专用 lint
+}
 
 var (
 	//go:embed cfgfiles/launch.json
@@ -83,6 +101,13 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 		// 设置 global eslint
 	} else if !*eslint && *eslintLocal {
 		// 设置 local eslint
+		fos, fis, sug, err := initProjectWithLocalLint()
+		if err != nil {
+			return nil, err
+		}
+		folders = append(folders, fos...)
+		files = append(files, fis...)
+		suggs = sug
 	} else {
 		// 不设置 eslint
 		// 只需要设置 settings.json 文件
@@ -126,4 +151,102 @@ func initProjectWithoutLint() (files util.FileContent) {
 		Content: settingJSON,
 	}
 	return
+}
+
+// 设置 project eslint
+// 需要写的文件:
+// <project>/eslint/eslintrc-ts.json
+// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
+// npm install dependencies // FIXME
+func initProjectWithLocalLint() (folders []string, files []util.FileContent, suggs []*util.Suggestion, err error) {
+	// 获取绝对地址
+	projectPath, er := filepath.Abs(".")
+	if er != nil {
+		return nil, nil, nil, er
+	}
+	// 添加 <project>/eslint 文件夹，添加 eslintrc-ts.json 文件
+	esl := setupLocalEslint(projectPath)
+
+	// setting.json 文件
+	// 设置 settings.json 文件, 将 --config 设置为 cipath
+	settingJSON, sug, er := _checkSettingJSON(esl.Espath)
+	if er != nil {
+		return nil, nil, nil, er
+	}
+	if sug != nil {
+		suggs = append(suggs, sug)
+	}
+	if settingJSON != nil {
+		// 添加 settings.json 文件到写入队列中
+		esl.Files = append(esl.Files, util.FileContent{
+			Path:    ".vscode/settings.json",
+			Content: settingJSON,
+		})
+	}
+
+	return esl.Folders, esl.Files, suggs, nil
+}
+
+// 检查 .vscode/settings.json 是否存在
+func _checkSettingJSON(esPath string) (newSetting []byte, sug *util.Suggestion, err error) {
+	settingsPath, err := filepath.Abs(".vscode/settings.json")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	sf, err := os.Open(settingsPath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return nil, nil, err
+	} else if errors.Is(err, os.ErrNotExist) {
+		// settings.json 不存在, 生成新的 settings.json 文件
+		return genSettingsJSONwith(esPath), nil, nil
+	}
+	defer sf.Close()
+
+	// 读取 settings.json 文件返回 eslint configFile 设置
+	eslintConfigFile, err := _readSettingJSON(sf)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// 判断 --config 地址是否和要设置的 espath 相同, 如果相同则不更新 setting 文件。
+	if eslintConfigFile == esPath { // 相同路径
+		return nil, nil, nil
+	}
+
+	// 如果 settings.json 文件存在，而且 config != cipath, 则需要 suggestion
+	// 建议手动添加设置到 .vscode/settings.json 中
+	cilintConfig := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(esPath))
+	return nil, &util.Suggestion{
+		Problem:  "please add following in '.vscode/settings.json':",
+		Solution: string(cilintConfig),
+	}, nil
+}
+
+// 读取 setting.json 文件
+func _readSettingJSON(file *os.File) (string, error) {
+	// json 反序列化 settings.json
+	jsonc, err := io.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	js, err := util.JSONCToJSON(jsonc)
+	if err != nil {
+		return "", err
+	}
+
+	type settingsStruct struct {
+		EslintOption struct {
+			ConfigFile string `json:"configFile,omitempty"`
+		} `json:"eslint.options,omitempty"`
+	}
+
+	var settings settingsStruct
+	err = json.Unmarshal(js, &settings)
+	if err != nil {
+		return "", err
+	}
+
+	return settings.EslintOption.ConfigFile, nil
 }

@@ -59,13 +59,13 @@ type esLintStruct struct {
 	Espath  string // dev-ci.yml 的文件地址
 }
 
-// 设置项目 golangci-lint, 写入文件，返回 golangci lint config 的文件地址.
+// 设置项目 eslint, 写入 eslintrc-json 文件，返回 eslint config 的文件地址.
 func setupLocalEslint(projectPath string) *esLintStruct {
 	// 生成 eslintrc-ts.json 文件，返回文件地址。
-	gls := _genEslintCfgFilesAndEspath(projectPath)
+	esl := _genEslintCfgFilesAndEspath(projectPath)
 
 	// 使用 ${workspaceRoot} 替代绝对路径
-	return &esLintStruct{gls.Folders, gls.Files, vsWorkspace + eslintDirector + eslintFilePath}
+	return &esLintStruct{esl.Folders, esl.Files, vsWorkspace + eslintDirector + eslintFilePath}
 }
 
 // 设置全局 eslint, 如果第一次写入，则生成新文件 eslintrc-ts.yml
@@ -84,18 +84,20 @@ func setupGlobleEslint() (*esLintStruct, error) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsc/vsc-config 文件不存在，
-		// 生成 dev-ci.yml, prod-ci.yml,vsc-config.yml 文件
+		// 生成 eslintrc-ts.json 文件
 		return _newGlobalEslintSetup(vscDir)
 	}
 
 	// ~/.vsc/vsc-config 文件存在
-	gls := _genEslintCfgFilesAndEspath(vscDir)
+	// 生成 folders & files
+	esl := _genEslintCfgFilesAndEspath(vscDir)
 
-	// 检查 golangci 设置
-	// 没有设置 golangci-lint 的情况
-	if vscCfgYML.Golangci == "" {
-		// 设置 golangci lint 配置文件地址
-		vscCfgYML.Golangci = gls.Espath
+	// 检查 eslint 设置
+	// 没有设置 eslint 的情况
+	// TODO JS 记得要改
+	if vscCfgYML.Eslint.TS == "" {
+		// 设置 eslint 配置文件地址
+		vscCfgYML.Eslint.TS = esl.Espath
 
 		// json 格式化
 		b, er := vscCfgYML.JSONIndentFormat()
@@ -104,18 +106,18 @@ func setupGlobleEslint() (*esLintStruct, error) {
 		}
 
 		// NOTE vsc-config.json 标记 overwrite, 否则不会重写文件
-		gls.Files = append(gls.Files, util.FileContent{
+		esl.Files = append(esl.Files, util.FileContent{
 			Path:      vscDir + util.VscConfigFilePath,
 			Content:   b,
 			Overwrite: true,
 		})
 
-		return &gls, nil
+		return &esl, nil
 	}
 
-	// 已经设置 golangci-lint，直接返回已有的 golangci lint 配置文件地址
-	gls.Espath = vscCfgYML.Golangci
-	return &gls, nil
+	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
+	esl.Espath = vscCfgYML.Eslint.TS
+	return &esl, nil
 }
 
 // 新写入 global eslint 配置
@@ -124,9 +126,9 @@ func _newGlobalEslintSetup(vscDir string) (*esLintStruct, error) {
 	esl := _genEslintCfgFilesAndEspath(vscDir)
 
 	// 设置 global cilint 配置文件的地址
-	vscCfgYML := util.VscConfigYML{
-		Eslint: esl.Espath,
-	}
+	// TODO JS 记得要改
+	var vscCfgYML util.VscConfigYML
+	vscCfgYML.Eslint.TS = esl.Espath
 
 	// json 格式化
 	b, er := vscCfgYML.JSONIndentFormat()
