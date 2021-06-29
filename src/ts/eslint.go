@@ -59,6 +59,15 @@ type esLintStruct struct {
 	Espath  string // dev-ci.yml 的文件地址
 }
 
+// 设置项目 golangci-lint, 写入文件，返回 golangci lint config 的文件地址.
+func setupLocalEslint(projectPath string) *esLintStruct {
+	// 生成 eslintrc-ts.json 文件，返回文件地址。
+	gls := _genEslintCfgFilesAndEspath(projectPath)
+
+	// 使用 ${workspaceRoot} 替代绝对路径
+	return &esLintStruct{gls.Folders, gls.Files, vsWorkspace + eslintDirector + eslintFilePath}
+}
+
 // 设置全局 eslint, 如果第一次写入，则生成新文件 eslintrc-ts.yml
 // 如果之前已经设置过，则直接返回 eslint config 的文件地址.
 func setupGlobleEslint() (*esLintStruct, error) {
@@ -76,11 +85,11 @@ func setupGlobleEslint() (*esLintStruct, error) {
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsc/vsc-config 文件不存在，
 		// 生成 dev-ci.yml, prod-ci.yml,vsc-config.yml 文件
-		return newGlobalEslintSetup(vscDir)
+		return _newGlobalEslintSetup(vscDir)
 	}
 
 	// ~/.vsc/vsc-config 文件存在
-	gls := genEslintCfgFilesAndEspath(vscDir)
+	gls := _genEslintCfgFilesAndEspath(vscDir)
 
 	// 检查 golangci 设置
 	// 没有设置 golangci-lint 的情况
@@ -109,19 +118,10 @@ func setupGlobleEslint() (*esLintStruct, error) {
 	return &gls, nil
 }
 
-// 设置项目 golangci-lint, 写入文件，返回 golangci lint config 的文件地址.
-func setupLocalEslint(projectPath string) *esLintStruct {
-	// 生成 eslintrc-ts.json 文件，返回文件地址。
-	gls := genEslintCfgFilesAndEspath(projectPath)
-
-	// 使用 ${workspaceRoot} 替代绝对路径
-	return &esLintStruct{gls.Folders, gls.Files, vsWorkspace + eslintDirector + eslintFilePath}
-}
-
 // 新写入 global eslint 配置
-func newGlobalEslintSetup(vscDir string) (*esLintStruct, error) {
+func _newGlobalEslintSetup(vscDir string) (*esLintStruct, error) {
 	// 生成 eslintrc-ts.json 文件，返回文件地址。
-	esl := genEslintCfgFilesAndEspath(vscDir)
+	esl := _genEslintCfgFilesAndEspath(vscDir)
 
 	// 设置 global cilint 配置文件的地址
 	vscCfgYML := util.VscConfigYML{
@@ -144,7 +144,7 @@ func newGlobalEslintSetup(vscDir string) (*esLintStruct, error) {
 }
 
 // 生成 eslintrc-ts.json 文件，返回文件地址。
-func genEslintCfgFilesAndEspath(dir string) esLintStruct {
+func _genEslintCfgFilesAndEspath(dir string) esLintStruct {
 	var esl esLintStruct
 
 	// 创建 <dir>/eslint 文件夹，用于存放 eslintrc-ts.json 文件
