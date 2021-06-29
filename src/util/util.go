@@ -106,6 +106,7 @@ func NpmInstallDependencies(path string, libs ...string) error {
 
 	// 指定下载到什么地方
 	if path != "" {
+		// --prefix 将 node_modules 创建到 path下. <path>/node_modules
 		results = append(results, "--prefix", path)
 	}
 
