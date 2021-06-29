@@ -66,7 +66,8 @@ func (ff *foldersAndFiles) writeCilintYMLAndCipath(dir string) {
 // 如果 vsc-config.json 不存在，生成 vsc-config.json, dev-ci.yml, prod-ci.yml 文件
 // 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，
 // 则 overwite vsc-config.json, dev-ci.yml, prod-ci.yml 文件.
-func (ff *foldersAndFiles) readCilintPathFromVSCconfigFile(vscDir string) error {
+// 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址。
+func (ff *foldersAndFiles) readCilintPathFromVscCfgJSON(vscDir string) error {
 	// 读取 ~/.vsc/vsc-config.yml 文件
 	var vscCfgJSON util.VscConfigJSON
 	err := vscCfgJSON.ReadFromDir(vscDir)

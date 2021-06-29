@@ -106,7 +106,7 @@ func (ff *foldersAndFiles) initProjectWithoutLint() (suggs []*util.Suggestion, e
 // <project>/golangci/dev-ci.yml, <project>/golangci/prod-ci.yml
 // <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
 func (ff *foldersAndFiles) initProjectWithLocalLint() (suggs []*util.Suggestion, err error) {
-	// 获取绝对地址
+	// 获取本项目的绝对地址
 	projectPath, er := filepath.Abs(".")
 	if er != nil {
 		return nil, er
@@ -144,7 +144,8 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() (suggs []*util.Suggestion
 	// 如果 vsc-config.json 不存在，生成 vsc-config.json, dev-ci.yml, prod-ci.yml 文件
 	// 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，
 	// 则 overwite vsc-config.json, dev-ci.yml, prod-ci.yml 文件.
-	err = ff.readCilintPathFromVSCconfigFile(vscDir)
+	// 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址。
+	err = ff.readCilintPathFromVscCfgJSON(vscDir)
 	if err != nil {
 		return nil, err
 	}
