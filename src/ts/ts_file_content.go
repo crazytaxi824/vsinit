@@ -127,7 +127,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 		return nil, err
 	}
 
-	// 安装依赖
+	// NOTE 安装依赖, 必须放在后面，否则 package.json 需要改写。
 	if *jestflag {
 		// 设置 jest，检查依赖
 		npmLibs, err := dependenciesNeedsToInstall()
