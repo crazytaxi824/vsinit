@@ -23,9 +23,6 @@ var (
 	//go:embed cfgfiles/settings_template.txt
 	settingTemplate []byte
 
-	//go:embed cfgfiles/settings.json
-	settingsJSON []byte
-
 	//go:embed cfgfiles/tasks.json
 	tasksJSON []byte
 
@@ -55,7 +52,7 @@ function main() {
 var filesAndContent = []util.FileContent{
 	{Path: ".vscode/launch.json", Content: launchJSON},
 	{Path: ".vscode/tasks.json", Content: tasksJSON},
-	{Path: ".vscode/settings.json", Content: settingsJSON},
+	// {Path: ".vscode/settings.json", Content: settingsJSON},
 	{Path: ".gitignore", Content: gitignore},
 	{Path: "package.json", Content: packageJSON},
 	{Path: "tsconfig.json", Content: tsconfigJSON},
@@ -113,18 +110,9 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 		return nil, err
 	}
 
-	// NOTE 安装依赖, 必须放在后面，否则 package.json 需要改写。
-	if *jestflag {
-		// 设置 jest，检查依赖
-		npmLibs, err := dependenciesNeedsToInstall(jestDependencies)
-		if err != nil {
-			return nil, err
-		}
-
-		// 下载依赖到项目中
-		if err := util.NpmInstallDependencies("", npmLibs...); err != nil {
-			return nil, err
-		}
+	// check and download dependencies
+	if err := installAllDependencies(jestflag, eslint, eslintLocal); err != nil {
+		return nil, err
 	}
 
 	// 检查返回是否为空
@@ -133,6 +121,55 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 	}
 
 	return suggs, nil
+}
+
+func installAllDependencies(jestflag, eslint, eslintLocal *bool) error {
+	// NOTE 安装依赖, 必须放在后面，否则 package.json 需要改写。
+	if *jestflag {
+		// 设置 jest，检查依赖
+		npmLibs, err := dependenciesNeedsToInstall(jestDependencies, "package.json")
+		if err != nil {
+			return err
+		}
+
+		// 下载依赖到项目中
+		if err := util.NpmInstallDependencies("", false, npmLibs...); err != nil {
+			return err
+		}
+	}
+
+	// 下载 dependencies
+	if *eslint { // global 情况
+		vscDir, er := util.GetVscConfigDir()
+		if er != nil {
+			return er
+		}
+
+		eslintFolder := vscDir + util.EslintDirector
+		pkgFilePath := eslintFolder + "/package.json"
+
+		eslibs, err := dependenciesNeedsToInstall(eslintDependencies, pkgFilePath)
+		if err != nil {
+			return err
+		}
+
+		// 下载依赖到 ~/.vsc/eslint 中，
+		if err := util.NpmInstallDependencies(eslintFolder, false, eslibs...); err != nil {
+			return err
+		}
+	} else if *eslintLocal { // local 的情况
+		eslibs, err := dependenciesNeedsToInstall(eslintDependencies, "package.json")
+		if err != nil {
+			return err
+		}
+
+		// 下载依赖到项目中
+		if err := util.NpmInstallDependencies("", false, eslibs...); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // 不设置 eslint

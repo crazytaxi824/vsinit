@@ -78,9 +78,7 @@ type esLintStruct struct {
 func setupLocalEslint(projectPath string) *esLintStruct {
 	// 生成 eslintrc-ts.json 文件，返回文件地址。
 	esl := _genEslintCfgFilesAndEspath(projectPath)
-
-	// 使用 ${workspaceRoot} 替代绝对路径
-	return &esLintStruct{esl.Folders, esl.Files, vsWorkspace + eslintDirector + eslintFilePath}
+	return &esl
 }
 
 // 设置全局 eslint, 如果第一次写入，则生成新文件 eslintrc-ts.yml

@@ -33,25 +33,29 @@ var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func dependenciesNeedsToInstall(dependencies []string) (libs []string, err error) {
+func dependenciesNeedsToInstall(dependencies []string, pkgFilePath string) (libs []string, err error) {
+	// var pkgFilePath string
+
+	// if global {
+	// 	vscDir, er := util.GetVscConfigDir()
+	// 	if er != nil {
+	// 		return nil, er
+	// 	}
+
+	// 	pkgFilePath = vscDir + util.EslintDirector + "/package.json"
+	// } else {
+	// 	pkgFilePath = "package.json"
+	// }
+
 	// open package.json 文件
-	pkgFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
-	if err != nil {
+	pkgFile, err := os.Open(pkgFilePath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
+	} else if errors.Is(err, os.ErrNotExist) {
+		// package.json 不存在的情况，下载所有 dependencies
+		return dependencies, nil
 	}
 	defer pkgFile.Close()
-
-	// 获取 file info
-	pkgInfo, err := pkgFile.Stat()
-	if err != nil {
-		return nil, err
-	}
-
-	// package.json is empty
-	if pkgInfo.Size() == 0 {
-		// NOTE package.json shouldn't be empty
-		return nil, errors.New("package.json shouldn't be empty, please re-initialize the project")
-	}
 
 	pkgMap, err := readFileToMap(pkgFile)
 	if err != nil {
