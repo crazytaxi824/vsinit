@@ -16,6 +16,9 @@ var (
 	//go:embed cfgfiles/launch.json
 	launchJSON []byte
 
+	//go:embed cfgfiles/settings_template.txt
+	settingTemplate []byte
+
 	//go:embed cfgfiles/settings.json
 	settingsJSON []byte
 
@@ -33,6 +36,9 @@ var (
 
 	//go:embed cfgfiles/example.test.ts
 	exampleTestTS []byte
+
+	//go:embed eslint/eslintrc-ts.json
+	eslintrcJSON []byte
 )
 
 var mainTS = []byte(`main();

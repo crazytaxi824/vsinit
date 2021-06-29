@@ -51,7 +51,7 @@ type golangciLintStruct struct {
 	Cipath  string // dev-ci.yml 的文件地址
 }
 
-// 设置全局 golangci-lint, 如果第一次写入，则生成新文件，
+// 设置全局 golangci-lint, 如果第一次写入，则生成新文件 dev-ci.yml prod-ci.yml
 // 如果之前已经设置过，则直接返回 golangci lint config 的文件地址.
 func setupGlobleCilint() (*golangciLintStruct, error) {
 	// 获取 .vsc 文件夹地址
