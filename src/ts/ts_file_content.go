@@ -63,7 +63,6 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag *bool) error {
 	if *jestflag {
 		// 检查 npm 是否安装
 		if sugg := util.CheckCMDInstall("npm"); sugg != nil {
-			// return util.Suggestions{sugg}, nil
 			return errors.New(sugg.String())
 		}
 

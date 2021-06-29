@@ -2,6 +2,12 @@
   // NOTE important, ts string 单引号
   "prettier.singleQuote": true,
 
+  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于配置 eslint.
+  "eslint.debug": true,
+
+  // save 的时候运行 eslint
+  "eslint.run": "onSave",
+
   // 单独设置 eslint 配置文件
   "eslint.options": {
     // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用。
