@@ -27,12 +27,12 @@ const (
 )
 
 // config 文件设置
-type VscSetting struct {
+type VscConfigYML struct {
 	Golangci string `json:"golangci,omitempty"`
 	Eslint   string `json:"eslint,omitempty"`
 }
 
-func (vs *VscSetting) ReadFromFile(vscDir string) error {
+func (vs *VscConfigYML) ReadFromFile(vscDir string) error {
 	// read vsc config file
 	f, err := os.Open(vscDir + VscConfigFilePath)
 	if err != nil {
@@ -49,15 +49,16 @@ func (vs *VscSetting) ReadFromFile(vscDir string) error {
 	return nil
 }
 
-func (vs *VscSetting) readJSON(reader io.Reader) error {
+func (vs *VscConfigYML) readJSON(reader io.Reader) error {
 	de := json.NewDecoder(reader)
 	return de.Decode(vs)
 }
 
-func (vs *VscSetting) JSONIndentFormat() ([]byte, error) {
+func (vs *VscConfigYML) JSONIndentFormat() ([]byte, error) {
 	return json.MarshalIndent(vs, "", "  ")
 }
 
+// 全局 vsc 配置文件地址 ~/.vsc/vsc-config.json
 func GetVscConfigDir() (string, error) {
 	home := os.Getenv("HOME")
 	if home == "" {

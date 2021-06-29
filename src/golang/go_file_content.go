@@ -98,7 +98,7 @@ func initProjectWithoutLint() (folders []string, files []util.FileContent) {
 	files = filesAndContent
 
 	// 不需要设置 cilint 的情况，直接写 setting
-	settingJSON := genNewSettingsFile("")
+	settingJSON := genSettingsJSONwith("")
 	files = append(files, util.FileContent{
 		Path:    ".vscode/settings.json",
 		Content: settingJSON,
@@ -108,6 +108,9 @@ func initProjectWithoutLint() (folders []string, files []util.FileContent) {
 }
 
 // 设置 project golangci-lint
+// 需要写的文件:
+// <project>/golangci/dev-ci.yml, <project>/golangci/prod-ci.yml
+// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
 func initProjectWithLocalLint() (folders []string, files []util.FileContent, suggs []*util.Suggestion, err error) {
 	// 获取绝对地址
 	projectPath, er := filepath.Abs(".")
@@ -142,8 +145,13 @@ func initProjectWithLocalLint() (folders []string, files []util.FileContent, sug
 }
 
 // 设置 global golangci-lint
+// 需要写的文件:
+// ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml, 全局地址。
+// ~/.vsc/vsc-config.json 全局配置文件。
+// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
 func initProjectWithGlobalLint() (folders []string, files []util.FileContent, suggs []*util.Suggestion, err error) {
 	// 添加 ~/.vsc/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
+	// 添加 ~/.vsc/vsc-config.json 文件
 	gls, err := setupGlobleCilint()
 	if err != nil {
 		return nil, nil, nil, err
@@ -185,11 +193,11 @@ func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, e
 		return nil, nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// settings.json 不存在, 生成新的 settings.json 文件
-		return genNewSettingsFile(ciPath), nil, nil
+		return genSettingsJSONwith(ciPath), nil, nil
 	}
 	defer sf.Close()
 
-	// json 反序列化 settings.json
+	// 读取 settings.json 文件返回 golangci lint -config 设置
 	golingFlags, err := readSettingJSON(sf)
 	if err != nil {
 		return nil, nil, err
@@ -211,6 +219,7 @@ func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, e
 	}, nil
 }
 
+// 读取 setting.json 文件
 func readSettingJSON(file *os.File) ([]string, error) {
 	// json 反序列化 settings.json
 	jsonc, err := io.ReadAll(file)
