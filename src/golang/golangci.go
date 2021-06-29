@@ -20,9 +20,6 @@ const (
 	// golangci-lint config file path
 	devciFilePath  = "/dev-ci.yml"
 	prodciFilePath = "/prod-ci.yml"
-
-	// vscode workspace
-	vsWorkspace = "${workspaceRoot}"
 )
 
 // golangci-lint setting
@@ -56,9 +53,7 @@ type golangciLintStruct struct {
 func setupLocalCilint(projectPath string) *golangciLintStruct {
 	// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
 	gls := _genCilintCfgFilesAndCipath(projectPath)
-
-	// 使用 ${workspaceRoot} 替代绝对路径
-	return &golangciLintStruct{gls.Folders, gls.Files, vsWorkspace + golangciDirector + devciFilePath}
+	return &gls
 }
 
 // 设置全局 golangci-lint, 如果第一次写入，则生成新文件 dev-ci.yml prod-ci.yml

@@ -34,9 +34,6 @@ const (
 
 	// golangci-lint config file path
 	eslintFilePath = "/eslintrc-ts.json"
-
-	// vscode workspace
-	vsWorkspace = "${workspaceRoot}"
 )
 
 // golangci-lint setting
