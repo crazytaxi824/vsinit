@@ -110,8 +110,14 @@ func checkGOPATH() *util.Suggestion {
 
 // 检查 golang-ci lint 设置
 func checkGolangciLint() (*util.Suggestion, error) {
+	vscDir, err := util.GetVscConfigDir()
+	if err != nil {
+		return nil, err
+	}
+
 	// 读取 vsc setting
-	cfg, err := util.ReadVscConfig()
+	var vscCfgYML *util.VscConfigYML
+	err = vscCfgYML.ReadFromFile(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
@@ -122,7 +128,7 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	}
 
 	// 查找 golangci 设置
-	if cfg.Golangci == "" {
+	if vscCfgYML.Golangci == "" {
 		return &util.Suggestion{
 			Problem:  "haven't setup golangci-lint yet, please run:",
 			Solution: util.GolintciCmd,
@@ -130,7 +136,7 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	}
 
 	// 寻找 golangci 配置文件
-	gof, err := os.Open(cfg.Golangci)
+	gof, err := os.Open(vscCfgYML.Golangci)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {

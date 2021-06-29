@@ -165,7 +165,7 @@ func JSONCToJSON(jsonc []byte) ([]byte, error) {
 
 	var (
 		multiComment bool
-		er           error
+		err          error
 
 		buf bytes.Buffer
 	)
@@ -180,9 +180,9 @@ func JSONCToJSON(jsonc []byte) ([]byte, error) {
 			}
 		}
 
-		multiComment, er = JsoncLineTojson(line, start, &buf)
-		if er != nil {
-			return nil, er
+		multiComment, err = JsoncLineTojson(line, start, &buf)
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -206,7 +206,6 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 		result       []jsoncStatment
 		lastIndex    int
 		multiComment bool
-		er           error
 	)
 
 	for i, line := range lines {
@@ -220,9 +219,9 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 			}
 		}
 
-		lastIndex, multiComment, er = lastValidChatInJSONCline(line, start)
-		if er != nil {
-			return 0, 0, er
+		lastIndex, multiComment, err = lastValidChatInJSONCline(line, start)
+		if err != nil {
+			return 0, 0, err
 		}
 
 		// lastIndex == -1, 表示整行都是 comment, 或者是空行
@@ -252,7 +251,7 @@ func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 		result       []jsoncStatment
 		lastIndex    int
 		multiComment bool
-		er           error
+		err          error
 	)
 
 	for i, line := range lines {
@@ -266,9 +265,9 @@ func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 			}
 		}
 
-		lastIndex, multiComment, er = lastValidChatInJSONCline(line, start)
-		if er != nil {
-			return nil, er
+		lastIndex, multiComment, err = lastValidChatInJSONCline(line, start)
+		if err != nil {
+			return nil, err
 		}
 
 		// lastIndex == -1, 表示整行都是 comment, 或者是空行
