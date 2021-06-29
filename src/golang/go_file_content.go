@@ -126,7 +126,7 @@ func initProjectWithLocalLint() (folders []string, files []util.FileContent, sug
 
 	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath
-	settingJSON, sug, er := checkSettingJSON(gls.Cipath)
+	settingJSON, sug, er := _checkSettingJSON(gls.Cipath)
 	if er != nil {
 		return nil, nil, nil, er
 	}
@@ -163,7 +163,7 @@ func initProjectWithGlobalLint() (folders []string, files []util.FileContent, su
 
 	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath
-	settingJSON, sug, er := checkSettingJSON(gls.Cipath)
+	settingJSON, sug, er := _checkSettingJSON(gls.Cipath)
 	if er != nil {
 		return nil, nil, nil, er
 	}
@@ -182,7 +182,7 @@ func initProjectWithGlobalLint() (folders []string, files []util.FileContent, su
 }
 
 // 检查 .vscode/settings.json 是否存在
-func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, err error) {
+func _checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, err error) {
 	settingsPath, err := filepath.Abs(".vscode/settings.json")
 	if err != nil {
 		return nil, nil, err
@@ -198,7 +198,7 @@ func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, e
 	defer sf.Close()
 
 	// 读取 settings.json 文件返回 golangci lint -config 设置
-	golingFlags, err := readSettingJSON(sf)
+	golingFlags, err := _readSettingJSON(sf)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -220,7 +220,7 @@ func checkSettingJSON(ciPath string) (newSetting []byte, sug *util.Suggestion, e
 }
 
 // 读取 setting.json 文件
-func readSettingJSON(file *os.File) ([]string, error) {
+func _readSettingJSON(file *os.File) ([]string, error) {
 	// json 反序列化 settings.json
 	jsonc, err := io.ReadAll(file)
 	if err != nil {

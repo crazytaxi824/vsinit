@@ -13,23 +13,15 @@ const (
 
 	// vsc 配置文件, ~/.vsc/vsc-config.json
 	VscConfigFilePath = "/vsc-config.json"
-
-	// eslint 文件夹
-	EslintDirector = "/eslint" // TODO 移动到 js/ts 文件中
-)
-
-// lint 类型
-type Lint byte
-
-const (
-	Golangci Lint = 1
-	Eslint   Lint = 2
 )
 
 // config 文件设置
 type VscConfigYML struct {
 	Golangci string `json:"golangci,omitempty"`
-	Eslint   string `json:"eslint,omitempty"`
+	Eslint   struct {
+		TS string `json:"ts,omitempty"`
+		JS string `json:"js,omitempty"`
+	} `json:"eslint,omitempty"`
 }
 
 func (vs *VscConfigYML) ReadFromFile(vscDir string) error {

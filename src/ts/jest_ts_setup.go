@@ -14,7 +14,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-
 	"os"
 
 	"local/src/util"
@@ -33,25 +32,16 @@ var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func dependenciesNeedsToInstall() (libs []string, err error) {
+func dependenciesNeedsToInstall(dependencies []string, pkgFilePath string) (libs []string, err error) {
 	// open package.json 文件
-	pkgFile, err := os.OpenFile("package.json", os.O_CREATE|os.O_RDWR, 0600)
-	if err != nil {
+	pkgFile, err := os.Open(pkgFilePath)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
+	} else if errors.Is(err, os.ErrNotExist) {
+		// package.json 不存在的情况，下载所有 dependencies
+		return dependencies, nil
 	}
 	defer pkgFile.Close()
-
-	// 获取 file info
-	pkgInfo, err := pkgFile.Stat()
-	if err != nil {
-		return nil, err
-	}
-
-	// package.json is empty
-	if pkgInfo.Size() == 0 {
-		// NOTE package.json shouldn't be empty
-		return nil, errors.New("package.json shouldn't be empty, please re-initialize the project")
-	}
 
 	pkgMap, err := readFileToMap(pkgFile)
 	if err != nil {
@@ -60,7 +50,7 @@ func dependenciesNeedsToInstall() (libs []string, err error) {
 
 	// 查看 devDependencies 是否有下载
 	// npm install ts-jest @types/jest
-	return checkDependencies(pkgMap, jestDependencies)
+	return _checkDependencies(pkgMap, dependencies)
 }
 
 func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
@@ -78,7 +68,7 @@ func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
 }
 
 // 检查 devDependencies 是否有安装 "ts-jest", "@types/jest"
-func checkDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
+func _checkDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
 	var result []string
 
 	devDependencies, ok := pkgMap["devDependencies"]

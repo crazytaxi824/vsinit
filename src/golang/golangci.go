@@ -20,9 +20,6 @@ const (
 	// golangci-lint config file path
 	devciFilePath  = "/dev-ci.yml"
 	prodciFilePath = "/prod-ci.yml"
-
-	// vscode workspace
-	vsWorkspace = "${workspaceRoot}"
 )
 
 // golangci-lint setting
@@ -51,7 +48,15 @@ type golangciLintStruct struct {
 	Cipath  string // dev-ci.yml 的文件地址
 }
 
-// 设置全局 golangci-lint, 如果第一次写入，则生成新文件，
+// 设置 local golangci-lint, 生成文件 dev-ci.yml prod-ci.yml，
+// 返回 golangci lint config 的文件地址.
+func setupLocalCilint(projectPath string) *golangciLintStruct {
+	// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
+	gls := _genCilintCfgFilesAndCipath(projectPath)
+	return &gls
+}
+
+// 设置全局 golangci-lint, 如果第一次写入，则生成新文件 dev-ci.yml prod-ci.yml
 // 如果之前已经设置过，则直接返回 golangci lint config 的文件地址.
 func setupGlobleCilint() (*golangciLintStruct, error) {
 	// 获取 .vsc 文件夹地址
@@ -68,11 +73,12 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsc/vsc-config 文件不存在，
 		// 生成 dev-ci.yml, prod-ci.yml,vsc-config.yml 文件
-		return newGlobalCilintSetup(vscDir)
+		return _newGlobalCilintSetup(vscDir)
 	}
 
 	// ~/.vsc/vsc-config 文件存在
-	gls := genCilintCfgFilesAndCipath(vscDir)
+	// 生成 folders & files
+	gls := _genCilintCfgFilesAndCipath(vscDir)
 
 	// 检查 golangci 设置
 	// 没有设置 golangci-lint 的情况
@@ -102,9 +108,9 @@ func setupGlobleCilint() (*golangciLintStruct, error) {
 }
 
 // 新写入 global golangci lint 配置
-func newGlobalCilintSetup(vscDir string) (*golangciLintStruct, error) {
+func _newGlobalCilintSetup(vscDir string) (*golangciLintStruct, error) {
 	// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
-	gls := genCilintCfgFilesAndCipath(vscDir)
+	gls := _genCilintCfgFilesAndCipath(vscDir)
 
 	// 设置 global cilint 配置文件的地址
 	vscCfgYML := util.VscConfigYML{
@@ -126,17 +132,8 @@ func newGlobalCilintSetup(vscDir string) (*golangciLintStruct, error) {
 	return &gls, nil
 }
 
-// 设置项目 golangci-lint, 写入文件，返回 golangci lint config 的文件地址.
-func setupLocalCilint(projectPath string) *golangciLintStruct {
-	// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
-	gls := genCilintCfgFilesAndCipath(projectPath)
-
-	// 使用 ${workspaceRoot} 替代绝对路径
-	return &golangciLintStruct{gls.Folders, gls.Files, vsWorkspace + golangciDirector + devciFilePath}
-}
-
 // 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
-func genCilintCfgFilesAndCipath(dir string) golangciLintStruct {
+func _genCilintCfgFilesAndCipath(dir string) golangciLintStruct {
 	var gls golangciLintStruct
 
 	// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml, prod-ci.yml 文件
