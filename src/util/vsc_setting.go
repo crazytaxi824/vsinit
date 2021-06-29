@@ -13,9 +13,6 @@ const (
 
 	// vsc 配置文件, ~/.vsc/vsc-config.json
 	VscConfigFilePath = "/vsc-config.json"
-
-	// eslint 文件夹
-	EslintDirector = "/eslint" // TODO 移动到 js/ts 文件中
 )
 
 // lint 类型

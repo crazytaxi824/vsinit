@@ -145,7 +145,7 @@ func installAllDependencies(jestflag, eslint, eslintLocal *bool) error {
 			return er
 		}
 
-		eslintFolder := vscDir + util.EslintDirector
+		eslintFolder := vscDir + eslintDirector
 		pkgFilePath := eslintFolder + "/package.json"
 
 		// NOTE 读取 ~/.vsc/eslint/package.json 文件
