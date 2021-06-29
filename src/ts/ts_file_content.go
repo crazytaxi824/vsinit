@@ -99,6 +99,13 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 		return nil, errors.New("can not setup eslint globally and locally at same time")
 	} else if *eslint && !*eslintLocal {
 		// 设置 global eslint
+		fos, fis, sug, err := initProjectWithGlobalLint()
+		if err != nil {
+			return nil, err
+		}
+		folders = append(folders, fos...)
+		files = append(files, fis...)
+		suggs = sug
 	} else if !*eslint && *eslintLocal {
 		// 设置 local eslint
 		fos, fis, sug, err := initProjectWithLocalLint()
@@ -166,6 +173,40 @@ func initProjectWithLocalLint() (folders []string, files []util.FileContent, sug
 	}
 	// 添加 <project>/eslint 文件夹，添加 eslintrc-ts.json 文件
 	esl := setupLocalEslint(projectPath)
+
+	// setting.json 文件
+	// 设置 settings.json 文件, 将 --config 设置为 cipath
+	settingJSON, sug, er := _checkSettingJSON(esl.Espath)
+	if er != nil {
+		return nil, nil, nil, er
+	}
+	if sug != nil {
+		suggs = append(suggs, sug)
+	}
+	if settingJSON != nil {
+		// 添加 settings.json 文件到写入队列中
+		esl.Files = append(esl.Files, util.FileContent{
+			Path:    ".vscode/settings.json",
+			Content: settingJSON,
+		})
+	}
+
+	return esl.Folders, esl.Files, suggs, nil
+}
+
+// 设置 global golangci-lint
+// 需要写的文件:
+// ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml, 全局地址。
+// ~/.vsc/vsc-config.json 全局配置文件。
+// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
+// npm install dependencies // FIXME
+func initProjectWithGlobalLint() (folders []string, files []util.FileContent, suggs []*util.Suggestion, err error) {
+	// 添加 ~/.vsc/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
+	// 添加 ~/.vsc/vsc-config.json 文件
+	esl, err := setupGlobleEslint()
+	if err != nil {
+		return nil, nil, nil, err
+	}
 
 	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath

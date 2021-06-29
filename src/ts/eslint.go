@@ -116,7 +116,7 @@ func setupGlobleEslint() (*esLintStruct, error) {
 	}
 
 	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
-	esl.Espath = vscCfgYML.Eslint.TS
+	esl.Espath = vscCfgYML.Eslint.TS // TODO JS 记得要改
 	return &esl, nil
 }
 
