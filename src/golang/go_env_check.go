@@ -10,6 +10,9 @@ import (
 	"os/exec"
 )
 
+// FIXME
+const GolintciCmd = "vs init go -cilint <path>"
+
 func CheckGO(lintFlag bool) ([]*util.Suggestion, error) {
 	return checkGOENV(lintFlag)
 }
@@ -123,7 +126,7 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	} else if errors.Is(err, os.ErrNotExist) {
 		return &util.Suggestion{
 			Problem:  "haven't setup golangci-lint yet, please run:",
-			Solution: util.GolintciCmd,
+			Solution: GolintciCmd,
 		}, nil
 	}
 
@@ -131,7 +134,7 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	if vscCfgJSON.Golangci == "" {
 		return &util.Suggestion{
 			Problem:  "haven't setup golangci-lint yet, please run:",
-			Solution: util.GolintciCmd,
+			Solution: GolintciCmd,
 		}, nil
 	}
 
@@ -142,7 +145,7 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	} else if errors.Is(err, os.ErrNotExist) {
 		return &util.Suggestion{
 			Problem:  "golangci-lint config file is missing, please run:",
-			Solution: util.GolintciCmd,
+			Solution: GolintciCmd,
 		}, nil
 	}
 	defer gof.Close()

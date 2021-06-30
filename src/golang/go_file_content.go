@@ -54,13 +54,13 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 		return nil, errors.New("can not setup golangci-lint globally and locally at same time")
 	} else if *cilintflag && !*cilintProjflag {
 		// 设置 global golangci-lint
-		err = initProjectWithGlobalLint(ff)
+		err = initGlobalLint(ff)
 	} else if !*cilintflag && *cilintProjflag {
 		// 设置 project golangci-lint
 		err = initLocalCiLint(ff)
 	} else {
 		// 不设置 golangci-lint
-		err = initProjectWithoutLint(ff)
+		err = initWithoutLint(ff)
 	}
 
 	if err != nil {
@@ -77,7 +77,7 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 }
 
 // 不设置 golangci-lint
-func initProjectWithoutLint(ff *util.FoldersAndFiles) error {
+func initWithoutLint(ff *util.FoldersAndFiles) error {
 	// 不需要设置 cilint 的情况，直接写 setting
 	err := addSettingJSON(ff)
 	if err != nil {
@@ -112,7 +112,7 @@ func initLocalCiLint(ff *util.FoldersAndFiles) error {
 //  - 写入 ~/.vsc/golangci/golangci.yml 文件.
 //  - 写入 <project>/.vscode/settings.json 文件.
 //  - 写入 ~/.vsc/vsc-config.json 全局配置文件.
-func initProjectWithGlobalLint(ff *util.FoldersAndFiles) error {
+func initGlobalLint(ff *util.FoldersAndFiles) error {
 	// 获取 .vsc 文件夹地址
 	vscDir, err := util.GetVscConfigDir()
 	if err != nil {
