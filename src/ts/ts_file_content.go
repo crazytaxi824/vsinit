@@ -100,12 +100,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 		return nil, err
 	}
 
-	// 检查返回是否为空
-	if ff.Suggestions() != nil {
-		return ff.Suggestions(), nil
-	}
-
-	return nil, nil
+	return ff.Suggestions(), nil
 }
 
 // 不设置 ESLint, 写入 <project>/.vscode/settings.json 文件.

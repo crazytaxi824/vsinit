@@ -93,7 +93,6 @@ func addVscCfgJSON(ff *util.FoldersAndFiles, vscDir string, vscCfgJSON util.VscC
 	ff.AddFolders(vscDir, vscDir+eslintDirector)
 
 	// 设置 vsc-config 文件之前需要生成 eslint 配置文件, 并获取文件地址.
-	// ff.addEslintJSONAndEspath(vscDir + eslintDirector + eslintFilePath)
 	ff.AddLintConfigAndLintPath(vscDir+eslintDirector+eslintFilePath, eslintrcJSON)
 
 	// 设置 vsc-config.json 文件中的 ESLint 配置文件地址
@@ -122,6 +121,7 @@ func addSettingJSON(ff *util.FoldersAndFiles) error {
 	}
 
 	// 读取 .vscode/settings.json 文件, 获取 "eslint.options{configFile}" 的值
+	// 只需要读取 configFile
 	type settingsStruct struct {
 		EslintOption struct {
 			ConfigFile string `json:"configFile,omitempty"`
@@ -146,10 +146,10 @@ func addSettingJSON(ff *util.FoldersAndFiles) error {
 
 	// 如果 settings.json 文件存在，而且 configFile != lintpath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
-	cilintConfig := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(ff.LintPath()))
+	lintConfig := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(ff.LintPath()))
 	ff.AddSuggestions(&util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
-		Solution: string(cilintConfig),
+		Solution: string(lintConfig),
 	})
 
 	return nil
