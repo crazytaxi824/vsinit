@@ -274,9 +274,7 @@ func (ff *foldersAndFiles) installMissingDependencies() error {
 	return nil
 }
 
+// 写入所有文件
 func (ff *foldersAndFiles) writeAllFiles() error {
-	if err := util.WriteFoldersAndFiles(ff.folders, ff.files); err != nil {
-		return err
-	}
-	return nil
+	return util.WriteFoldersAndFiles(ff.folders, ff.files)
 }

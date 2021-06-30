@@ -113,13 +113,13 @@ func (ff *foldersAndFiles) addMissingLocalEslintDependencies() error {
 // 则 overwite vsc-config.json, eslintrc-ts.json 文件.
 // 如果 vsc-config.json 存在，同时也设置了 eslint.TS 配置文件地址，直接读取配置文件地址。
 func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
-	// 读取 ~/.vsc/vsc-config.yml 文件
+	// 读取 ~/.vsc/vsc-config.json 文件
 	var vscCfgJSON util.VscConfigJSON
 	err := vscCfgJSON.ReadFromDir(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
-		// ~/.vsc/vsc-config 文件不存在
+		// ~/.vsc/vsc-config.json 文件不存在
 		return ff.addVscCfgJSON(vscDir, vscCfgJSON, false)
 	}
 

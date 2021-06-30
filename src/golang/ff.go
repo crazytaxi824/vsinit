@@ -17,14 +17,14 @@ func initFoldersAndFiles(folders []string, files []util.FileContent) foldersAndF
 	return ff
 }
 
-func (ff *foldersAndFiles) addFiles(files ...util.FileContent) {
+func (ff *foldersAndFiles) _addFiles(files ...util.FileContent) {
 	ff.files = append(ff.files, files...)
 }
 
-func (ff *foldersAndFiles) addFolders(folders ...string) {
+func (ff *foldersAndFiles) _addFolders(folders ...string) {
 	ff.folders = append(ff.folders, folders...)
 }
 
-func (ff *foldersAndFiles) addSuggestion(sug ...*util.Suggestion) {
+func (ff *foldersAndFiles) _addSuggestion(sug ...*util.Suggestion) {
 	ff.suggestions = append(ff.suggestions, sug...)
 }

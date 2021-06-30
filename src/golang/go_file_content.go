@@ -74,8 +74,7 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 	}
 
 	fmt.Println("init Golang project")
-	err = util.WriteFoldersAndFiles(ff.folders, ff.files)
-	if err != nil {
+	if err := ff.writeAllFiles(); err != nil {
 		return nil, err
 	}
 
@@ -90,7 +89,7 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 // 不设置 golangci-lint
 func (ff *foldersAndFiles) initProjectWithoutLint() error {
 	// 不需要设置 cilint 的情况，直接写 setting
-	err := ff.writeSettingJSON()
+	err := ff.addSettingJSON()
 	if err != nil {
 		return err
 	}
@@ -109,11 +108,11 @@ func (ff *foldersAndFiles) initProjectWithLocalLint() error {
 	}
 
 	// 添加 <project>/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
-	ff.writeCilintYMLAndCipath(projectPath)
+	ff.addCilintYMLAndCipath(projectPath)
 
 	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath
-	err = ff.writeSettingJSON()
+	err = ff.addSettingJSON()
 	if err != nil {
 		return err
 	}
@@ -145,7 +144,7 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 
 	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath
-	err = ff.writeSettingJSON()
+	err = ff.addSettingJSON()
 	if err != nil {
 		return err
 	}
@@ -153,10 +152,10 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 }
 
 // 检查 .vscode/settings.json 是否存在, 是否需要修改
-func (ff *foldersAndFiles) writeSettingJSON() error {
+func (ff *foldersAndFiles) addSettingJSON() error {
 	if ff.cipath == "" {
 		// 不设置 golangci-lint 的情况
-		ff.addFiles(genSettingsJSONwith(""))
+		ff._addFiles(newSettingsJSONwith(""))
 		return nil
 	}
 
@@ -166,7 +165,7 @@ func (ff *foldersAndFiles) writeSettingJSON() error {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// settings.json 不存在, 生成新的 settings.json 文件
-		ff.addFiles(genSettingsJSONwith(ff.cipath))
+		ff._addFiles(newSettingsJSONwith(ff.cipath))
 		return nil
 	}
 
@@ -181,7 +180,7 @@ func (ff *foldersAndFiles) writeSettingJSON() error {
 	// 如果 settings.json 文件存在，而且 config != cipath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
 	cilintConfig := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ff.cipath))
-	ff.addSuggestion(&util.Suggestion{
+	ff._addSuggestion(&util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
 		Solution: string(cilintConfig),
 	})
@@ -226,4 +225,9 @@ func _readSettingJSON() ([]string, error) {
 	}
 
 	return settings.GolingFlags, nil
+}
+
+// 写入所有文件
+func (ff *foldersAndFiles) writeAllFiles() error {
+	return util.WriteFoldersAndFiles(ff.folders, ff.files)
 }
