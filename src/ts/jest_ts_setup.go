@@ -21,7 +21,7 @@ import (
 
 const testFolder = "test"
 
-// jestFileContent add example of unit test
+// jestFileContent 添加 example of unit test
 var jestFileContent = util.FileContent{
 	Path:    testFolder + "/example.test.ts",
 	Content: exampleTestTS,
@@ -30,7 +30,7 @@ var jestFileContent = util.FileContent{
 // TS 中 jest 所需要的依赖
 var jestDependencies = []string{"@types/jest", "ts-jest"}
 
-// 写入 test 相关文件，test/example.test.ts 文件
+// 写入 Jest 相关文件，test/example.test.ts 文件. 添加 Jest 所需依赖.
 func (ff *foldersAndFiles) initJest() error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
@@ -44,6 +44,7 @@ func (ff *foldersAndFiles) initJest() error {
 	return ff.addMissingJestDependencies()
 }
 
+// 添加缺失的 Jest 依赖
 func (ff *foldersAndFiles) addMissingJestDependencies() error {
 	// 检查本地 package.json 文件
 	libs, err := checkMissingdependencies(jestDependencies, "package.json")
@@ -62,22 +63,16 @@ func (ff *foldersAndFiles) addMissingJestDependencies() error {
 	return nil
 }
 
-// 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
-// npm i -D @types/jest ts-jest
+// 查看 package.json 是否下载了所需要的依赖.
+//  - package.json 可以是 local 也可以是 globle，需要手动填写文件地址.
 func checkMissingdependencies(dependencies []string, pkgFilePath string) (libs []string, err error) {
 	// open package.json 文件
-	pkgFile, err := os.Open(pkgFilePath)
+	pkgMap, err := _readPkgJSONToMap(pkgFilePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// package.json 不存在的情况，下载所有 dependencies
 		return dependencies, nil
-	}
-	defer pkgFile.Close()
-
-	pkgMap, err := _readPkgJSONToMap(pkgFile)
-	if err != nil {
-		return nil, err
 	}
 
 	// 查看 devDependencies 是否有下载
@@ -85,8 +80,15 @@ func checkMissingdependencies(dependencies []string, pkgFilePath string) (libs [
 	return _filterDependencies(pkgMap, dependencies)
 }
 
-func _readPkgJSONToMap(packageFile *os.File) (map[string]interface{}, error) {
-	byt, err := io.ReadAll(packageFile)
+// 读取 package.json 文件, json 反序列化到 map 中.
+func _readPkgJSONToMap(pkgFilePath string) (map[string]interface{}, error) {
+	pkgFile, err := os.Open(pkgFilePath)
+	if err != nil {
+		return nil, err
+	}
+	defer pkgFile.Close()
+
+	byt, err := io.ReadAll(pkgFile)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +101,7 @@ func _readPkgJSONToMap(packageFile *os.File) (map[string]interface{}, error) {
 	return m, nil
 }
 
-// 筛选 devDependencies 是否有安装 "ts-jest", "@types/jest"
+// 筛选 "devDependencies" 中没有下载的依赖.
 func _filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
 	var result []string
 
@@ -113,7 +115,7 @@ func _filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string
 		return nil, errors.New("devDependencies assert error: is not an Object")
 	}
 
-	// 检查 dependencies 是否存在
+	// 检查依赖是否存在
 	for _, lib := range libs {
 		if _, ok := dev[lib]; !ok {
 			result = append(result, lib)

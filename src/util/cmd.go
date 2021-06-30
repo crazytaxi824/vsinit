@@ -10,7 +10,7 @@ import (
 var GoTools = []string{"gopkgs", "go-outline", "gotests",
 	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
 
-// 检查是否安装了语言
+// 检查是否安装了命令行工具
 func CheckCMDInstall(langs ...string) *Suggestion {
 	var result []string
 	for _, lang := range langs {

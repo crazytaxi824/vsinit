@@ -91,13 +91,13 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 		return nil, err
 	}
 
-	// NOTE write project files first
+	// 写入所需文件
 	fmt.Println("init TypeScript project")
 	if err := ff.writeAllFiles(); err != nil {
 		return nil, err
 	}
 
-	// check and download dependencies
+	// 安装所有缺失的依赖
 	if err := ff.installMissingDependencies(); err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 	return nil, nil
 }
 
-// 不设置 eslint
+// 不设置 ESLint, 写入 <project>/.vscode/settings.json 文件.
 func (ff *foldersAndFiles) initWithoutEslint() error {
 	// 直接写 settings.json 文件
 	err := ff.addSettingJSON()
@@ -120,11 +120,10 @@ func (ff *foldersAndFiles) initWithoutEslint() error {
 	return nil
 }
 
-// 设置 project eslint
-// 需要写的文件:
-// <project>/eslint/eslintrc-ts.json
-// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
-// npm install dependencies
+// 设置 local ESLint:
+//  - 写入 <project>/eslint/eslintrc-ts.json 本地配置文件.
+//  - 写入 <project>/.vscode/settings.json 文件.
+//  - 安装 ESLint 缺失的本地依赖.
 func (ff *foldersAndFiles) initLocalEslint() error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
@@ -150,46 +149,40 @@ func (ff *foldersAndFiles) initLocalEslint() error {
 	return ff.addMissingLocalEslintDependencies()
 }
 
-// 设置 global golangci-lint
-// 需要写的文件:
-// ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml, 全局地址。
-// ~/.vsc/vsc-config.json 全局配置文件。
-// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
-// npm install dependencies
+// 设置 global ESLint:
+//  - 写入 ~/.vsc/eslint/eslintrc-ts.json 全局配置文件.
+//  - 写入 ~/.vsc/vsc-config.json 全局配置文件.
+//  - 写入 <project>/.vscode/settings.json 文件.
+//  - 安装 ESLint 缺失的全局依赖.
 func (ff *foldersAndFiles) initGlobalEslint() error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
 		return errors.New(sugg.String())
 	}
 
-	// 获取 .vsc 文件夹地址
+	// 获取 ~/.vsc 文件夹地址
 	vscDir, err := util.GetVscConfigDir()
 	if err != nil {
 		return err
 	}
 
 	// 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
-	// 如果 vsc-config.json 不存在，生成 vsc-config.json, eslintrc-ts.json 文件
-	// 如果 vsc-config.json 存在，但是没有设置过 eslint.TS 配置文件地址，
-	// 则 overwite vsc-config.json, eslintrc-ts.json 文件.
-	// 如果 vsc-config.json 存在，同时也设置了 eslint.TS 配置文件地址，直接读取配置文件地址。
 	err = ff.readEslintPathFromVscCfgJSON(vscDir)
 	if err != nil {
 		return err
 	}
 
-	// // setting.json 文件
-	// // 设置 settings.json 文件, 将 --config 设置为 cipath
+	// 添加 settings.json 文件, 将 config 地址设置为 cipath
 	err = ff.addSettingJSON()
 	if err != nil {
 		return err
 	}
 
-	// 添加 eslint Dependencies globally
+	// 添加 ESLint 缺失的全局依赖
 	return ff.addMissingGlobalEslintDependencies()
 }
 
-// 检查 .vscode/settings.json 是否存在
+// 添加 .vscode/settings.json 文件，如果文件存在则给出建议
 func (ff *foldersAndFiles) addSettingJSON() error {
 	if ff.espath == "" {
 		// 不设置 eslint 的情况
@@ -197,6 +190,7 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 		return nil
 	}
 
+	// 读取 .vscode/settings.json 文件, 获取 eslint.options{configFile} 的值
 	eslintConfigFile, err := _readSettingJSON()
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
@@ -222,7 +216,7 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 	return nil
 }
 
-// 读取 setting.json 文件
+// 读取 .vscode/settings.json 文件, 获取 eslint.options{configFile} 的值
 func _readSettingJSON() (string, error) {
 	// 读取 .vscode/settings.json
 	settingsPath, err := filepath.Abs(util.SettingsJSONPath)
@@ -262,7 +256,7 @@ func _readSettingJSON() (string, error) {
 	return settings.EslintOption.ConfigFile, nil
 }
 
-// 安装依赖
+// 安装所有缺失的依赖
 func (ff *foldersAndFiles) installMissingDependencies() error {
 	if len(ff.dependencies) > 0 {
 		for _, dep := range ff.dependencies {
@@ -274,7 +268,7 @@ func (ff *foldersAndFiles) installMissingDependencies() error {
 	return nil
 }
 
-// 写入所有文件
+// 写入所需文件
 func (ff *foldersAndFiles) writeAllFiles() error {
 	return util.WriteFoldersAndFiles(ff.folders, ff.files)
 }

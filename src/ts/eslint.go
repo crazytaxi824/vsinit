@@ -23,20 +23,20 @@ var eslintDependencies = []string{
 }
 
 const (
-	// 整个 golangci-lint 的设置占位符
+	// 整个 ESLint 的设置占位符
 	lintPlaceHolder = "${eslintPlaceHolder}"
 
-	// go.lintFlags --config 的占位符
+	// "eslint.options{configFile}" 的占位符
 	configPlaceHolder = "${configPlaceHolder}"
 
-	// golangci 文件夹
+	// ESLint 文件夹名
 	eslintDirector = "/eslint"
 
-	// golangci-lint config file path
+	// ESLint 配置文件名
 	eslintFilePath = "/eslintrc-ts.json"
 )
 
-// golangci-lint setting
+// ESLint setting
 var (
 	eslintconfig = []byte(`
   // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于配置 eslint.
@@ -63,6 +63,7 @@ var (
 `)
 )
 
+// 添加 ESLint 缺失的全局依赖
 func (ff *foldersAndFiles) addMissingGlobalEslintDependencies() error {
 	vscDir, err := util.GetVscConfigDir()
 	if err != nil {
@@ -72,7 +73,7 @@ func (ff *foldersAndFiles) addMissingGlobalEslintDependencies() error {
 	eslintFolder := vscDir + eslintDirector
 	pkgFilePath := eslintFolder + "/package.json"
 
-	// NOTE 读取 ~/.vsc/eslint/package.json 文件
+	// NOTE 读取 ~/.vsc/eslint/package.json 文件, 这里是 eslint 全局安装的地址.
 	libs, err := checkMissingdependencies(eslintDependencies, pkgFilePath)
 	if err != nil {
 		return err
@@ -88,6 +89,7 @@ func (ff *foldersAndFiles) addMissingGlobalEslintDependencies() error {
 	return nil
 }
 
+// 添加 ESLint 缺失的本地依赖
 func (ff *foldersAndFiles) addMissingLocalEslintDependencies() error {
 	// 检查本地 package.json 文件
 	libs, err := checkMissingdependencies(eslintDependencies, "package.json")
@@ -107,10 +109,9 @@ func (ff *foldersAndFiles) addMissingLocalEslintDependencies() error {
 }
 
 // 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
-// 如果 vsc-config.json 不存在，生成 vsc-config.json, eslintrc-ts.json 文件
-// 如果 vsc-config.json 存在，但是没有设置过 eslint.TS 配置文件地址，
-// 则 overwite vsc-config.json, eslintrc-ts.json 文件.
-// 如果 vsc-config.json 存在，同时也设置了 eslint.TS 配置文件地址，直接读取配置文件地址。
+//  - 如果 vsc-config.json 不存在, 则生成 vsc-config.json, eslintrc-ts.json 文件.
+//  - 如果 vsc-config.json 存在，但是没有设置过 eslint.TS 配置文件地址, 则 overwite vsc-config.json, eslintrc-ts.json 文件.
+//  - 如果 vsc-config.json 存在，同时也设置了 eslint.TS 配置文件地址, 直接读取配置文件地址.
 func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
 	// 读取 ~/.vsc/vsc-config.json 文件
 	var vscCfgJSON util.VscConfigJSON
@@ -133,7 +134,7 @@ func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
 	return nil
 }
 
-// 写 vsc-config.json 文件,
+// 添加 ~/.vsc/vsc-config.json 文件
 func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
 	// 设置 vsc-config 文件之前需要生成 dev-ci.yml prod-ci.yml 文件
 	// 并获取 cipath 地址.
@@ -156,7 +157,7 @@ func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfi
 	return nil
 }
 
-// 生成 eslintrc-ts.json 文件，返回文件地址。
+// 生成 eslintrc-ts.json 文件，返回 eslint 配置文件地址。
 func (ff *foldersAndFiles) addEslintJSONAndEspath(dir string) {
 	// 创建 <dir>/eslint 文件夹，用于存放 eslintrc-ts.json 文件
 	ff._addFolders(dir, dir+eslintDirector)
@@ -171,7 +172,7 @@ func (ff *foldersAndFiles) addEslintJSONAndEspath(dir string) {
 	ff.espath = dir + eslintDirector + eslintFilePath
 }
 
-// 生成一个 settings.json 文件, 填入设置的 eslint path
+// 生成一个新的 settings.json 文件, 填入设置的 ESLint 配置文件地址
 func newSettingsJSONwith(esPath string) util.FileContent {
 	if esPath == "" {
 		// 如果 espath 为空，则不设置 eslint 到 settings.json 中
@@ -181,10 +182,11 @@ func newSettingsJSONwith(esPath string) util.FileContent {
 		}
 	}
 
-	// 设置 eslint 到 settings.json 中，同时添加 espath
+	// ESLint 中的 ${configPlaceHolder} 替换成 ESLint 配置文件的地址
 	r := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(esPath))
 	return util.FileContent{
-		Path:    util.SettingsJSONPath,
+		Path: util.SettingsJSONPath,
+		// 将 setting template 中的 ${eslintPlaceHolder} 替换成整个 ESLint 的设置.
 		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
 	}
 }
