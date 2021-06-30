@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-type DependenciesInstall struct {
+type Dependencies struct { // FIXME 改成小写
 	Dependencies []string
 	Prefix       string
 	Global       bool
@@ -13,7 +13,7 @@ type DependenciesInstall struct {
 
 // npm install libs to devDependencies
 // 指定位置安装 eslint 所需依赖
-func NpmInstallDependencies(path string, global bool, libs ...string) error {
+func npmInstallDependencies(path string, global bool, libs ...string) error {
 	if len(libs) == 0 {
 		return nil
 	}

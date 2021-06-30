@@ -14,7 +14,7 @@ type FoldersAndFiles struct {
 	folders []string
 	files   []FileContent
 	tsjs    struct {
-		dependencies []DependenciesInstall
+		dependencies []Dependencies
 		suggestions  []*Suggestion
 		lintPath     string
 	}
@@ -26,6 +26,10 @@ func InitFoldersAndFiles(folders []string, files []FileContent) *FoldersAndFiles
 	ff.files = files
 
 	return &ff
+}
+
+func (ff *FoldersAndFiles) SetLintPath(lintPath string) {
+	ff.tsjs.lintPath = lintPath
 }
 
 func (ff *FoldersAndFiles) LintPath() string {
@@ -40,11 +44,19 @@ func (ff *FoldersAndFiles) AddFolders(folders ...string) {
 	ff.folders = append(ff.folders, folders...)
 }
 
-func (ff *FoldersAndFiles) AddSuggestion(sug ...*Suggestion) {
+func (ff *FoldersAndFiles) AddSuggestions(sug ...*Suggestion) {
 	ff.tsjs.suggestions = append(ff.tsjs.suggestions, sug...)
 }
 
-func (ff *FoldersAndFiles) _addDependencies(dependencies ...DependenciesInstall) {
+func (ff *FoldersAndFiles) Suggestions() []*Suggestion {
+	if len(ff.tsjs.suggestions) > 0 {
+		return ff.tsjs.suggestions
+	}
+
+	return nil
+}
+
+func (ff *FoldersAndFiles) _addDependencies(dependencies ...Dependencies) {
 	ff.tsjs.dependencies = append(ff.tsjs.dependencies, dependencies...)
 }
 
@@ -57,7 +69,7 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 	}
 
 	if len(libs) > 0 {
-		ff._addDependencies(DependenciesInstall{
+		ff._addDependencies(Dependencies{
 			Dependencies: libs,
 			Prefix:       prefix,
 		})
@@ -70,7 +82,7 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 func (ff *FoldersAndFiles) InstallMissingDependencies() error {
 	if len(ff.tsjs.dependencies) > 0 {
 		for _, dep := range ff.tsjs.dependencies {
-			err := NpmInstallDependencies(dep.Prefix, dep.Global, dep.Dependencies...)
+			err := npmInstallDependencies(dep.Prefix, dep.Global, dep.Dependencies...)
 			return err
 		}
 	}

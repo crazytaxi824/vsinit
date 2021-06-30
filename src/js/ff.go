@@ -5,7 +5,7 @@ import "local/src/util"
 type foldersAndFiles struct {
 	folders      []string
 	files        []util.FileContent
-	dependencies []util.DependenciesInstall
+	dependencies []util.Dependencies
 	suggestions  []*util.Suggestion
 	espath       string
 }
@@ -30,6 +30,6 @@ func (ff *foldersAndFiles) _addSuggestion(sug ...*util.Suggestion) {
 	ff.suggestions = append(ff.suggestions, sug...)
 }
 
-func (ff *foldersAndFiles) _addDependencies(dependencies ...util.DependenciesInstall) {
+func (ff *foldersAndFiles) _addDependencies(dependencies ...util.Dependencies) {
 	ff.dependencies = append(ff.dependencies, dependencies...)
 }
