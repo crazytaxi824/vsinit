@@ -33,8 +33,8 @@ func Test_StringFormat(t *testing.T) {
 }
 
 func Test_writeNewSettingFile(t *testing.T) {
-	t.Log(string(genSettingsJSONwith("")))
-	t.Log(string(genSettingsJSONwith("abc/def.yml")))
+	t.Log(genSettingsJSONwith(""))
+	t.Log(genSettingsJSONwith("abc/def.yml"))
 }
 
 func Test_cilintFilePath(t *testing.T) {

@@ -20,6 +20,9 @@ const (
 	// golangci-lint config file path
 	devciFilePath  = "/dev-ci.yml"
 	prodciFilePath = "/prod-ci.yml"
+
+	// setting.json 文件地址
+	settingJSONPath = ".vscode/settings.json"
 )
 
 // golangci-lint setting
@@ -41,106 +44,13 @@ var (
 `)
 )
 
-// golangci lint 配置文件的位置，和文件夹和文件
-type golangciLintStruct struct {
-	Folders []string
-	Files   []util.FileContent
-	Cipath  string // dev-ci.yml 的文件地址
-}
-
-// 设置 local golangci-lint, 生成文件 dev-ci.yml prod-ci.yml，
-// 返回 golangci lint config 的文件地址.
-func setupLocalCilint(projectPath string) *golangciLintStruct {
-	// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
-	gls := _genCilintCfgFilesAndCipath(projectPath)
-	return &gls
-}
-
-// 设置全局 golangci-lint, 如果第一次写入，则生成新文件 dev-ci.yml prod-ci.yml
-// 如果之前已经设置过，则直接返回 golangci lint config 的文件地址.
-func setupGlobleCilint() (*golangciLintStruct, error) {
-	// 获取 .vsc 文件夹地址
-	vscDir, err := util.GetVscConfigDir()
-	if err != nil {
-		return nil, err
-	}
-
-	// 读取 ~/.vsc/vsc-config.yml 文件
-	var vscCfgYML util.VscConfigYML
-	err = vscCfgYML.ReadFromFile(vscDir)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return nil, err
-	} else if errors.Is(err, os.ErrNotExist) {
-		// ~/.vsc/vsc-config 文件不存在，
-		// 生成 dev-ci.yml, prod-ci.yml,vsc-config.yml 文件
-		return _newGlobalCilintSetup(vscDir)
-	}
-
-	// ~/.vsc/vsc-config 文件存在
-	// 生成 folders & files
-	gls := _genCilintCfgFilesAndCipath(vscDir)
-
-	// 检查 golangci 设置
-	// 没有设置 golangci-lint 的情况
-	if vscCfgYML.Golangci == "" {
-		// 设置 golangci lint 配置文件地址
-		vscCfgYML.Golangci = gls.Cipath
-
-		// json 格式化
-		b, er := vscCfgYML.JSONIndentFormat()
-		if er != nil {
-			return nil, er
-		}
-
-		// NOTE vsc-config.json 标记 overwrite, 否则不会重写文件
-		gls.Files = append(gls.Files, util.FileContent{
-			Path:      vscDir + util.VscConfigFilePath,
-			Content:   b,
-			Overwrite: true,
-		})
-
-		return &gls, nil
-	}
-
-	// 已经设置 golangci-lint，直接返回已有的 golangci lint 配置文件地址
-	gls.Cipath = vscCfgYML.Golangci
-	return &gls, nil
-}
-
-// 新写入 global golangci lint 配置
-func _newGlobalCilintSetup(vscDir string) (*golangciLintStruct, error) {
-	// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
-	gls := _genCilintCfgFilesAndCipath(vscDir)
-
-	// 设置 global cilint 配置文件的地址
-	vscCfgYML := util.VscConfigYML{
-		Golangci: gls.Cipath,
-	}
-
-	// json 格式化
-	b, er := vscCfgYML.JSONIndentFormat()
-	if er != nil {
-		return nil, er
-	}
-
-	// 将 vsc-config.json 文件加入创建队列
-	gls.Files = append(gls.Files, util.FileContent{
-		Path:    vscDir + util.VscConfigFilePath,
-		Content: b,
-	})
-
-	return &gls, nil
-}
-
-// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回文件地址。
-func _genCilintCfgFilesAndCipath(dir string) golangciLintStruct {
-	var gls golangciLintStruct
-
+// 生成 dev-ci.yml 和 prod-ci.yml 文件，返回配置文件地址。
+func (ff *foldersAndFiles) writeCilintYMLAndCipath(dir string) {
 	// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml, prod-ci.yml 文件
-	gls.Folders = append(gls.Folders, dir, dir+golangciDirector)
+	ff.addFolders(dir, dir+golangciDirector)
 
 	// 创建 dev-ci.yml, prod-ci.yml 文件
-	gls.Files = append(gls.Files, util.FileContent{
+	ff.addFiles(util.FileContent{
 		Path:    dir + golangciDirector + devciFilePath,
 		Content: devci,
 	}, util.FileContent{
@@ -149,19 +59,75 @@ func _genCilintCfgFilesAndCipath(dir string) golangciLintStruct {
 	})
 
 	// ci.yml 的文件路径
-	gls.Cipath = dir + golangciDirector + devciFilePath
+	ff.cipath = dir + golangciDirector + devciFilePath
+}
 
-	return gls
+// 通过 vsc-config.json 获取 golangci 配置文件地址.
+// 如果 vsc-config.json 不存在，生成 vsc-config.json, dev-ci.yml, prod-ci.yml 文件
+// 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，
+// 则 overwite vsc-config.json, dev-ci.yml, prod-ci.yml 文件.
+// 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址。
+func (ff *foldersAndFiles) readCilintPathFromVscCfgJSON(vscDir string) error {
+	// 读取 ~/.vsc/vsc-config.yml 文件
+	var vscCfgJSON util.VscConfigJSON
+	err := vscCfgJSON.ReadFromDir(vscDir)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	} else if errors.Is(err, os.ErrNotExist) {
+		// ~/.vsc/vsc-config.json 文件不存在
+		return ff.writeVscCfgJSON(vscDir, vscCfgJSON, false)
+	}
+
+	// 检查 golangci 设置
+	// 没有设置 golangci-lint 的情况
+	if vscCfgJSON.Golangci == "" {
+		// overwrite vsc-config.json 文件
+		return ff.writeVscCfgJSON(vscDir, vscCfgJSON, true)
+	}
+
+	// 已经设置 golangci-lint，直接返回已有的 golangci lint 配置文件地址
+	ff.cipath = vscCfgJSON.Golangci
+	return nil
+}
+
+// 写 vsc-config.json 文件,
+func (ff *foldersAndFiles) writeVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
+	// 设置 vsc-config 文件之前需要生成 dev-ci.yml prod-ci.yml 文件
+	// 并获取 cipath 地址.
+	ff.writeCilintYMLAndCipath(vscDir)
+
+	// 设置 vsc-config.json 文件
+	vscCfgJSON.Golangci = ff.cipath
+
+	b, er := vscCfgJSON.JSONIndentFormat()
+	if er != nil {
+		return er
+	}
+
+	ff.addFiles(util.FileContent{
+		Path:      vscDir + util.VscConfigFilePath,
+		Content:   b,
+		Overwrite: overwrite,
+	})
+
+	return nil
 }
 
 // 生成一个 settings.json 文件, 填入设置的 golangci lint path
-func genSettingsJSONwith(ciPath string) []byte {
+func genSettingsJSONwith(ciPath string) util.FileContent {
 	if ciPath == "" {
 		// 如果 cipath 为空，则不设置 go.lint 到 settings.json 中
-		return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil)
+		return util.FileContent{
+			Path:    settingJSONPath,
+			Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil),
+		}
 	}
 
 	// 设置 go.lint 到 settings.json 中，同时添加 cipath
 	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
-	return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r)
+	// return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r)
+	return util.FileContent{
+		Path:    settingJSONPath,
+		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
+	}
 }

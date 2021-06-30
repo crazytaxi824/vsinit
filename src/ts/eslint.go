@@ -88,8 +88,8 @@ func setupGlobleEslint() (*esLintStruct, error) {
 	}
 
 	// 读取 ~/.vsc/vsc-config.yml 文件
-	var vscCfgYML util.VscConfigYML
-	err = vscCfgYML.ReadFromFile(vscDir)
+	var vscCfgJSON util.VscConfigJSON
+	err = vscCfgJSON.ReadFromDir(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
@@ -105,12 +105,12 @@ func setupGlobleEslint() (*esLintStruct, error) {
 	// 检查 eslint 设置
 	// 没有设置 eslint 的情况
 	// TODO JS 记得要改
-	if vscCfgYML.Eslint.TS == "" {
+	if vscCfgJSON.Eslint.TS == "" {
 		// 设置 eslint 配置文件地址
-		vscCfgYML.Eslint.TS = esl.Espath
+		vscCfgJSON.Eslint.TS = esl.Espath
 
 		// json 格式化
-		b, er := vscCfgYML.JSONIndentFormat()
+		b, er := vscCfgJSON.JSONIndentFormat()
 		if er != nil {
 			return nil, er
 		}
@@ -126,7 +126,7 @@ func setupGlobleEslint() (*esLintStruct, error) {
 	}
 
 	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
-	esl.Espath = vscCfgYML.Eslint.TS // TODO JS 记得要改
+	esl.Espath = vscCfgJSON.Eslint.TS // TODO JS 记得要改
 	return &esl, nil
 }
 
@@ -137,11 +137,11 @@ func _newGlobalEslintSetup(vscDir string) (*esLintStruct, error) {
 
 	// 设置 global cilint 配置文件的地址
 	// TODO JS 记得要改
-	var vscCfgYML util.VscConfigYML
-	vscCfgYML.Eslint.TS = esl.Espath
+	var vscCfgJSON util.VscConfigJSON
+	vscCfgJSON.Eslint.TS = esl.Espath
 
 	// json 格式化
-	b, er := vscCfgYML.JSONIndentFormat()
+	b, er := vscCfgJSON.JSONIndentFormat()
 	if er != nil {
 		return nil, er
 	}
