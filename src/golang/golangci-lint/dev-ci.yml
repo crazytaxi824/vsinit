@@ -135,7 +135,7 @@ linters-settings:
     # 最小复杂性
     min-complexity: 15
 
-  # TODO, DEBUG and FIXME 标记
+  # - TODO, DEBUG and FIXME 标记
   godox:
     # these can be overwritten by this setting
     keywords:
@@ -296,7 +296,7 @@ linters:
   disable-all: true
   enable:
     - bodyclose # check HTTP res.Body is correctly closed.
-    # - deadcode
+    # - deadcode # 直接用 unused 就可以了
     - depguard # dep 包管理工具，第三方 package 白名单，有自己的config文件，https://github.com/OpenPeeDeeP/depguard
     # - gomodguard    # go mod 包管理工具，第三方 package 白名单。和 depguard 二选一
     - dogsled # 超过n个返回值未接受，eg: x, _, _, _, := f()
@@ -309,7 +309,7 @@ linters:
     - goconst # 查找是否有重复的 string 可以用常量 const 表示
     - gocritic # 检查合集 https://go-critic.github.io/overview
     - gocyclo # 检查函数的复杂程度，gocognit 二选一
-    # - gofmt       # 和 goimports 二选一即可。
+    # - gofmt # 和 goimports 二选一即可。
     - goimports # 格式化工具
     - golint # 检查合集，不想给每个函数写注释
     - gomnd # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
@@ -329,7 +329,7 @@ linters:
     - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
     - unconvert # 检查不必要的类型转换
     - unparam # 检查函数内没用到的入参，出参
-    # - unused # 检查没用的函数，结构体属性等
+    # - unused # NOTE 生产环境下打开
     - varcheck # 检查没用的全局变量
     - whitespace # detection of 开始和结尾的空行 leading and trailing whitespace
 
@@ -411,8 +411,7 @@ issues:
   # it can be disabled by this option. To list all
   # excluded by default patterns execute `golangci-lint run --help`.
   # Default value for this option is true.
-  # exclude-use-default: false # prod 环境
-  exclude-use-default: true # dev 环境
+  exclude-use-default: true
 
   include:
     # - EXC0001 # errcheck - 不检查某些特殊情况 eg: defer file.Close()
