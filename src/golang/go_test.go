@@ -41,6 +41,5 @@ func Test_cilintFilePath(t *testing.T) {
 	vscDir, _ := util.GetVscConfigDir()
 
 	t.Log(vscDir + util.VscConfigFilePath)
-	t.Log(vscDir + golangciDirector + devciFilePath)
-	t.Log(vscDir + golangciDirector + prodciFilePath)
+	t.Log(vscDir + golangciDirector + cilintFilePath)
 }

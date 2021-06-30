@@ -28,9 +28,6 @@ var (
 
 	//go:embed golangci-lint/dev-ci.yml
 	devci []byte
-
-	//go:embed golangci-lint/prod-ci.yml
-	prodci []byte
 )
 
 var mainGO = []byte(`package main
@@ -98,7 +95,7 @@ func (ff *foldersAndFiles) initProjectWithoutLint() error {
 }
 
 // 设置 local golangci-lint:
-//  - 写入 <project>/golangci/dev-ci.yml, <project>/golangci/prod-ci.yml
+//  - 写入 <project>/golangci/dev-ci.yml
 //  - 写入 <project>/.vscode/settings.json 文件
 func (ff *foldersAndFiles) initLocalCiLint() error {
 	// 获取本项目的绝对地址
@@ -107,7 +104,7 @@ func (ff *foldersAndFiles) initLocalCiLint() error {
 		return err
 	}
 
-	// 添加 <project>/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
+	// 添加 <project>/golangci 文件夹，添加 dev-ci.yml 文件
 	ff.addCilintYMLAndCipath(projectPath)
 
 	// 设置 settings.json 文件, 将 config 设置为 cilint 配置文件地址
@@ -120,7 +117,7 @@ func (ff *foldersAndFiles) initLocalCiLint() error {
 }
 
 // 设置 global golangci-lint:
-//  - 写入 ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml 文件.
+//  - 写入 ~/.vsc/golangci/dev-ci.yml 文件.
 //  - 写入 <project>/.vscode/settings.json 文件.
 //  - 写入 ~/.vsc/vsc-config.json 全局配置文件.
 func (ff *foldersAndFiles) initProjectWithGlobalLint() error {

@@ -57,7 +57,6 @@
 
     // golangci-lint 配置文件地址
     // "--config=${workspaceRoot}/golangci.yml" // 本地
-    // "--config=~/.golangci/prod-ci.yml"
     "--config=~/.golangci/dev-ci.yml" //vsc:cilint DON'T EDIT
   ],
 

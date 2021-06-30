@@ -18,8 +18,7 @@ const (
 	golangciDirector = "/golangci"
 
 	// golangci-lint 配置文件名
-	devciFilePath  = "/dev-ci.yml"
-	prodciFilePath = "/prod-ci.yml"
+	cilintFilePath = "/dev-ci.yml"
 )
 
 // golangci-lint setting
@@ -42,8 +41,8 @@ var (
 )
 
 // 通过 vsc-config.json 获取 golangci 配置文件地址.
-//  - 如果 vsc-config.json 不存在，生成 vsc-config.json, dev-ci.yml, prod-ci.yml 文件.
-//  - 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，则 overwite vsc-config.json, dev-ci.yml, prod-ci.yml 文件.
+//  - 如果 vsc-config.json 不存在，生成 vsc-config.json, dev-ci.yml 文件.
+//  - 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，则 overwite vsc-config.json, dev-ci.yml 文件.
 //  - 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址.
 func (ff *foldersAndFiles) readCilintPathFromVscCfgJSON(vscDir string) error {
 	// 读取 ~/.vsc/vsc-config.json 文件
@@ -69,7 +68,7 @@ func (ff *foldersAndFiles) readCilintPathFromVscCfgJSON(vscDir string) error {
 
 // 添加 ~/.vsc/vsc-config.json 文件
 func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
-	// 设置 vsc-config 文件之前需要生成 dev-ci.yml prod-ci.yml 文件, 并获取文件地址.
+	// 设置 vsc-config 文件之前需要生成 dev-ci.yml 文件, 并获取文件地址.
 	ff.addCilintYMLAndCipath(vscDir)
 
 	// 设置 vsc-config.json 文件中的 golangci 配置文件地址
@@ -89,22 +88,19 @@ func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfi
 	return nil
 }
 
-// 生成 dev-ci.yml 和 prod-ci.yml 文件，记录配置文件地址。
+// 生成 dev-ci.yml 文件，记录配置文件地址。
 func (ff *foldersAndFiles) addCilintYMLAndCipath(dir string) {
-	// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml, prod-ci.yml 文件
+	// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml 文件
 	ff._addFolders(dir, dir+golangciDirector)
 
-	// 创建 dev-ci.yml, prod-ci.yml 文件
+	// 创建 dev-ci.yml 文件
 	ff._addFiles(util.FileContent{
-		Path:    dir + golangciDirector + devciFilePath,
+		Path:    dir + golangciDirector + cilintFilePath,
 		Content: devci,
-	}, util.FileContent{
-		Path:    dir + golangciDirector + prodciFilePath,
-		Content: prodci,
 	})
 
 	// ci.yml 的文件路径
-	ff.cipath = dir + golangciDirector + devciFilePath
+	ff.cipath = dir + golangciDirector + cilintFilePath
 }
 
 // 生成一个 settings.json 文件, 填入设置的 golangci 配置文件地址
