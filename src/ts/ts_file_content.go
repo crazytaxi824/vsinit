@@ -68,7 +68,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 
 	// 写入 test 相关文件
 	if *jestflag {
-		err = ff.writeTestFile()
+		err = ff.writeJestFile()
 		if err != nil {
 			return nil, err
 		}
@@ -126,13 +126,12 @@ func (ff *foldersAndFiles) initProjectWithoutLint() error {
 // <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
 // npm install dependencies
 func (ff *foldersAndFiles) initProjectWithLocalLint() error {
-	// 获取绝对地址
+	// 获取项目的绝对地址
 	projectPath, err := filepath.Abs(".")
 	if err != nil {
 		return err
 	}
 	// 添加 <project>/eslint 文件夹，添加 eslintrc-ts.json 文件
-	// esl := setupLocalEslint(projectPath)
 	ff.writeEslintJSONAndEspath(projectPath)
 
 	// setting.json 文件
@@ -292,7 +291,7 @@ func installMissingDependencies(jestflag, eslint, eslintLocal *bool) error {
 
 // 检查哪些依赖没有装，然后安装依赖。
 func _checkAndInstallMissingDependencies(pkgJSONPath, prefix string, checkDeps []string) error {
-	npmLibs, err := dependenciesNeedsToInstall(checkDeps, pkgJSONPath)
+	npmLibs, err := checkMissingdependencies(checkDeps, pkgJSONPath)
 	if err != nil {
 		return err
 	}

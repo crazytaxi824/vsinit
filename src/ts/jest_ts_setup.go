@@ -31,7 +31,7 @@ var jestFileContent = util.FileContent{
 var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 写入 test 相关文件，test/example.test.ts 文件
-func (ff *foldersAndFiles) writeTestFile() error {
+func (ff *foldersAndFiles) writeJestFile() error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
 		return errors.New(sugg.String())
@@ -45,7 +45,7 @@ func (ff *foldersAndFiles) writeTestFile() error {
 
 // 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
-func dependenciesNeedsToInstall(dependencies []string, pkgFilePath string) (libs []string, err error) {
+func checkMissingdependencies(dependencies []string, pkgFilePath string) (libs []string, err error) {
 	// open package.json 文件
 	pkgFile, err := os.Open(pkgFilePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -56,17 +56,17 @@ func dependenciesNeedsToInstall(dependencies []string, pkgFilePath string) (libs
 	}
 	defer pkgFile.Close()
 
-	pkgMap, err := readFileToMap(pkgFile)
+	pkgMap, err := _readPkgJSONToMap(pkgFile)
 	if err != nil {
 		return nil, err
 	}
 
 	// 查看 devDependencies 是否有下载
 	// npm install ts-jest @types/jest
-	return _checkDependencies(pkgMap, dependencies)
+	return _filterDependencies(pkgMap, dependencies)
 }
 
-func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
+func _readPkgJSONToMap(packageFile *os.File) (map[string]interface{}, error) {
 	byt, err := io.ReadAll(packageFile)
 	if err != nil {
 		return nil, err
@@ -80,8 +80,8 @@ func readFileToMap(packageFile *os.File) (map[string]interface{}, error) {
 	return m, nil
 }
 
-// 检查 devDependencies 是否有安装 "ts-jest", "@types/jest"
-func _checkDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
+// 筛选 devDependencies 是否有安装 "ts-jest", "@types/jest"
+func _filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
 	var result []string
 
 	devDependencies, ok := pkgMap["devDependencies"]
