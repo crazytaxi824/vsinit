@@ -68,7 +68,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 
 	// 写入 test 相关文件
 	if *jestflag {
-		err = ff.writeJestFile()
+		err = ff.initJest()
 		if err != nil {
 			return nil, err
 		}
@@ -78,13 +78,13 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 		return nil, errors.New("can not setup eslint globally and locally at same time")
 	} else if *eslint && !*eslintLocal {
 		// 设置 global eslint
-		err = ff.initProjectWithGlobalLint()
+		err = ff.initGlobalEslint()
 	} else if !*eslint && *eslintLocal {
 		// 设置 local eslint
-		err = ff.initProjectWithLocalLint()
+		err = ff.initLocalEslint()
 	} else {
 		// 不设置 eslint, 只需要设置 settings.json 文件
-		err = ff.initProjectWithoutLint()
+		err = ff.initWithoutEslint()
 	}
 
 	if err != nil {
@@ -98,7 +98,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 	}
 
 	// check and download dependencies
-	if err := installMissingDependencies(jestflag, eslint, eslintLocal); err != nil {
+	if err := ff.installMissingDependencies(); err != nil {
 		return nil, err
 	}
 
@@ -111,7 +111,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 }
 
 // 不设置 eslint
-func (ff *foldersAndFiles) initProjectWithoutLint() error {
+func (ff *foldersAndFiles) initWithoutEslint() error {
 	// 直接写 settings.json 文件
 	err := ff.writeSettingJSON()
 	if err != nil {
@@ -125,7 +125,12 @@ func (ff *foldersAndFiles) initProjectWithoutLint() error {
 // <project>/eslint/eslintrc-ts.json
 // <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
 // npm install dependencies
-func (ff *foldersAndFiles) initProjectWithLocalLint() error {
+func (ff *foldersAndFiles) initLocalEslint() error {
+	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
+	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
+		return errors.New(sugg.String())
+	}
+
 	// 获取项目的绝对地址
 	projectPath, err := filepath.Abs(".")
 	if err != nil {
@@ -141,7 +146,8 @@ func (ff *foldersAndFiles) initProjectWithLocalLint() error {
 		return err
 	}
 
-	return nil
+	// 添加 eslint Dependencies locally
+	return ff.addMissingLocalEslintDependencies()
 }
 
 // 设置 global golangci-lint
@@ -150,7 +156,12 @@ func (ff *foldersAndFiles) initProjectWithLocalLint() error {
 // ~/.vsc/vsc-config.json 全局配置文件。
 // <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
 // npm install dependencies
-func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
+func (ff *foldersAndFiles) initGlobalEslint() error {
+	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
+	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
+		return errors.New(sugg.String())
+	}
+
 	// 获取 .vsc 文件夹地址
 	vscDir, err := util.GetVscConfigDir()
 	if err != nil {
@@ -174,14 +185,15 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 		return err
 	}
 
-	return nil
+	// 添加 eslint Dependencies globally
+	return ff.addMissingGlobalEslintDependencies()
 }
 
 // 检查 .vscode/settings.json 是否存在
 func (ff *foldersAndFiles) writeSettingJSON() error {
 	if ff.espath == "" {
 		// 不设置 eslint 的情况
-		ff.addFiles(genSettingsJSONwith(""))
+		ff.addFiles(newSettingsJSONwith(""))
 		return nil
 	}
 
@@ -190,7 +202,7 @@ func (ff *foldersAndFiles) writeSettingJSON() error {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// settings.json 不存在, 生成新的 settings.json 文件
-		ff.addFiles(genSettingsJSONwith(ff.espath))
+		ff.addFiles(newSettingsJSONwith(ff.espath))
 		return nil
 	}
 
@@ -251,54 +263,12 @@ func _readSettingJSON() (string, error) {
 }
 
 // 安装依赖
-func installMissingDependencies(jestflag, eslint, eslintLocal *bool) error {
-	// NOTE 安装依赖, 必须放在后面，否则 package.json 需要改写。
-	if *jestflag {
-		// 检查本地 package.json 文件
-		err := _checkAndInstallMissingDependencies("package.json", "", jestDependencies)
-		if err != nil {
+func (ff *foldersAndFiles) installMissingDependencies() error {
+	if len(ff.dependencies) > 0 {
+		for _, dep := range ff.dependencies {
+			err := util.NpmInstallDependencies(dep.Prefix, dep.Global, dep.Dependencies...)
 			return err
 		}
-	}
-
-	// 下载 dependencies
-	if *eslint { // global 情况
-		vscDir, err := util.GetVscConfigDir()
-		if err != nil {
-			return err
-		}
-
-		eslintFolder := vscDir + eslintDirector
-		pkgFilePath := eslintFolder + "/package.json"
-
-		// NOTE 读取 ~/.vsc/eslint/package.json 文件
-		err = _checkAndInstallMissingDependencies(pkgFilePath, eslintFolder, eslintDependencies)
-		if err != nil {
-			return err
-		}
-
-		return nil // NOTE 这里不需要再继续匹配了
-	} else if *eslintLocal { // local 的情况
-		// 检查本地 package.json 文件
-		err := _checkAndInstallMissingDependencies("package.json", "", eslintDependencies)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// 检查哪些依赖没有装，然后安装依赖。
-func _checkAndInstallMissingDependencies(pkgJSONPath, prefix string, checkDeps []string) error {
-	npmLibs, err := checkMissingdependencies(checkDeps, pkgJSONPath)
-	if err != nil {
-		return err
-	}
-
-	err = util.NpmInstallDependencies(prefix, false, npmLibs...)
-	if err != nil {
-		return err
 	}
 
 	return nil

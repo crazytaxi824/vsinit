@@ -64,6 +64,49 @@ var (
 `)
 )
 
+func (ff *foldersAndFiles) addMissingGlobalEslintDependencies() error {
+	vscDir, err := util.GetVscConfigDir()
+	if err != nil {
+		return err
+	}
+
+	eslintFolder := vscDir + eslintDirector
+	pkgFilePath := eslintFolder + "/package.json"
+
+	// NOTE 读取 ~/.vsc/eslint/package.json 文件
+	libs, err := checkMissingdependencies(eslintDependencies, pkgFilePath)
+	if err != nil {
+		return err
+	}
+
+	if len(libs) > 0 {
+		ff.addDependencies(util.DependenciesInstall{
+			Dependencies: libs,
+			Prefix:       eslintFolder,
+			Global:       false,
+		})
+	}
+	return nil
+}
+
+func (ff *foldersAndFiles) addMissingLocalEslintDependencies() error {
+	// 检查本地 package.json 文件
+	libs, err := checkMissingdependencies(eslintDependencies, "package.json")
+	if err != nil {
+		return err
+	}
+
+	if len(libs) > 0 {
+		ff.addDependencies(util.DependenciesInstall{
+			Dependencies: libs,
+			Prefix:       "",
+			Global:       false,
+		})
+	}
+
+	return nil
+}
+
 // 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
 // 如果 vsc-config.json 不存在，生成 vsc-config.json, eslintrc-ts.json 文件
 // 如果 vsc-config.json 存在，但是没有设置过 eslint.TS 配置文件地址，
@@ -130,7 +173,7 @@ func (ff *foldersAndFiles) writeEslintJSONAndEspath(dir string) {
 }
 
 // 生成一个 settings.json 文件, 填入设置的 eslint path
-func genSettingsJSONwith(esPath string) util.FileContent {
+func newSettingsJSONwith(esPath string) util.FileContent {
 	if esPath == "" {
 		// 如果 espath 为空，则不设置 eslint 到 settings.json 中
 		return util.FileContent{

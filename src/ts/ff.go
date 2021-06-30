@@ -5,7 +5,7 @@ import "local/src/util"
 type foldersAndFiles struct {
 	folders      []string
 	files        []util.FileContent
-	dependencies []string
+	dependencies []util.DependenciesInstall
 	suggestions  []*util.Suggestion // FIXME 全部改好之后这里不使用 * 类型
 	espath       string
 }
@@ -30,6 +30,6 @@ func (ff *foldersAndFiles) addSuggestion(sug ...*util.Suggestion) {
 	ff.suggestions = append(ff.suggestions, sug...)
 }
 
-func (ff *foldersAndFiles) addDependencies(dependencies ...string) {
+func (ff *foldersAndFiles) addDependencies(dependencies ...util.DependenciesInstall) {
 	ff.dependencies = append(ff.dependencies, dependencies...)
 }

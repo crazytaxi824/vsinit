@@ -31,7 +31,7 @@ var jestFileContent = util.FileContent{
 var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 写入 test 相关文件，test/example.test.ts 文件
-func (ff *foldersAndFiles) writeJestFile() error {
+func (ff *foldersAndFiles) initJest() error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
 		return errors.New(sugg.String())
@@ -39,6 +39,25 @@ func (ff *foldersAndFiles) writeJestFile() error {
 
 	ff.addFolders(testFolder)
 	ff.addFiles(jestFileContent)
+
+	// 添加 Jest Dependencies
+	return ff.addMissingJestDependencies()
+}
+
+func (ff *foldersAndFiles) addMissingJestDependencies() error {
+	// 检查本地 package.json 文件
+	libs, err := checkMissingdependencies(jestDependencies, "package.json")
+	if err != nil {
+		return err
+	}
+
+	if len(libs) > 0 {
+		ff.addDependencies(util.DependenciesInstall{
+			Dependencies: libs,
+			Prefix:       "",
+			Global:       false,
+		})
+	}
 
 	return nil
 }
