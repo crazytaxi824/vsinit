@@ -122,7 +122,3 @@ func NpmInstallDependencies(path string, global bool, libs ...string) error {
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
-
-func Warn(m string) string {
-	return fmt.Sprintf("\033[0;37;41m%s\033[0m", m)
-}

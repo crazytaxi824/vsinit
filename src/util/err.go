@@ -1,5 +1,7 @@
 package util
 
+import "fmt"
+
 const (
 	InternalErrMsg = "CMD is not in the list, please contact author"
 
@@ -12,5 +14,9 @@ type Suggestion struct {
 }
 
 func (e *Suggestion) String() string {
-	return Warn(">>> "+e.Problem) + "\n" + e.Solution + "\n\n"
+	return warn(">>> "+e.Problem) + "\n" + e.Solution + "\n\n"
+}
+
+func warn(m string) string {
+	return fmt.Sprintf("\033[0;37;41m%s\033[0m", m)
 }
