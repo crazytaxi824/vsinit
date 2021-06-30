@@ -98,7 +98,7 @@ func (ff *foldersAndFiles) addCilintYMLAndCipath(dir string, global bool) {
 		// 创建 dev-ci.yml 文件
 		ff._addFiles(util.FileContent{
 			Path:    dir + golangciDirector + cilintFilePath,
-			Content: devci,
+			Content: golangciYML,
 		})
 
 		// dev-ci.yml 的文件路径
@@ -109,7 +109,7 @@ func (ff *foldersAndFiles) addCilintYMLAndCipath(dir string, global bool) {
 	// 创建 dev-ci.yml 文件
 	ff._addFiles(util.FileContent{
 		Path:    dir + cilintFilePath,
-		Content: devci,
+		Content: golangciYML,
 	})
 
 	// dev-ci.yml 的文件路径
