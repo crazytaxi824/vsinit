@@ -28,9 +28,9 @@ main()
 `)
 
 var filesAndContent = []util.FileContent{
-	{Path: ".vscode/launch.json", Content: launchJSON},
-	{Path: ".vscode/settings.json", Content: settingsJSON},
-	{Path: ".gitignore", Content: gitignore},
+	{Path: util.LaunchJSONPath, Content: launchJSON},
+	{Path: util.SettingsJSONPath, Content: settingsJSON},
+	{Path: util.GitignorePath, Content: gitignore},
 	{Path: "src/main.py", Content: mainPY},
 }
 

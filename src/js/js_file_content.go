@@ -41,9 +41,9 @@ function main() {
 
 // filesAndContent JS project files
 var filesAndContent = []util.FileContent{
-	{Path: ".vscode/launch.json", Content: launchJSON},
-	{Path: ".vscode/settings.json", Content: settingsJSON},
-	{Path: ".gitignore", Content: gitignore},
+	{Path: util.LaunchJSONPath, Content: launchJSON},
+	{Path: util.SettingsJSONPath, Content: settingsJSON},
+	{Path: util.GitignorePath, Content: gitignore},
 	{Path: "package.json", Content: packageJSON},
 	{Path: "src/main.js", Content: mainJS},
 }

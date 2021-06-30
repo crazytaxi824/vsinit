@@ -50,9 +50,9 @@ function main() {
 `)
 
 var filesAndContent = []util.FileContent{
-	{Path: ".vscode/launch.json", Content: launchJSON},
-	{Path: ".vscode/tasks.json", Content: tasksJSON},
-	{Path: ".gitignore", Content: gitignore},
+	{Path: util.LaunchJSONPath, Content: launchJSON},
+	{Path: util.TasksJSONPath, Content: tasksJSON},
+	{Path: util.GitignorePath, Content: gitignore},
 	{Path: "package.json", Content: packageJSON},
 	{Path: "tsconfig.json", Content: tsconfigJSON},
 	{Path: "src/main.ts", Content: mainTS},
@@ -225,7 +225,7 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 // 读取 setting.json 文件
 func _readSettingJSON() (string, error) {
 	// 读取 .vscode/settings.json
-	settingsPath, err := filepath.Abs(".vscode/settings.json")
+	settingsPath, err := filepath.Abs(util.SettingsJSONPath)
 	if err != nil {
 		return "", err
 	}

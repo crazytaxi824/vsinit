@@ -177,7 +177,7 @@ func newSettingsJSONwith(esPath string) util.FileContent {
 	if esPath == "" {
 		// 如果 espath 为空，则不设置 eslint 到 settings.json 中
 		return util.FileContent{
-			Path:    ".vscode/settings.json",
+			Path:    util.SettingsJSONPath,
 			Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil),
 		}
 	}
@@ -185,7 +185,7 @@ func newSettingsJSONwith(esPath string) util.FileContent {
 	// 设置 eslint 到 settings.json 中，同时添加 espath
 	r := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(esPath))
 	return util.FileContent{
-		Path:    ".vscode/settings.json",
+		Path:    util.SettingsJSONPath,
 		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
 	}
 }

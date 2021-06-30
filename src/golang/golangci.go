@@ -20,9 +20,6 @@ const (
 	// golangci-lint config file path
 	devciFilePath  = "/dev-ci.yml"
 	prodciFilePath = "/prod-ci.yml"
-
-	// setting.json 文件地址
-	settingJSONPath = ".vscode/settings.json"
 )
 
 // golangci-lint setting
@@ -118,7 +115,7 @@ func newSettingsJSONwith(ciPath string) util.FileContent {
 	if ciPath == "" {
 		// 如果 cipath 为空，则不设置 go.lint 到 settings.json 中
 		return util.FileContent{
-			Path:    settingJSONPath,
+			Path:    util.SettingsJSONPath,
 			Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil),
 		}
 	}
@@ -126,7 +123,7 @@ func newSettingsJSONwith(ciPath string) util.FileContent {
 	// 设置 go.lint 到 settings.json 中，同时添加 cipath
 	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
 	return util.FileContent{
-		Path:    settingJSONPath,
+		Path:    util.SettingsJSONPath,
 		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
 	}
 }
