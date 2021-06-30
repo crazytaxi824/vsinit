@@ -92,7 +92,6 @@ func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfi
 }
 
 // 生成 golangci.yml 文件，记录配置文件地址。
-//  - 如果是 global 设置需要多添加一个 folder.
 func (ff *foldersAndFiles) addCilintYMLAndCipath(dir string) {
 	// 创建 golangci.yml 文件
 	ff._addFiles(util.FileContent{
