@@ -1,4 +1,4 @@
-package ts
+package js
 
 import "local/src/util"
 

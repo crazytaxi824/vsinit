@@ -5,7 +5,7 @@ import "local/src/util"
 type foldersAndFiles struct {
 	folders     []string
 	files       []util.FileContent
-	suggestions []*util.Suggestion // FIXME 全部改好之后这里不使用 * 类型
+	suggestions []*util.Suggestion
 	cipath      string
 }
 

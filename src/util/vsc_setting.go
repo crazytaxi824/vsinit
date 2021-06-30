@@ -19,8 +19,8 @@ const (
 type VscConfigJSON struct {
 	Golangci string `json:"golangci,omitempty"`
 	Eslint   struct {
-		TS string `json:"ts,omitempty"`
-		JS string `json:"js,omitempty"`
+		TS string `json:"typescript,omitempty"`
+		JS string `json:"javascript,omitempty"`
 	} `json:"eslint,omitempty"`
 }
 

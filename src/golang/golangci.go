@@ -42,7 +42,7 @@ var (
 
 // 通过 vsc-config.json 获取 golangci 配置文件地址.
 //  - 如果 vsc-config.json 不存在，生成 vsc-config.json, golangci.yml 文件.
-//  - 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，则 overwite vsc-config.json, golangci.yml 文件.
+//  - 如果 vsc-config.json 存在，但是没有设置 golangci 配置文件地址，则 overwite vsc-config.json, golangci.yml 文件.
 //  - 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址.
 func (ff *foldersAndFiles) readCilintPathFromVscCfgJSON(vscDir string) error {
 	// 读取 ~/.vsc/vsc-config.json 文件

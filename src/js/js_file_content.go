@@ -20,6 +20,9 @@ var (
 	//go:embed cfgfiles/settings.json
 	settingsJSON []byte
 
+	//go:embed cfgfiles/settings_template.txt
+	settingTemplate []byte
+
 	//go:embed cfgfiles/gitignore
 	gitignore []byte
 
@@ -29,6 +32,9 @@ var (
 	// for unit test 'jest' use
 	//go:embed cfgfiles/example.test.js
 	exampleTestJS []byte
+
+	//go:embed eslint/eslintrc-js.json
+	eslintrcJSON []byte
 )
 
 // file content
