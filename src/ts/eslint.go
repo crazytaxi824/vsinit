@@ -63,6 +63,88 @@ var (
 `)
 )
 
+// 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
+//  - 如果 vsc-config.json 不存在, 则生成 vsc-config.json, eslintrc-ts.json 文件.
+//  - 如果 vsc-config.json 存在，但是没有设置过 eslint.TS 配置文件地址, 则 overwite vsc-config.json, eslintrc-ts.json 文件.
+//  - 如果 vsc-config.json 存在，同时也设置了 eslint.TS 配置文件地址, 直接读取配置文件地址.
+func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
+	// 读取 ~/.vsc/vsc-config.json 文件
+	var vscCfgJSON util.VscConfigJSON
+	err := vscCfgJSON.ReadFromDir(vscDir)
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	} else if errors.Is(err, os.ErrNotExist) {
+		// ~/.vsc/vsc-config.json 文件不存在, 则生成该文件.
+		return ff.addVscCfgJSON(vscDir, vscCfgJSON, false)
+	}
+
+	// 检查 eslint 设置情况
+	if vscCfgJSON.Eslint.TS == "" {
+		// 没有设置 golangci-lint 的情况, //NOTE overwrite vsc-config.json 文件.
+		return ff.addVscCfgJSON(vscDir, vscCfgJSON, true)
+	}
+
+	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
+	ff.espath = vscCfgJSON.Eslint.TS // TODO JS 记得要改
+	return nil
+}
+
+// 添加 ~/.vsc/vsc-config.json 文件
+func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
+	// 设置 vsc-config 文件之前需要生成 eslint 配置文件, 并获取文件地址.
+	ff.addEslintJSONAndEspath(vscDir)
+
+	// 设置 vsc-config.json 文件中的 ESLint 配置文件地址
+	vscCfgJSON.Eslint.TS = ff.espath // TODO JS 要改
+
+	b, er := vscCfgJSON.JSONIndentFormat()
+	if er != nil {
+		return er
+	}
+
+	ff._addFiles(util.FileContent{
+		Path:      vscDir + util.VscConfigFilePath,
+		Content:   b,
+		Overwrite: overwrite,
+	})
+
+	return nil
+}
+
+// 生成 eslintrc-ts.json 文件，记录 eslint 配置文件地址。
+func (ff *foldersAndFiles) addEslintJSONAndEspath(dir string) {
+	// 创建 <dir>/eslint 文件夹，用于存放 eslintrc-ts.json 文件
+	ff._addFolders(dir, dir+eslintDirector)
+
+	// 创建 eslintrc-ts.json 文件
+	ff._addFiles(util.FileContent{
+		Path:    dir + eslintDirector + eslintFilePath,
+		Content: eslintrcJSON,
+	})
+
+	// eslintrc-ts.json 的文件路径
+	ff.espath = dir + eslintDirector + eslintFilePath
+}
+
+// 生成一个新的 settings.json 文件, 填入设置的 ESLint 配置文件地址
+func newSettingsJSONwith(esPath string) util.FileContent {
+	if esPath == "" {
+		// 如果 espath 为空，则不设置 eslint 到 settings.json 中
+		return util.FileContent{
+			Path:    util.SettingsJSONPath,
+			Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil),
+		}
+	}
+
+	// ESLint 中的 ${configPlaceHolder} 替换成 ESLint 配置文件的地址
+	r := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(esPath))
+	return util.FileContent{
+		Path: util.SettingsJSONPath,
+		// 将 setting template 中的 ${eslintPlaceHolder} 替换成整个 ESLint 的设置.
+		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
+	}
+}
+
 // 添加 ESLint 缺失的全局依赖
 func (ff *foldersAndFiles) addMissingGlobalEslintDependencies() error {
 	vscDir, err := util.GetVscConfigDir()
@@ -106,87 +188,4 @@ func (ff *foldersAndFiles) addMissingLocalEslintDependencies() error {
 	}
 
 	return nil
-}
-
-// 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
-//  - 如果 vsc-config.json 不存在, 则生成 vsc-config.json, eslintrc-ts.json 文件.
-//  - 如果 vsc-config.json 存在，但是没有设置过 eslint.TS 配置文件地址, 则 overwite vsc-config.json, eslintrc-ts.json 文件.
-//  - 如果 vsc-config.json 存在，同时也设置了 eslint.TS 配置文件地址, 直接读取配置文件地址.
-func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
-	// 读取 ~/.vsc/vsc-config.json 文件
-	var vscCfgJSON util.VscConfigJSON
-	err := vscCfgJSON.ReadFromDir(vscDir)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return err
-	} else if errors.Is(err, os.ErrNotExist) {
-		// ~/.vsc/vsc-config.json 文件不存在
-		return ff.addVscCfgJSON(vscDir, vscCfgJSON, false)
-	}
-
-	// 检查 eslint 设置情况
-	if vscCfgJSON.Eslint.TS == "" {
-		// 没有设置 golangci-lint 的情况
-		return ff.addVscCfgJSON(vscDir, vscCfgJSON, true)
-	}
-
-	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
-	ff.espath = vscCfgJSON.Eslint.TS // TODO JS 记得要改
-	return nil
-}
-
-// 添加 ~/.vsc/vsc-config.json 文件
-func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
-	// 设置 vsc-config 文件之前需要生成 dev-ci.yml prod-ci.yml 文件
-	// 并获取 cipath 地址.
-	ff.addEslintJSONAndEspath(vscDir)
-
-	// 设置 vsc-config.json 文件
-	vscCfgJSON.Eslint.TS = ff.espath // TODO JS 要改
-
-	b, er := vscCfgJSON.JSONIndentFormat()
-	if er != nil {
-		return er
-	}
-
-	ff._addFiles(util.FileContent{
-		Path:      vscDir + util.VscConfigFilePath,
-		Content:   b,
-		Overwrite: overwrite,
-	})
-
-	return nil
-}
-
-// 生成 eslintrc-ts.json 文件，返回 eslint 配置文件地址。
-func (ff *foldersAndFiles) addEslintJSONAndEspath(dir string) {
-	// 创建 <dir>/eslint 文件夹，用于存放 eslintrc-ts.json 文件
-	ff._addFolders(dir, dir+eslintDirector)
-
-	// 创建 eslintrc-ts.json 文件
-	ff._addFiles(util.FileContent{
-		Path:    dir + eslintDirector + eslintFilePath,
-		Content: eslintrcJSON,
-	})
-
-	// eslintrc-ts.json 的文件路径
-	ff.espath = dir + eslintDirector + eslintFilePath
-}
-
-// 生成一个新的 settings.json 文件, 填入设置的 ESLint 配置文件地址
-func newSettingsJSONwith(esPath string) util.FileContent {
-	if esPath == "" {
-		// 如果 espath 为空，则不设置 eslint 到 settings.json 中
-		return util.FileContent{
-			Path:    util.SettingsJSONPath,
-			Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), nil),
-		}
-	}
-
-	// ESLint 中的 ${configPlaceHolder} 替换成 ESLint 配置文件的地址
-	r := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(esPath))
-	return util.FileContent{
-		Path: util.SettingsJSONPath,
-		// 将 setting template 中的 ${eslintPlaceHolder} 替换成整个 ESLint 的设置.
-		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
-	}
 }

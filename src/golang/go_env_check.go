@@ -75,7 +75,7 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	return suggs, nil
 }
 
-// 安装 vscode 插件 GO
+// 检查 vscode 插件 GO
 func checkVscodeExtensions() (*util.Suggestion, error) {
 	cmd := exec.Command("code", "--list-extensions")
 	out, err := cmd.Output()

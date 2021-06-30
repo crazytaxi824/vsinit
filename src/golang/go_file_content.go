@@ -63,7 +63,7 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 		err = ff.initProjectWithGlobalLint()
 	} else if !*cilintflag && *cilintProjflag {
 		// 设置 project golangci-lint
-		err = ff.initProjectWithLocalLint()
+		err = ff.initLocalCiLint()
 	} else {
 		// 不设置 golangci-lint
 		err = ff.initProjectWithoutLint()
@@ -73,6 +73,7 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 		return nil, err
 	}
 
+	// 写入所需文件
 	fmt.Println("init Golang project")
 	if err := ff.writeAllFiles(); err != nil {
 		return nil, err
@@ -96,11 +97,10 @@ func (ff *foldersAndFiles) initProjectWithoutLint() error {
 	return nil
 }
 
-// 设置 project golangci-lint
-// 需要写的文件:
-// <project>/golangci/dev-ci.yml, <project>/golangci/prod-ci.yml
-// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
-func (ff *foldersAndFiles) initProjectWithLocalLint() error {
+// 设置 local golangci-lint:
+//  - 写入 <project>/golangci/dev-ci.yml, <project>/golangci/prod-ci.yml
+//  - 写入 <project>/.vscode/settings.json 文件
+func (ff *foldersAndFiles) initLocalCiLint() error {
 	// 获取本项目的绝对地址
 	projectPath, err := filepath.Abs(".")
 	if err != nil {
@@ -110,8 +110,7 @@ func (ff *foldersAndFiles) initProjectWithLocalLint() error {
 	// 添加 <project>/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
 	ff.addCilintYMLAndCipath(projectPath)
 
-	// setting.json 文件
-	// 设置 settings.json 文件, 将 --config 设置为 cipath
+	// 设置 settings.json 文件, 将 config 设置为 cilint 配置文件地址
 	err = ff.addSettingJSON()
 	if err != nil {
 		return err
@@ -120,11 +119,10 @@ func (ff *foldersAndFiles) initProjectWithLocalLint() error {
 	return nil
 }
 
-// 设置 global golangci-lint
-// 需要写的文件:
-// ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml, 全局地址。
-// ~/.vsc/vsc-config.json 全局配置文件。
-// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
+// 设置 global golangci-lint:
+//  - 写入 ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml 文件.
+//  - 写入 <project>/.vscode/settings.json 文件.
+//  - 写入 ~/.vsc/vsc-config.json 全局配置文件.
 func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 	// 获取 .vsc 文件夹地址
 	vscDir, err := util.GetVscConfigDir()
@@ -133,16 +131,11 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 	}
 
 	// 从 vsc-config.json 文件获取 golangci 配置文件的地址。
-	// 如果 vsc-config.json 不存在，生成 vsc-config.json, dev-ci.yml, prod-ci.yml 文件
-	// 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，
-	// 则 overwite vsc-config.json, dev-ci.yml, prod-ci.yml 文件.
-	// 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址。
 	err = ff.readCilintPathFromVscCfgJSON(vscDir)
 	if err != nil {
 		return err
 	}
 
-	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath
 	err = ff.addSettingJSON()
 	if err != nil {
@@ -151,7 +144,7 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 	return nil
 }
 
-// 检查 .vscode/settings.json 是否存在, 是否需要修改
+// 添加 .vscode/settings.json 文件，如果文件存在则给出建议
 func (ff *foldersAndFiles) addSettingJSON() error {
 	if ff.cipath == "" {
 		// 不设置 golangci-lint 的情况
@@ -159,7 +152,7 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 		return nil
 	}
 
-	// 读取 .vscode/settings.json
+	// 读取 .vscode/settings.json, 获取 "go.lintFlags" 的值
 	golingFlags, err := _readSettingJSON()
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
@@ -176,7 +169,6 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 		}
 	}
 
-	// 这里是 suggestion
 	// 如果 settings.json 文件存在，而且 config != cipath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
 	cilintConfig := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ff.cipath))
@@ -188,7 +180,7 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 	return nil
 }
 
-// 读取 setting.json 文件
+// 读取 .vscode/settings.json, 获取 "go.lintFlags" 的值
 func _readSettingJSON() ([]string, error) {
 	// 读取 .vscode/settings.json
 	settingsPath, err := filepath.Abs(util.SettingsJSONPath)

@@ -8,7 +8,7 @@ import (
 )
 
 // 单行处理 jsonc 语句，不会改变原语句，只会指出原语句中最后一个有效字符的 index.
-// multiLineComment 说明是否在多行注释中 /* */
+// - multiLineComment 说明是否在多行注释中 /* */
 func lastValidChatInJSONCline(src []byte, start int) (lastValidCharIndex int, multiLineComment bool, err error) {
 	l := len(src)
 
@@ -88,8 +88,8 @@ func toggle(b *bool) {
 	}
 }
 
-// 单行处理 jsonc 语句，将有效字符写入 buf 中。会改变原本的语句。
-// multiLineComment 说明是否在多行注释中 /* */
+// 处理单行 jsonc 语句，将有效字符写入 buf 中。会改变原本行的内容。
+//  - multiLineComment 说明是否在多行注释中 /* */
 func JsoncLineTojson(src []byte, start int, buf *bytes.Buffer) (multiLineComment bool, err error) {
 	l := len(src)
 
@@ -159,7 +159,7 @@ ForLoop:
 	return multiLineComment, nil
 }
 
-// 将整个 jsonc 转成 json
+// 将整个 jsonc 转成 json, 逐字读取.
 func JSONCToJSON(jsonc []byte) ([]byte, error) {
 	lines := bytes.Split(jsonc, []byte("\n"))
 
@@ -239,7 +239,7 @@ func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err er
 	return r.LineIndex, r.LastValidCharIndex, nil
 }
 
-// 向 jsonc 最后添加设置
+// 向 jsonc 末尾添加内容.
 func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 	if len(content) == 0 {
 		return jsonc, nil
@@ -280,7 +280,7 @@ func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 	var r jsoncStatment
 	var newJSONC [][]byte
 
-	// TODO if l == 0 表示整个文件中连 {} 都没有，只有 comments
+	// NOTE if l == 0 表示整个文件中连 {} 都没有，只有 comments
 	if l == 0 {
 		return nil, errors.New("append to nil valid jsonc file")
 	}

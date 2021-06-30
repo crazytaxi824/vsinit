@@ -75,6 +75,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 	}
 
 	if *eslint && *eslintLocal {
+		// 如果两个选项都有，则报错
 		return nil, errors.New("can not setup eslint globally and locally at same time")
 	} else if *eslint && !*eslintLocal {
 		// 设置 global eslint
@@ -135,11 +136,11 @@ func (ff *foldersAndFiles) initLocalEslint() error {
 	if err != nil {
 		return err
 	}
+
 	// 添加 <project>/eslint 文件夹，添加 eslintrc-ts.json 文件
 	ff.addEslintJSONAndEspath(projectPath)
 
-	// setting.json 文件
-	// 设置 settings.json 文件, 将 --config 设置为 cipath
+	// 设置 settings.json 文件, 将 config 设置为 eslint 配置文件地址
 	err = ff.addSettingJSON()
 	if err != nil {
 		return err
@@ -172,7 +173,7 @@ func (ff *foldersAndFiles) initGlobalEslint() error {
 		return err
 	}
 
-	// 添加 settings.json 文件, 将 config 地址设置为 cipath
+	// 设置 settings.json 文件, 将 configFile 设置为 eslint 配置文件地址
 	err = ff.addSettingJSON()
 	if err != nil {
 		return err
@@ -190,7 +191,7 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 		return nil
 	}
 
-	// 读取 .vscode/settings.json 文件, 获取 eslint.options{configFile} 的值
+	// 读取 .vscode/settings.json 文件, 获取 "eslint.options{configFile}" 的值
 	eslintConfigFile, err := _readSettingJSON()
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
@@ -200,12 +201,12 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 		return nil
 	}
 
-	// 判断 --config 地址是否和要设置的 espath 相同, 如果相同则不更新 setting 文件。
-	if eslintConfigFile == ff.espath { // 相同路径
+	// 判断 configFile 地址是否和要设置的 espath 相同, 如果相同则不更新 setting 文件。
+	if eslintConfigFile == ff.espath {
 		return nil
 	}
 
-	// 如果 settings.json 文件存在，而且 config != espath, 则需要 suggestion
+	// 如果 settings.json 文件存在，而且 configFile != espath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
 	cilintConfig := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(ff.espath))
 	ff._addSuggestion(&util.Suggestion{
@@ -216,7 +217,7 @@ func (ff *foldersAndFiles) addSettingJSON() error {
 	return nil
 }
 
-// 读取 .vscode/settings.json 文件, 获取 eslint.options{configFile} 的值
+// 读取 .vscode/settings.json 文件, 获取 "eslint.options{configFile}" 的值
 func _readSettingJSON() (string, error) {
 	// 读取 .vscode/settings.json
 	settingsPath, err := filepath.Abs(util.SettingsJSONPath)

@@ -25,7 +25,7 @@ func CheckCMDInstall(langs ...string) *Suggestion {
 
 	var solutions []string
 	for _, v := range result {
-		solut := installMsg(v)
+		solut := solutionMsg(v)
 		solutions = append(solutions, solut)
 	}
 
@@ -50,8 +50,8 @@ func whichCmd() string {
 	return "which"
 }
 
-// FIXME 改名叫 solutionMsg
-func installMsg(cmdName string) string {
+// 如果缺失以下 command line 工具，则提示以下内容.
+func solutionMsg(cmdName string) string {
 	switch cmdName {
 	case "code":
 		return "download it at https://code.visualstudio.com, or run:\nbrew install vscode"
@@ -79,6 +79,7 @@ func installMsg(cmdName string) string {
 	return InternalErrMsg
 }
 
+// 检查 vscode 中 go 插件所需要的工具.
 func checkGoTools(tool string) string {
 	switch tool {
 	case "gopkgs":
