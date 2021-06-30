@@ -5,10 +5,10 @@ import (
 	"os/exec"
 )
 
-type Dependencies struct { // FIXME 改成小写
-	Dependencies []string
-	Prefix       string
-	Global       bool
+type dependenciesInstall struct { // FIXME 改成小写
+	dependencies []string
+	prefix       string
+	global       bool
 }
 
 // npm install libs to devDependencies

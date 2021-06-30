@@ -1,5 +1,3 @@
-// 添加 dependencies, lintpath, settings.json, .vsc/vsc-config.json
-
 package util
 
 import (
@@ -14,7 +12,7 @@ type FoldersAndFiles struct {
 	folders []string
 	files   []FileContent
 	tsjs    struct {
-		dependencies []Dependencies
+		dependencies []dependenciesInstall
 		suggestions  []*Suggestion
 		lintPath     string
 	}
@@ -56,7 +54,7 @@ func (ff *FoldersAndFiles) Suggestions() []*Suggestion {
 	return nil
 }
 
-func (ff *FoldersAndFiles) _addDependencies(dependencies ...Dependencies) {
+func (ff *FoldersAndFiles) _addDependencies(dependencies ...dependenciesInstall) {
 	ff.tsjs.dependencies = append(ff.tsjs.dependencies, dependencies...)
 }
 
@@ -69,9 +67,9 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 	}
 
 	if len(libs) > 0 {
-		ff._addDependencies(Dependencies{
-			Dependencies: libs,
-			Prefix:       prefix,
+		ff._addDependencies(dependenciesInstall{
+			dependencies: libs,
+			prefix:       prefix,
 		})
 	}
 
@@ -82,7 +80,7 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 func (ff *FoldersAndFiles) InstallMissingDependencies() error {
 	if len(ff.tsjs.dependencies) > 0 {
 		for _, dep := range ff.tsjs.dependencies {
-			err := npmInstallDependencies(dep.Prefix, dep.Global, dep.Dependencies...)
+			err := npmInstallDependencies(dep.prefix, dep.global, dep.dependencies...)
 			return err
 		}
 	}
