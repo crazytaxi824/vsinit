@@ -105,7 +105,7 @@ func (ff *foldersAndFiles) initLocalCiLint() error {
 	}
 
 	// 添加 <project>/golangci 文件夹，添加 dev-ci.yml 文件
-	ff.addCilintYMLAndCipath(projectPath)
+	ff.addCilintYMLAndCipath(projectPath, false)
 
 	// 设置 settings.json 文件, 将 config 设置为 cilint 配置文件地址
 	err = ff.addSettingJSON()

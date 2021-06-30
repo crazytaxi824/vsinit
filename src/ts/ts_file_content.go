@@ -138,7 +138,7 @@ func (ff *foldersAndFiles) initLocalEslint() error {
 	}
 
 	// 添加 <project>/eslint 文件夹，添加 eslintrc-ts.json 文件
-	ff.addEslintJSONAndEspath(projectPath)
+	ff.addEslintJSONAndEspath(projectPath, false)
 
 	// 设置 settings.json 文件, 将 config 设置为 eslint 配置文件地址
 	err = ff.addSettingJSON()

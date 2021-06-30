@@ -18,7 +18,7 @@ const (
 	golangciDirector = "/golangci"
 
 	// golangci-lint 配置文件名
-	cilintFilePath = "/dev-ci.yml"
+	cilintFilePath = "/golangci.yml"
 )
 
 // golangci-lint setting
@@ -69,7 +69,7 @@ func (ff *foldersAndFiles) readCilintPathFromVscCfgJSON(vscDir string) error {
 // 添加 ~/.vsc/vsc-config.json 文件
 func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
 	// 设置 vsc-config 文件之前需要生成 dev-ci.yml 文件, 并获取文件地址.
-	ff.addCilintYMLAndCipath(vscDir)
+	ff.addCilintYMLAndCipath(vscDir, true)
 
 	// 设置 vsc-config.json 文件中的 golangci 配置文件地址
 	vscCfgJSON.Golangci = ff.cipath
@@ -89,18 +89,31 @@ func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfi
 }
 
 // 生成 dev-ci.yml 文件，记录配置文件地址。
-func (ff *foldersAndFiles) addCilintYMLAndCipath(dir string) {
-	// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml 文件
-	ff._addFolders(dir, dir+golangciDirector)
+//  - 如果是 global 设置需要多添加一个 folder.
+func (ff *foldersAndFiles) addCilintYMLAndCipath(dir string, global bool) {
+	if global {
+		// 创建 <dir>/golangci 文件夹，用于存放 dev-ci.yml 文件
+		ff._addFolders(dir, dir+golangciDirector)
+
+		// 创建 dev-ci.yml 文件
+		ff._addFiles(util.FileContent{
+			Path:    dir + golangciDirector + cilintFilePath,
+			Content: devci,
+		})
+
+		// dev-ci.yml 的文件路径
+		ff.cipath = dir + golangciDirector + cilintFilePath
+		return
+	}
 
 	// 创建 dev-ci.yml 文件
 	ff._addFiles(util.FileContent{
-		Path:    dir + golangciDirector + cilintFilePath,
+		Path:    dir + cilintFilePath,
 		Content: devci,
 	})
 
-	// ci.yml 的文件路径
-	ff.cipath = dir + golangciDirector + cilintFilePath
+	// dev-ci.yml 的文件路径
+	ff.cipath = dir + cilintFilePath
 }
 
 // 生成一个 settings.json 文件, 填入设置的 golangci 配置文件地址

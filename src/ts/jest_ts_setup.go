@@ -64,7 +64,7 @@ func (ff *foldersAndFiles) addMissingJestDependencies() error {
 }
 
 // 查看 package.json 是否下载了所需要的依赖.
-//  - package.json 可以是 local 也可以是 globle，需要手动填写文件地址.
+//  - package.json 可以是 local 也可以是 global，需要手动填写文件地址.
 func checkMissingdependencies(dependencies []string, pkgFilePath string) (libs []string, err error) {
 	// open package.json 文件
 	pkgMap, err := _readPkgJSONToMap(pkgFilePath)

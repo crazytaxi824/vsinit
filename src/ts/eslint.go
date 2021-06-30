@@ -92,7 +92,7 @@ func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
 // 添加 ~/.vsc/vsc-config.json 文件
 func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
 	// 设置 vsc-config 文件之前需要生成 eslint 配置文件, 并获取文件地址.
-	ff.addEslintJSONAndEspath(vscDir)
+	ff.addEslintJSONAndEspath(vscDir, true)
 
 	// 设置 vsc-config.json 文件中的 ESLint 配置文件地址
 	vscCfgJSON.Eslint.TS = ff.espath // TODO JS 要改
@@ -112,18 +112,30 @@ func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfi
 }
 
 // 生成 eslintrc-ts.json 文件，记录 eslint 配置文件地址。
-func (ff *foldersAndFiles) addEslintJSONAndEspath(dir string) {
-	// 创建 <dir>/eslint 文件夹，用于存放 eslintrc-ts.json 文件
-	ff._addFolders(dir, dir+eslintDirector)
+//  - 如果是 global 设置需要多添加一个 folder.
+func (ff *foldersAndFiles) addEslintJSONAndEspath(dir string, global bool) {
+	if global {
+		// 创建 <dir>/eslint 文件夹，用于存放 eslintrc-ts.json 文件
+		ff._addFolders(dir, dir+eslintDirector)
 
-	// 创建 eslintrc-ts.json 文件
+		// 创建 eslintrc-ts.json 文件
+		ff._addFiles(util.FileContent{
+			Path:    dir + eslintDirector + eslintFilePath,
+			Content: eslintrcJSON,
+		})
+
+		// eslintrc-ts.json 的文件路径
+		ff.espath = dir + eslintDirector + eslintFilePath
+		return
+	}
+
 	ff._addFiles(util.FileContent{
-		Path:    dir + eslintDirector + eslintFilePath,
+		Path:    dir + eslintFilePath,
 		Content: eslintrcJSON,
 	})
 
 	// eslintrc-ts.json 的文件路径
-	ff.espath = dir + eslintDirector + eslintFilePath
+	ff.espath = dir + eslintFilePath
 }
 
 // 生成一个新的 settings.json 文件, 填入设置的 ESLint 配置文件地址
