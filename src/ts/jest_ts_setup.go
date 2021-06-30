@@ -37,8 +37,8 @@ func (ff *foldersAndFiles) initJest() error {
 		return errors.New(sugg.String())
 	}
 
-	ff.addFolders(testFolder)
-	ff.addFiles(jestFileContent)
+	ff._addFolders(testFolder)
+	ff._addFiles(jestFileContent)
 
 	// 添加 Jest Dependencies
 	return ff.addMissingJestDependencies()
@@ -52,7 +52,7 @@ func (ff *foldersAndFiles) addMissingJestDependencies() error {
 	}
 
 	if len(libs) > 0 {
-		ff.addDependencies(util.DependenciesInstall{
+		ff._addDependencies(util.DependenciesInstall{
 			Dependencies: libs,
 			Prefix:       "",
 			Global:       false,

@@ -93,7 +93,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 
 	// NOTE write project files first
 	fmt.Println("init TypeScript project")
-	if err := util.WriteFoldersAndFiles(ff.folders, ff.files); err != nil {
+	if err := ff.writeAllFiles(); err != nil {
 		return nil, err
 	}
 
@@ -113,7 +113,7 @@ func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (su
 // 不设置 eslint
 func (ff *foldersAndFiles) initWithoutEslint() error {
 	// 直接写 settings.json 文件
-	err := ff.writeSettingJSON()
+	err := ff.addSettingJSON()
 	if err != nil {
 		return err
 	}
@@ -137,11 +137,11 @@ func (ff *foldersAndFiles) initLocalEslint() error {
 		return err
 	}
 	// 添加 <project>/eslint 文件夹，添加 eslintrc-ts.json 文件
-	ff.writeEslintJSONAndEspath(projectPath)
+	ff.addEslintJSONAndEspath(projectPath)
 
 	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath
-	err = ff.writeSettingJSON()
+	err = ff.addSettingJSON()
 	if err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (ff *foldersAndFiles) initGlobalEslint() error {
 
 	// // setting.json 文件
 	// // 设置 settings.json 文件, 将 --config 设置为 cipath
-	err = ff.writeSettingJSON()
+	err = ff.addSettingJSON()
 	if err != nil {
 		return err
 	}
@@ -190,10 +190,10 @@ func (ff *foldersAndFiles) initGlobalEslint() error {
 }
 
 // 检查 .vscode/settings.json 是否存在
-func (ff *foldersAndFiles) writeSettingJSON() error {
+func (ff *foldersAndFiles) addSettingJSON() error {
 	if ff.espath == "" {
 		// 不设置 eslint 的情况
-		ff.addFiles(newSettingsJSONwith(""))
+		ff._addFiles(newSettingsJSONwith(""))
 		return nil
 	}
 
@@ -202,7 +202,7 @@ func (ff *foldersAndFiles) writeSettingJSON() error {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// settings.json 不存在, 生成新的 settings.json 文件
-		ff.addFiles(newSettingsJSONwith(ff.espath))
+		ff._addFiles(newSettingsJSONwith(ff.espath))
 		return nil
 	}
 
@@ -214,7 +214,7 @@ func (ff *foldersAndFiles) writeSettingJSON() error {
 	// 如果 settings.json 文件存在，而且 config != espath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
 	cilintConfig := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(ff.espath))
-	ff.addSuggestion(&util.Suggestion{
+	ff._addSuggestion(&util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
 		Solution: string(cilintConfig),
 	})
@@ -271,5 +271,12 @@ func (ff *foldersAndFiles) installMissingDependencies() error {
 		}
 	}
 
+	return nil
+}
+
+func (ff *foldersAndFiles) writeAllFiles() error {
+	if err := util.WriteFoldersAndFiles(ff.folders, ff.files); err != nil {
+		return err
+	}
 	return nil
 }

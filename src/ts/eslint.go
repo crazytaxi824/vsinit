@@ -80,7 +80,7 @@ func (ff *foldersAndFiles) addMissingGlobalEslintDependencies() error {
 	}
 
 	if len(libs) > 0 {
-		ff.addDependencies(util.DependenciesInstall{
+		ff._addDependencies(util.DependenciesInstall{
 			Dependencies: libs,
 			Prefix:       eslintFolder,
 			Global:       false,
@@ -97,7 +97,7 @@ func (ff *foldersAndFiles) addMissingLocalEslintDependencies() error {
 	}
 
 	if len(libs) > 0 {
-		ff.addDependencies(util.DependenciesInstall{
+		ff._addDependencies(util.DependenciesInstall{
 			Dependencies: libs,
 			Prefix:       "",
 			Global:       false,
@@ -120,13 +120,13 @@ func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsc/vsc-config 文件不存在
-		return ff.writeVscCfgJSON(vscDir, vscCfgJSON, false)
+		return ff.addVscCfgJSON(vscDir, vscCfgJSON, false)
 	}
 
 	// 检查 eslint 设置情况
 	if vscCfgJSON.Eslint.TS == "" {
 		// 没有设置 golangci-lint 的情况
-		return ff.writeVscCfgJSON(vscDir, vscCfgJSON, true)
+		return ff.addVscCfgJSON(vscDir, vscCfgJSON, true)
 	}
 
 	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
@@ -135,10 +135,10 @@ func (ff *foldersAndFiles) readEslintPathFromVscCfgJSON(vscDir string) error {
 }
 
 // 写 vsc-config.json 文件,
-func (ff *foldersAndFiles) writeVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
+func (ff *foldersAndFiles) addVscCfgJSON(vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
 	// 设置 vsc-config 文件之前需要生成 dev-ci.yml prod-ci.yml 文件
 	// 并获取 cipath 地址.
-	ff.writeEslintJSONAndEspath(vscDir)
+	ff.addEslintJSONAndEspath(vscDir)
 
 	// 设置 vsc-config.json 文件
 	vscCfgJSON.Eslint.TS = ff.espath // TODO JS 要改
@@ -148,7 +148,7 @@ func (ff *foldersAndFiles) writeVscCfgJSON(vscDir string, vscCfgJSON util.VscCon
 		return er
 	}
 
-	ff.addFiles(util.FileContent{
+	ff._addFiles(util.FileContent{
 		Path:      vscDir + util.VscConfigFilePath,
 		Content:   b,
 		Overwrite: overwrite,
@@ -158,12 +158,12 @@ func (ff *foldersAndFiles) writeVscCfgJSON(vscDir string, vscCfgJSON util.VscCon
 }
 
 // 生成 eslintrc-ts.json 文件，返回文件地址。
-func (ff *foldersAndFiles) writeEslintJSONAndEspath(dir string) {
+func (ff *foldersAndFiles) addEslintJSONAndEspath(dir string) {
 	// 创建 <dir>/eslint 文件夹，用于存放 eslintrc-ts.json 文件
-	ff.addFolders(dir, dir+eslintDirector)
+	ff._addFolders(dir, dir+eslintDirector)
 
 	// 创建 eslintrc-ts.json 文件
-	ff.addFiles(util.FileContent{
+	ff._addFiles(util.FileContent{
 		Path:    dir + eslintDirector + eslintFilePath,
 		Content: eslintrcJSON,
 	})
