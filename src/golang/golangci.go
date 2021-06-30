@@ -125,7 +125,6 @@ func genSettingsJSONwith(ciPath string) util.FileContent {
 
 	// 设置 go.lint 到 settings.json 中，同时添加 cipath
 	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
-	// return bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r)
 	return util.FileContent{
 		Path:    settingJSONPath,
 		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),

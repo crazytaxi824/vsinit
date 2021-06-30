@@ -30,6 +30,19 @@ var jestFileContent = util.FileContent{
 // TS 中 jest 所需要的依赖
 var jestDependencies = []string{"@types/jest", "ts-jest"}
 
+// 写入 test 相关文件，test/example.test.ts 文件
+func (ff *foldersAndFiles) writeTestFile() error {
+	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
+	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
+		return errors.New(sugg.String())
+	}
+
+	ff.addFolders(testFolder)
+	ff.addFiles(jestFileContent)
+
+	return nil
+}
+
 // 查看 package.json devDependencies 是否下载了 @types/jest, ts-jest
 // npm i -D @types/jest ts-jest
 func dependenciesNeedsToInstall(dependencies []string, pkgFilePath string) (libs []string, err error) {

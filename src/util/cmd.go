@@ -50,6 +50,7 @@ func whichCmd() string {
 	return "which"
 }
 
+// FIXME 改名叫 solutionMsg
 func installMsg(cmdName string) string {
 	switch cmdName {
 	case "code":

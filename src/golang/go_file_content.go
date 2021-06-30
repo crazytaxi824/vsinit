@@ -155,6 +155,7 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 // 检查 .vscode/settings.json 是否存在, 是否需要修改
 func (ff *foldersAndFiles) writeSettingJSON() error {
 	if ff.cipath == "" {
+		// 不设置 golangci-lint 的情况
 		ff.addFiles(genSettingsJSONwith(""))
 		return nil
 	}
