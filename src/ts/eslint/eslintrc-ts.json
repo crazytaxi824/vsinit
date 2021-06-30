@@ -136,7 +136,6 @@ eslint-config-airbnb-base // js 专用 lint
     {
       "files": ["*.js"],
       "rules": {
-        // Allow require()
         "@typescript-eslint/no-var-requires": "off" // 不允许使用 require，除非在 import 语句中.
       }
     }

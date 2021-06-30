@@ -57,8 +57,7 @@ var (
   "eslint.options": {
     // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用。
     // https://eslint.org/docs/developer-guide/nodejs-api#cliengine
-    // 这里是全局 eslint 配置文件的固定地址
-    // ts lint config file
+    // eslint 配置文件地址
     "configFile": "` + configPlaceHolder + `"
   },
 `)
