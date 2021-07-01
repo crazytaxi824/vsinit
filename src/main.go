@@ -55,7 +55,7 @@ func main() {
 	case "js":
 		suggestions, err = js.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 	case "envcheck":
-		suggestions, err = golang.CheckGO(false) // DEBUG
+		suggestions, err = golang.CheckGO(true) // DEBUG
 	default:
 		helpMsg()
 		os.Exit(2)

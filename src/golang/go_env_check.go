@@ -3,22 +3,16 @@
 package golang
 
 import (
-	"bytes"
 	"errors"
 	"local/src/util"
 	"os"
-	"os/exec"
 )
 
 // FIXME
 const GolintciCmd = "vs init go -cilint <path>"
 
-// vscode go 插件 suggestion
-var golangSuggestion = util.Suggestion{
-	Problem: "need to install vscode extension 'golang.go'",
-	Solution: "you can install it in the vscode extentsion market, or run:\n" +
-		"code --install-extension golang.go",
-}
+// 需要安装的插件
+var extensions = []string{"golang.go", "humao.rest-client"}
 
 func CheckGO(lintFlag bool) ([]*util.Suggestion, error) {
 	return checkGOENV(lintFlag)
@@ -34,24 +28,19 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 		suggs = append(suggs, sug)
 	}
 
-	// 检查 go 是否安装 // 检查 code 安装
+	// 检查 go 是否安装
 	sug = util.CheckCMDInstall("go")
 	if sug != nil {
 		suggs = append(suggs, sug)
 	}
 
-	// 检查 vscode and extensions,
-	sug = util.CheckCMDInstall("code")
-	if sug != nil {
-		suggs = append(suggs, sug, &golangSuggestion)
-	} else {
-		su, er := checkVscodeExtensions()
-		if er != nil {
-			return nil, er
-		}
-		if su != nil {
-			suggs = append(suggs, su)
-		}
+	// 检查 vscode 和 vscode extensions
+	sus, err := util.CheckVscodeAndExtensions(extensions)
+	if err != nil {
+		return nil, err
+	}
+	if len(sus) > 0 {
+		suggs = append(suggs, sus...)
 	}
 
 	// plugins:gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
@@ -74,24 +63,10 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	}
 
 	// 检查返回是否为空
-	if len(suggs) == 0 {
-		return nil, nil
+	if len(suggs) > 0 {
+		return suggs, nil
 	}
 
-	return suggs, nil
-}
-
-// 检查 vscode 插件 GO
-func checkVscodeExtensions() (*util.Suggestion, error) {
-	cmd := exec.Command("code", "--list-extensions")
-	out, err := cmd.Output()
-	if err != nil {
-		return nil, err
-	}
-
-	if !bytes.Contains(out, []byte("golang.go")) {
-		return &golangSuggestion, nil
-	}
 	return nil, nil
 }
 
@@ -118,7 +93,7 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	}
 
 	// 读取 vsc setting
-	var vscCfgJSON *util.VscConfigJSON
+	var vscCfgJSON util.VscConfigJSON
 	err = vscCfgJSON.ReadFromDir(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
