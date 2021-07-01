@@ -81,7 +81,9 @@ func (ff *FoldersAndFiles) InstallMissingDependencies() error {
 	if len(ff.tsjs.dependencies) > 0 {
 		for _, dep := range ff.tsjs.dependencies {
 			err := npmInstallDependencies(dep.prefix, dep.global, dep.dependencies...)
-			return err
+			if err != nil {
+				return err
+			}
 		}
 	}
 
