@@ -72,7 +72,7 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 		return nil
 	}
 
-	// TODO 判断 global & prefix 是否相同，如果相同直接 append 到里面
+	// NOTE 判断 global & prefix 是否相同，如果相同直接 append 到里面
 	for i, v := range ff.tsjs.dependencies {
 		if v.prefix == prefix {
 			ff.tsjs.dependencies[i].dependencies = append(ff.tsjs.dependencies[i].dependencies, libs...)

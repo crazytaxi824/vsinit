@@ -55,3 +55,11 @@ func Test_ReadJSON(t *testing.T) {
 
 	t.Logf("%+v", vs)
 }
+
+func Test_StringToByte(t *testing.T) {
+	s := "abc"
+	t.Log(StringToBytes(s))
+
+	b := []byte("abc")
+	t.Log(BytesToString(b))
+}
