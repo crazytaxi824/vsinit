@@ -1,4 +1,4 @@
-package ts
+package js
 
 import (
 	"bytes"
@@ -10,17 +10,10 @@ import (
 
 // eslint dependencies
 var eslintDependencies = []string{
-	"eslint-plugin-import",
-	"eslint-plugin-jsx-a11y",
-	"eslint-plugin-react",
-	"eslint-plugin-react-hooks",
-	"@typescript-eslint/parser", // parser
-	"@typescript-eslint/eslint-plugin",
-	"eslint-plugin-jest",              // jest unit test
-	"eslint-plugin-promise",           // promise 用法
-	"eslint-config-airbnb-typescript", // ts 用
-	"eslint-config-prettier",          // 解决 vscode 插件中 prettier 造成的代码问题
-	"eslint-config-airbnb-base",       // js 专用 lint
+	"eslint-plugin-jest",        // jest unit test
+	"eslint-plugin-promise",     // promise 用法
+	"eslint-config-prettier",    // 解决 vscode 插件中 prettier 造成的代码问题
+	"eslint-config-airbnb-base", // js 专用 lint
 }
 
 const (
@@ -34,7 +27,7 @@ const (
 	eslintDirector = "/eslint"
 
 	// ESLint 配置文件名
-	eslintFilePath = "/eslintrc-ts.json" // TODO JS 需要更改
+	eslintFilePath = "/eslintrc-js.json" // TODO JS 需要更改
 )
 
 // ESLint setting
@@ -46,9 +39,6 @@ var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于�
 
   // eslint 检查文件类型
   "eslint.validate": [
-    "typescriptreact",
-    "typescript",
-    "javascriptreact",
     "javascript"
   ],
 
@@ -60,10 +50,10 @@ var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于�
     "configFile": "` + configPlaceHolder + `"
   },`
 
-// 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
-//  - 如果 vsc-config.json 不存在, 则生成 vsc-config.json, eslintrc-ts.json 文件.
-//  - 如果 vsc-config.json 存在，但是没有设置 eslint.TS 配置文件地址, 则 overwite vsc-config.json, eslintrc-ts.json 文件.
-//  - 如果 vsc-config.json 存在，同时也设置了 eslint.TS 配置文件地址, 直接读取配置文件地址.
+// 通过 vsc-config.json 获取 eslint.JS 配置文件地址.
+//  - 如果 vsc-config.json 不存在, 则生成 vsc-config.json, eslintrc-js.json 文件.
+//  - 如果 vsc-config.json 存在，但是没有设置 eslint.JS 配置文件地址, 则 overwite vsc-config.json, eslintrc-js.json 文件.
+//  - 如果 vsc-config.json 存在，同时也设置了 eslint.JS 配置文件地址, 直接读取配置文件地址.
 func readEslintPathFromVscCfgJSON(ff *util.FoldersAndFiles, vscDir string) error {
 	// 读取 ~/.vsc/vsc-config.json 文件
 	var vscCfgJSON util.VscConfigJSON
@@ -76,13 +66,13 @@ func readEslintPathFromVscCfgJSON(ff *util.FoldersAndFiles, vscDir string) error
 	}
 
 	// 检查 eslint 设置情况
-	if vscCfgJSON.Eslint.TS == "" { // TODO JS 记得要改
+	if vscCfgJSON.Eslint.JS == "" { // TODO JS 记得要改
 		// 没有设置 golangci-lint 的情况, //NOTE overwrite vsc-config.json 文件.
 		return addVscCfgJSON(ff, vscDir, vscCfgJSON, true)
 	}
 
 	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
-	ff.SetLintPath(vscCfgJSON.Eslint.TS) // TODO JS 记得要改
+	ff.SetLintPath(vscCfgJSON.Eslint.JS) // TODO JS 记得要改
 	return nil
 }
 
@@ -95,7 +85,7 @@ func addVscCfgJSON(ff *util.FoldersAndFiles, vscDir string, vscCfgJSON util.VscC
 	ff.AddLintConfigAndLintPath(vscDir+eslintDirector+eslintFilePath, eslintrcJSON)
 
 	// 设置 vsc-config.json 文件中的 ESLint 配置文件地址
-	vscCfgJSON.Eslint.TS = ff.LintPath() // TODO JS 要改
+	vscCfgJSON.Eslint.JS = ff.LintPath() // TODO JS 要改
 
 	b, er := vscCfgJSON.JSONIndentFormat()
 	if er != nil {

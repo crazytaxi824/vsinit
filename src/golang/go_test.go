@@ -33,14 +33,13 @@ func Test_StringFormat(t *testing.T) {
 }
 
 func Test_writeNewSettingFile(t *testing.T) {
-	t.Log(genSettingsJSONwith(""))
-	t.Log(genSettingsJSONwith("abc/def.yml"))
+	t.Log(newSettingsJSONwith(""))
+	t.Log(newSettingsJSONwith("abc/def.yml"))
 }
 
 func Test_cilintFilePath(t *testing.T) {
 	vscDir, _ := util.GetVscConfigDir()
 
 	t.Log(vscDir + util.VscConfigFilePath)
-	t.Log(vscDir + golangciDirector + devciFilePath)
-	t.Log(vscDir + golangciDirector + prodciFilePath)
+	t.Log(vscDir + golangciDirector + cilintFilePath)
 }

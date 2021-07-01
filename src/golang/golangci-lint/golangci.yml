@@ -43,7 +43,7 @@ run:
   skip-files:
     # - ^.*main.go$   # 两种写法都可以
     # - "^.*main.go$"
-    # - ^.*debug
+    - ^.*debug
 
 # 输出配置
 output:
@@ -135,7 +135,7 @@ linters-settings:
     # 最小复杂性
     min-complexity: 15
 
-  # TODO, DEBUG and FIXME 标记
+  # - TODO, DEBUG and FIXME 标记
   godox:
     # these can be overwritten by this setting
     keywords:
@@ -183,9 +183,8 @@ linters-settings:
     # To specify a set of rules to explicitly exclude.
     # Available rules: https://github.com/securego/gosec#available-rules
     excludes:
-      # 以下需要 nolint 写原因
-      # - G204  # exec.Command(cmd, args...) - cmd/args 是变量的情况
-      # - G304  # ioutil.ReadFile(filename) - filename 是变量的情况
+      - G204 # exec.Command(cmd, args...) - cmd/args 是变量的情况
+      - G304 # ioutil.ReadFile(filename) - filename 是变量的情况
     # To specify the configuration of rules.
     # The configuration of rules is not fully documented by gosec:
     # https://github.com/securego/gosec#configuration
@@ -288,7 +287,7 @@ linters-settings:
     allow-no-explanation: []
     # Enable to require an explanation after each nolint directive. Default is false.
     # true - 使用 nolint 需要提供解释
-    require-explanation: true
+    require-explanation: false
     # Enable to require an explanation after each nolint directive. Default is false.
     # true - 需要指定哪个 linter 不检查，false - 不需要指定，所有 linter 都不检查.
     require-specific: false
@@ -297,7 +296,7 @@ linters:
   disable-all: true
   enable:
     - bodyclose # check HTTP res.Body is correctly closed.
-    - deadcode
+    # - deadcode # 直接用 unused 就可以了
     - depguard # dep 包管理工具，第三方 package 白名单，有自己的config文件，https://github.com/OpenPeeDeeP/depguard
     # - gomodguard    # go mod 包管理工具，第三方 package 白名单。和 depguard 二选一
     - dogsled # 超过n个返回值未接受，eg: x, _, _, _, := f()
@@ -310,7 +309,7 @@ linters:
     - goconst # 查找是否有重复的 string 可以用常量 const 表示
     - gocritic # 检查合集 https://go-critic.github.io/overview
     - gocyclo # 检查函数的复杂程度，gocognit 二选一
-    # - gofmt       # 和 goimports 二选一即可。
+    # - gofmt # 和 goimports 二选一即可。
     - goimports # 格式化工具
     - golint # 检查合集，不想给每个函数写注释
     - gomnd # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
@@ -330,7 +329,7 @@ linters:
     - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
     - unconvert # 检查不必要的类型转换
     - unparam # 检查函数内没用到的入参，出参
-    - unused # 检查没用的函数，结构体属性等
+    # - unused # NOTE 生产环境下打开
     - varcheck # 检查没用的全局变量
     - whitespace # detection of 开始和结尾的空行 leading and trailing whitespace
 
@@ -369,9 +368,9 @@ issues:
     - path: _test\.go # _test.go 测试文件，不使用以下lint
       linters:
         - gocyclo
-        # - errcheck
+        - errcheck
         - dupl
-        # - gosec
+        - gosec
         - gomnd
         - goconst
         - funlen
@@ -411,22 +410,21 @@ issues:
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
   # excluded by default patterns execute `golangci-lint run --help`.
-  # Default value for this option is True.
-  exclude-use-default: false # prod 环境
-  # exclude-use-default: true # dev 环境
+  # Default value for this option is true.
+  exclude-use-default: true
 
-  # include:
-  #   - EXC0001 # errcheck - 不检查某些特殊情况 eg: defer file.Close()
-  #   - EXC0003 # when tests are defined in package 'test'
-  #   - EXC0006 # gosec - unsafe 包使用，需要审计
-  #   - EXC0007 #
-  #   - EXC0009 # gosec - 读写文件权限 0600
-  #   - EXC0010 # gosec:excludes: 中已经处理(G304) - ioutil.ReadFile(filename) filename是变量
-  #   # 以下都是检查 comments 的
-  #   # - EXC0002
-  #   # - EXC0011
-  #   # - EXC0012
-  #   # - EXC0013
+  include:
+    # - EXC0001 # errcheck - 不检查某些特殊情况 eg: defer file.Close()
+    - EXC0003 # when tests are defined in package 'test'
+    - EXC0006 # gosec - unsafe 包使用，需要审计
+    - EXC0007 #
+    - EXC0009 # gosec - 读写文件权限 0600
+    # - EXC0010 # gosec:excludes: 中已经处理(G304) - ioutil.ReadFile(filename) filename是变量
+    # 以下都是检查 comments 的, 全部关闭.
+    # - EXC0002
+    # - EXC0011
+    # - EXC0012
+    # - EXC0013
 
   # The default value is false. If set to true exclude and exclude-rules
   # regular expressions become case sensitive.

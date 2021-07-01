@@ -19,8 +19,8 @@ const (
 type VscConfigJSON struct {
 	Golangci string `json:"golangci,omitempty"`
 	Eslint   struct {
-		TS string `json:"ts,omitempty"`
-		JS string `json:"js,omitempty"`
+		TS string `json:"typescript,omitempty"`
+		JS string `json:"javascript,omitempty"`
 	} `json:"eslint,omitempty"`
 }
 
@@ -50,7 +50,7 @@ func (vs *VscConfigJSON) JSONIndentFormat() ([]byte, error) {
 	return json.MarshalIndent(vs, "", "  ")
 }
 
-// 全局 vsc 配置文件地址 ~/.vsc/vsc-config.json
+// 全局 vsc 配置文件地址 ~/.vsc
 func GetVscConfigDir() (string, error) {
 	home := os.Getenv("HOME")
 	if home == "" {

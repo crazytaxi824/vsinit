@@ -57,8 +57,7 @@
 
     // golangci-lint 配置文件地址
     // "--config=${workspaceRoot}/golangci.yml" // 本地
-    // "--config=~/.golangci/prod-ci.yml"
-    "--config=~/.golangci/dev-ci.yml" //vsc:cilint DON'T EDIT
+    "--config=~/.golangci/golangci.yml" //vsc:cilint DON'T EDIT
   ],
 
   // search.exclude 用来忽略搜索的文件夹

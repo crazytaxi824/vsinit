@@ -35,11 +35,11 @@ func main() {
 	tsjsSet := flag.NewFlagSet("ts/js", flag.ExitOnError)
 	jestflag := tsjsSet.Bool("jest", false, "add 'jest' - unit test components")
 	eslintflag := tsjsSet.Bool("eslint", false, "setup eslint globally")
-	eslintProjectflag := tsjsSet.Bool("eslint-proj", false, "setup eslint in project")
+	eslintProjectflag := tsjsSet.Bool("eslint-local", false, "setup eslint in project")
 
 	goSet := flag.NewFlagSet("go", flag.ExitOnError)
 	cilintflag := goSet.Bool("cilint", false, "setup golangci-lint globally")
-	cilintProjectflag := goSet.Bool("cilint-proj", false, "setup golangci-lint in project")
+	cilintProjectflag := goSet.Bool("cilint-local", false, "setup golangci-lint in project")
 
 	var (
 		err         error
@@ -53,7 +53,7 @@ func main() {
 	case "ts":
 		suggestions, err = ts.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 	case "js":
-		err = js.InitProject(tsjsSet, jestflag)
+		suggestions, err = js.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 	case "envcheck":
 		suggestions, err = golang.CheckGO(false) // DEBUG
 	default:

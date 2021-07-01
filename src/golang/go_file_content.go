@@ -1,13 +1,10 @@
 package golang
 
 import (
-	"bytes"
 	_ "embed" // for go:embed file use
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -26,11 +23,8 @@ var (
 	//go:embed cfgfiles/gitignore
 	gitignore []byte
 
-	//go:embed golangci-lint/dev-ci.yml
-	devci []byte
-
-	//go:embed golangci-lint/prod-ci.yml
-	prodci []byte
+	//go:embed golangci-lint/golangci.yml
+	golangciYML []byte
 )
 
 var mainGO = []byte(`package main
@@ -44,8 +38,8 @@ func main() {
 `)
 
 var filesAndContent = []util.FileContent{
-	{Path: ".vscode/launch.json", Content: launchJSON},
-	{Path: ".gitignore", Content: gitignore},
+	{Path: util.LaunchJSONPath, Content: launchJSON},
+	{Path: util.GitignorePath, Content: gitignore},
 	{Path: "src/main.go", Content: mainGO},
 }
 
@@ -53,67 +47,60 @@ func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs [
 	// nolint // flag.ExitOnError will do the os.Exit(2)
 	goSet.Parse(os.Args[2:])
 
-	ff := initFoldersAndFiles(createFolders, filesAndContent)
+	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
 	if *cilintflag && *cilintProjflag {
 		// 如果两个选项都有，则报错
 		return nil, errors.New("can not setup golangci-lint globally and locally at same time")
 	} else if *cilintflag && !*cilintProjflag {
 		// 设置 global golangci-lint
-		err = ff.initProjectWithGlobalLint()
+		err = initGlobalLint(ff)
 	} else if !*cilintflag && *cilintProjflag {
 		// 设置 project golangci-lint
-		err = ff.initProjectWithLocalLint()
+		err = initLocalCiLint(ff)
 	} else {
 		// 不设置 golangci-lint
-		err = ff.initProjectWithoutLint()
+		err = initWithoutLint(ff)
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
+	// 写入所需文件
 	fmt.Println("init Golang project")
-	err = util.WriteFoldersAndFiles(ff.folders, ff.files)
-	if err != nil {
+	if err := ff.WriteAllFiles(); err != nil {
 		return nil, err
 	}
 
-	// 检查返回是否为空
-	if len(ff.suggestions) != 0 {
-		return ff.suggestions, nil
-	}
-
-	return nil, nil
+	return ff.Suggestions(), nil
 }
 
 // 不设置 golangci-lint
-func (ff *foldersAndFiles) initProjectWithoutLint() error {
+func initWithoutLint(ff *util.FoldersAndFiles) error {
 	// 不需要设置 cilint 的情况，直接写 setting
-	err := ff.writeSettingJSON()
+	err := addSettingJSON(ff)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// 设置 project golangci-lint
-// 需要写的文件:
-// <project>/golangci/dev-ci.yml, <project>/golangci/prod-ci.yml
-// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
-func (ff *foldersAndFiles) initProjectWithLocalLint() error {
+// 设置 local golangci-lint:
+//  - 写入 <project>/golangci/golangci.yml
+//  - 写入 <project>/.vscode/settings.json 文件
+func initLocalCiLint(ff *util.FoldersAndFiles) error {
 	// 获取本项目的绝对地址
 	projectPath, err := filepath.Abs(".")
 	if err != nil {
 		return err
 	}
 
-	// 添加 <project>/golangci 文件夹，添加 dev-ci.yml, prod-ci.yml 文件
-	ff.writeCilintYMLAndCipath(projectPath)
+	// 添加 <project>/golangci 文件夹，添加 golangci.yml 文件
+	ff.AddLintConfigAndLintPath(projectPath+cilintFilePath, golangciYML)
 
-	// setting.json 文件
-	// 设置 settings.json 文件, 将 --config 设置为 cipath
-	err = ff.writeSettingJSON()
+	// 设置 settings.json 文件, 将 config 设置为 cilint 配置文件地址
+	err = addSettingJSON(ff)
 	if err != nil {
 		return err
 	}
@@ -121,12 +108,11 @@ func (ff *foldersAndFiles) initProjectWithLocalLint() error {
 	return nil
 }
 
-// 设置 global golangci-lint
-// 需要写的文件:
-// ~/.vsc/golangci/dev-ci.yml, ~/.vsc/golangci/prod-ci.yml, 全局地址。
-// ~/.vsc/vsc-config.json 全局配置文件。
-// <project>/.vscode/settings.json, 替换 settings 中 -config 地址。
-func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
+// 设置 global golangci-lint:
+//  - 写入 ~/.vsc/golangci/golangci.yml 文件.
+//  - 写入 <project>/.vscode/settings.json 文件.
+//  - 写入 ~/.vsc/vsc-config.json 全局配置文件.
+func initGlobalLint(ff *util.FoldersAndFiles) error {
 	// 获取 .vsc 文件夹地址
 	vscDir, err := util.GetVscConfigDir()
 	if err != nil {
@@ -134,95 +120,15 @@ func (ff *foldersAndFiles) initProjectWithGlobalLint() error {
 	}
 
 	// 从 vsc-config.json 文件获取 golangci 配置文件的地址。
-	// 如果 vsc-config.json 不存在，生成 vsc-config.json, dev-ci.yml, prod-ci.yml 文件
-	// 如果 vsc-config.json 存在，但是没有设置过 golangci 配置文件地址，
-	// 则 overwite vsc-config.json, dev-ci.yml, prod-ci.yml 文件.
-	// 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址。
-	err = ff.readCilintPathFromVscCfgJSON(vscDir)
+	err = readCilintPathFromVscCfgJSON(ff, vscDir)
 	if err != nil {
 		return err
 	}
 
-	// setting.json 文件
 	// 设置 settings.json 文件, 将 --config 设置为 cipath
-	err = ff.writeSettingJSON()
+	err = addSettingJSON(ff)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-// 检查 .vscode/settings.json 是否存在, 是否需要修改
-func (ff *foldersAndFiles) writeSettingJSON() error {
-	if ff.cipath == "" {
-		ff.addFiles(genSettingsJSONwith(""))
-		return nil
-	}
-
-	// 读取 .vscode/settings.json
-	golingFlags, err := _readSettingJSON()
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return err
-	} else if errors.Is(err, os.ErrNotExist) {
-		// settings.json 不存在, 生成新的 settings.json 文件
-		ff.addFiles(genSettingsJSONwith(ff.cipath))
-		return nil
-	}
-
-	// 判断 --config 地址是否和要设置的 cipath 相同, 如果相同则不更新 setting 文件。
-	for _, v := range golingFlags {
-		if v == "--config="+ff.cipath { // 相同的路径
-			return nil
-		}
-	}
-
-	// 这里是 suggestion
-	// 如果 settings.json 文件存在，而且 config != cipath, 则需要 suggestion
-	// 建议手动添加设置到 .vscode/settings.json 中
-	cilintConfig := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ff.cipath))
-	ff.addSuggestion(&util.Suggestion{
-		Problem:  "please add following in '.vscode/settings.json':",
-		Solution: string(cilintConfig),
-	})
-
-	return nil
-}
-
-// 读取 setting.json 文件
-func _readSettingJSON() ([]string, error) {
-	// 读取 .vscode/settings.json
-	settingsPath, err := filepath.Abs(settingJSONPath)
-	if err != nil {
-		return nil, err
-	}
-
-	sf, err := os.Open(settingsPath)
-	if err != nil {
-		return nil, err
-	}
-	defer sf.Close()
-
-	// json 反序列化 settings.json
-	jsonc, err := io.ReadAll(sf)
-	if err != nil {
-		return nil, err
-	}
-
-	js, err := util.JSONCToJSON(jsonc)
-	if err != nil {
-		return nil, err
-	}
-
-	// 只需要读取 go.lintFlags
-	type settingsStruct struct {
-		GolingFlags []string `json:"go.lintFlags,omitempty"`
-	}
-
-	var settings settingsStruct
-	err = json.Unmarshal(js, &settings)
-	if err != nil {
-		return nil, err
-	}
-
-	return settings.GolingFlags, nil
 }
