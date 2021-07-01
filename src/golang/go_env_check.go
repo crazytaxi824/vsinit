@@ -1,16 +1,10 @@
-// vsc envcheck go -lint
-
 package golang
 
 import (
-	"errors"
 	"local/src/util"
 	"os"
 	"strings"
 )
-
-// FIXME
-const GolintciCmd = "vs init go -cilint <path>"
 
 // 需要安装的插件
 var extensions = []string{"golang.go", "humao.rest-client"}
@@ -19,15 +13,12 @@ var extensions = []string{"golang.go", "humao.rest-client"}
 var goTools = []string{"gopkgs", "go-outline", "gotests",
 	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
 
-func CheckGO(gofs util.GoFlags) ([]*util.Suggestion, error) {
-	// nolint // flag.ExitOnError will do the os.Exit(2)
-	gofs.FlagSet.Parse(os.Args[3:])
-
-	return checkGOENV(*gofs.Cilint)
+func CheckGO() ([]*util.Suggestion, error) {
+	return checkGOENV()
 }
 
 // 检查所有 GO 运行环境
-func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
+func checkGOENV() ([]*util.Suggestion, error) {
 	var suggs []*util.Suggestion
 
 	// 检查 SHELL 环境设置
@@ -59,17 +50,6 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 		suggs = append(suggs, sug)
 	}
 
-	// 检查 golangci-lint
-	if lintFlag {
-		su, er := checkGolangciLint()
-		if er != nil {
-			return nil, er
-		}
-		if su != nil {
-			suggs = append(suggs, su)
-		}
-	}
-
 	// 检查返回是否为空
 	if len(suggs) > 0 {
 		return suggs, nil
@@ -84,56 +64,13 @@ func checkGOPATH() *util.Suggestion {
 		return &util.Suggestion{
 			Problem: "need to setup $GOPATH in ~/.bash_profile OR ./zshrc",
 			Solution: "# golang setting\n" +
-				"export GOPATH=/Users/ray/gopath\n" +
+				"export GOPATH=$HOME/gopath\n" +
 				"export GOBIN=$GOPATH/bin\n" +
 				"export PATH=$PATH:$GOBIN\n" +
 				"export GO111MODULE=on",
 		}
 	}
 	return nil
-}
-
-// 检查 golang-ci lint 设置
-func checkGolangciLint() (*util.Suggestion, error) {
-	vscDir, err := util.GetVscConfigDir()
-	if err != nil {
-		return nil, err
-	}
-
-	// 读取 vsc setting
-	var vscCfgJSON util.VscConfigJSON
-	err = vscCfgJSON.ReadFromDir(vscDir)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return nil, err
-	} else if errors.Is(err, os.ErrNotExist) {
-		return &util.Suggestion{
-			Problem:  "haven't setup golangci-lint yet, please run:",
-			Solution: GolintciCmd,
-		}, nil
-	}
-
-	// 查找 golangci 设置
-	if vscCfgJSON.Golangci == "" {
-		return &util.Suggestion{
-			Problem:  "haven't setup golangci-lint yet, please run:",
-			Solution: GolintciCmd,
-		}, nil
-	}
-
-	// 寻找 golangci 配置文件
-	gof, err := os.Open(vscCfgJSON.Golangci)
-	if err != nil && !errors.Is(err, os.ErrNotExist) {
-		return nil, err
-	} else if errors.Is(err, os.ErrNotExist) {
-		return &util.Suggestion{
-			Problem:  "golangci-lint config file is missing, please run:",
-			Solution: GolintciCmd,
-		}, nil
-	}
-	defer gof.Close()
-
-	// 能够打开说明已经设置成功
-	return nil, nil
 }
 
 // 检查 gotools 安装情况

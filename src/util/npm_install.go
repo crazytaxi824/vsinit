@@ -18,8 +18,6 @@ func npmInstallDependencies(di dependenciesInstall) error {
 		return nil
 	}
 
-	// TODO 是否需要安装？(y/n)
-
 	var args []string
 	if di.global {
 		args = []string{"i", "-g"}

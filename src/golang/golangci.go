@@ -37,50 +37,50 @@ var golangcilintconfig = `  // golangci-lint 设置
     "--config=` + configPlaceHolder + `"
   ],`
 
-// 通过 vsc-config.json 获取 golangci 配置文件地址.
-//  - 如果 vsc-config.json 不存在，生成 vsc-config.json, golangci.yml 文件.
-//  - 如果 vsc-config.json 存在，但是没有设置 golangci 配置文件地址，则 overwite vsc-config.json, golangci.yml 文件.
-//  - 如果 vsc-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址.
-func readCilintPathFromVscCfgJSON(ff *util.FoldersAndFiles, vscDir string) error {
-	// 读取 ~/.vsc/vsc-config.json 文件
-	var vscCfgJSON util.VscConfigJSON
-	err := vscCfgJSON.ReadFromDir(vscDir)
+// 通过 vsi-config.json 获取 golangci 配置文件地址.
+//  - 如果 vsi-config.json 不存在，生成 vsi-config.json, golangci.yml 文件.
+//  - 如果 vsi-config.json 存在，但是没有设置 golangci 配置文件地址，则 overwite vsi-config.json, golangci.yml 文件.
+//  - 如果 vsi-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址.
+func readCilintPathFromVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string) error {
+	// 读取 ~/.vsi/vsi-config.json 文件
+	var vsiCfgJSON util.VsiConfigJSON
+	err := vsiCfgJSON.ReadFromDir(vsiDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
-		// ~/.vsc/vsc-config.json 文件不存在, 则生成该文件.
-		return addVscCfgJSON(ff, vscDir, vscCfgJSON, false)
+		// ~/.vsi/vsi-config.json 文件不存在, 则生成该文件.
+		return addVsiCfgJSON(ff, vsiDir, vsiCfgJSON, false)
 	}
 
 	// 检查 golangci 设置
-	if vscCfgJSON.Golangci == "" {
-		// 没有设置 golangci-lint 的情况, //NOTE overwrite vsc-config.json 文件.
-		return addVscCfgJSON(ff, vscDir, vscCfgJSON, true)
+	if vsiCfgJSON.Golangci == "" {
+		// 没有设置 golangci-lint 的情况, //NOTE overwrite vsi-config.json 文件.
+		return addVsiCfgJSON(ff, vsiDir, vsiCfgJSON, true)
 	}
 
 	// 已经设置 golangci-lint，直接返回已有的 golangci lint 配置文件地址
-	ff.SetLintPath(vscCfgJSON.Golangci)
+	ff.SetLintPath(vsiCfgJSON.Golangci)
 	return nil
 }
 
-// 添加 ~/.vsc/vsc-config.json 文件
-func addVscCfgJSON(ff *util.FoldersAndFiles, vscDir string, vscCfgJSON util.VscConfigJSON, overwrite bool) error {
+// 添加 ~/.vsi/vsi-config.json 文件
+func addVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string, vsiCfgJSON util.VsiConfigJSON, overwrite bool) error {
 	// 全局设置需要多添加多个 folder.
-	ff.AddFolders(vscDir, vscDir+golangciDirector)
+	ff.AddFolders(vsiDir, vsiDir+golangciDirector)
 
-	// 设置 vsc-config 文件之前需要生成 golangci.yml 文件, 并获取文件地址.
-	ff.AddLintConfigAndLintPath(vscDir+golangciDirector+cilintFilePath, golangciYML)
+	// 设置 vsi-config 文件之前需要生成 golangci.yml 文件, 并获取文件地址.
+	ff.AddLintConfigAndLintPath(vsiDir+golangciDirector+cilintFilePath, golangciYML)
 
-	// 设置 vsc-config.json 文件中的 golangci 配置文件地址
-	vscCfgJSON.Golangci = ff.LintPath()
+	// 设置 vsi-config.json 文件中的 golangci 配置文件地址
+	vsiCfgJSON.Golangci = ff.LintPath()
 
-	b, er := vscCfgJSON.JSONIndentFormat()
+	b, er := vsiCfgJSON.JSONIndentFormat()
 	if er != nil {
 		return er
 	}
 
 	ff.AddFiles(util.FileContent{
-		Path:      vscDir + util.VscConfigFilePath,
+		Path:      vsiDir + util.VsiConfigFilePath,
 		Content:   b,
 		Overwrite: overwrite,
 	})

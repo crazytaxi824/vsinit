@@ -143,8 +143,8 @@ func initLocalEslint(ff *util.FoldersAndFiles) error {
 }
 
 // 设置 global ESLint:
-//  - 写入 ~/.vsc/eslint/eslintrc-ts.json 全局配置文件.
-//  - 写入 ~/.vsc/vsc-config.json 全局配置文件.
+//  - 写入 ~/.vsi/eslint/eslintrc-ts.json 全局配置文件.
+//  - 写入 ~/.vsi/vsi-config.json 全局配置文件.
 //  - 写入 <project>/.vscode/settings.json 文件.
 //  - 安装 ESLint 缺失的全局依赖.
 func initGlobalEslint(ff *util.FoldersAndFiles) error {
@@ -153,14 +153,14 @@ func initGlobalEslint(ff *util.FoldersAndFiles) error {
 		return errors.New(sugg.String())
 	}
 
-	// 获取 ~/.vsc 文件夹地址
-	vscDir, err := util.GetVscConfigDir()
+	// 获取 ~/.vsi 文件夹地址
+	vsiDir, err := util.GetVsiConfigDir()
 	if err != nil {
 		return err
 	}
 
-	// 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
-	err = readEslintPathFromVscCfgJSON(ff, vscDir)
+	// 通过 vsi-config.json 获取 eslint.TS 配置文件地址.
+	err = readEslintPathFromVsiCfgJSON(ff, vsiDir)
 	if err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func initGlobalEslint(ff *util.FoldersAndFiles) error {
 	}
 
 	// 添加 ESLint 缺失的全局依赖
-	eslintFolder := vscDir + eslintDirector
+	eslintFolder := vsiDir + eslintDirector
 	pkgFilePath := eslintFolder + "/package.json"
 	return ff.AddMissingDependencies(eslintDependencies, pkgFilePath, eslintFolder)
 }

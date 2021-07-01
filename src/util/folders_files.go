@@ -158,7 +158,7 @@ func filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string,
 	return result, nil
 }
 
-// 安装所有缺失的依赖
+// 安装所有缺失的依赖 // TODO 是否提示需要安装？(y/n)
 func (ff *FoldersAndFiles) InstallMissingDependencies() error {
 	if len(ff.tsjs.dependencies) > 0 {
 		for _, dep := range ff.tsjs.dependencies {

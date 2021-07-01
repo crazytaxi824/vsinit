@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	// vsc 文件夹，~/.vsc
-	vscDirectory = "/.vsc"
+	// vsi 文件夹，~/.vsi
+	vsiDirectory = "/.vsi"
 
-	// vsc 配置文件, ~/.vsc/vsc-config.json
-	VscConfigFilePath = "/vsc-config.json"
+	// vsi 配置文件, ~/.vsi/vsi-config.json
+	VsiConfigFilePath = "/vsi-config.json"
 )
 
 // config 文件设置
-type VscConfigJSON struct {
+type VsiConfigJSON struct {
 	Golangci string `json:"golangci,omitempty"`
 	Eslint   struct {
 		TS string `json:"typescript,omitempty"`
@@ -25,25 +25,25 @@ type VscConfigJSON struct {
 	} `json:"eslint,omitempty"`
 }
 
-// 全局 vsc 配置文件地址 ~/.vsc
-func GetVscConfigDir() (string, error) {
+// 全局 vsi 配置文件地址 ~/.vsi
+func GetVsiConfigDir() (string, error) {
 	home := os.Getenv("HOME")
 	if home == "" {
 		return "", errors.New("$HOME is not exist, please set $HOME env")
 	}
 
-	return home + vscDirectory, nil
+	return home + vsiDirectory, nil
 }
 
-func (vs *VscConfigJSON) ReadFromDir(vscDir string) error {
-	// read vsc config file
-	f, err := os.Open(vscDir + VscConfigFilePath)
+func (vs *VsiConfigJSON) ReadFromDir(vsiDir string) error {
+	// read vsi config file
+	f, err := os.Open(vsiDir + VsiConfigFilePath)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	// ~/.vsc/vsc-config 文件存在, 读取文件
+	// ~/.vsi/vsi-config 文件存在, 读取文件
 	err = vs.readJSON(f)
 	if err != nil {
 		return err
@@ -52,12 +52,12 @@ func (vs *VscConfigJSON) ReadFromDir(vscDir string) error {
 	return nil
 }
 
-func (vs *VscConfigJSON) readJSON(reader io.Reader) error {
+func (vs *VsiConfigJSON) readJSON(reader io.Reader) error {
 	de := json.NewDecoder(reader)
 	return de.Decode(vs)
 }
 
-func (vs *VscConfigJSON) JSONIndentFormat() ([]byte, error) {
+func (vs *VsiConfigJSON) JSONIndentFormat() ([]byte, error) {
 	return json.MarshalIndent(vs, "", "  ")
 }
 
