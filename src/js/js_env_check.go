@@ -10,11 +10,11 @@ var extensions = []string{"esbenp.prettier-vscode",
 	"dbaeumer.vscode-eslint",
 }
 
-func checkJS() ([]*util.Suggestion, error) {
+func CheckJS() ([]*util.Suggestion, error) {
 	var suggs []*util.Suggestion
 
 	// 检查 node, typescript 是否安装
-	sug := util.CheckCMDInstall("node", "npm")
+	sug := util.CheckCMDInstall("node")
 	if sug != nil {
 		suggs = append(suggs, sug)
 	}
