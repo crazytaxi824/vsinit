@@ -141,10 +141,14 @@ func checkGoTools(tools ...string) *util.Suggestion {
 		}
 	}
 
-	return &util.Suggestion{
-		Problem:  "need to install following goTools:",
-		Solution: strings.Join(solutions, "; \\\n"),
+	if len(solutions) > 0 {
+		return &util.Suggestion{
+			Problem:  "need to install following goTools:",
+			Solution: strings.Join(solutions, "; \\\n"),
+		}
 	}
+
+	return nil
 }
 
 // 检查 vscode 中 go 插件所需要的工具.

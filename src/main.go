@@ -55,7 +55,7 @@ func main() {
 	case "js":
 		suggestions, err = js.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 
-		// DEBUG
+		// TODO
 	case "envcheck-go":
 		suggestions, err = golang.CheckGO(true)
 	case "envcheck-ts":
