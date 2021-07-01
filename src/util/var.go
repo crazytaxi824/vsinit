@@ -8,6 +8,9 @@ import (
 const (
 	// internal error
 	InternalErrMsg = "CMD is not in the list, please contact author"
+
+	// 支持的语言
+	languages = "go | py | ts | js"
 )
 
 // 固定文件路径
@@ -43,4 +46,18 @@ func BytesToString(b []byte) string {
 	x := (*[3]uintptr)(unsafe.Pointer(&b))
 	s := [2]uintptr{x[0], x[1]}
 	return *(*string)(unsafe.Pointer(&s))
+}
+
+// 命令行工具帮助信息
+func HelpMsg() {
+	fmt.Println("Usage: vs <command> <language> [<flags>]")
+	fmt.Println("  vs init <lang>")
+	fmt.Println("\tinitialize project with <lang> - " + languages)
+	fmt.Println("  vs envcheck <lang>")
+	fmt.Println("\tcheck vscode develop environment with <lang>")
+	fmt.Println()
+	fmt.Println("Help with flags:")
+	fmt.Println("  vs init <lang> -h")
+	fmt.Println("\tshow all flags of <lang>")
+	fmt.Println()
 }

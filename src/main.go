@@ -16,21 +16,13 @@ import (
 	"local/src/util"
 )
 
-const languages = "go/py/ts/js"
-
-func helpMsg() {
-	fmt.Println("please specify language -", languages)
-	fmt.Println("usage: vsinit <language> [<args>]")
-	fmt.Println("eg: vsinit go")
-}
-
 func main() {
 	if len(os.Args) < 3 {
-		helpMsg()
+		util.HelpMsg()
 		os.Exit(2)
 	}
 
-	// 接受 flags
+	// 设置 flags
 	gofs := util.SetupGoFlags()
 	tsjs := util.SetupTSJSFlags()
 
@@ -45,7 +37,7 @@ func main() {
 	case "envcheck":
 		suggestions, err = envCheckCommand()
 	default:
-		helpMsg()
+		util.HelpMsg()
 		os.Exit(2)
 	}
 
@@ -70,7 +62,7 @@ func initCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Su
 	case "js":
 		suggestions, err = js.InitProject(tsjs)
 	default:
-		helpMsg()
+		util.HelpMsg()
 		os.Exit(2)
 	}
 
@@ -95,7 +87,7 @@ func envCheckCommand() (suggestions []*util.Suggestion, err error) {
 	case "js":
 		suggestions, err = js.CheckJS()
 	default:
-		helpMsg()
+		util.HelpMsg()
 		os.Exit(2)
 	}
 

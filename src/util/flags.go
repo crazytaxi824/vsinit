@@ -9,7 +9,7 @@ type TSJSFlags struct {
 
 func SetupTSJSFlags() TSJSFlags {
 	var tsjs TSJSFlags
-	tsjs.FlagSet = flag.NewFlagSet("ts/js", flag.ExitOnError)
+	tsjs.FlagSet = flag.NewFlagSet("'vs init ts|js'", flag.ExitOnError) // TODO flag 名字修改
 	tsjs.Jest = tsjs.FlagSet.Bool("jest", false, "setup 'jest' in the Project")
 	tsjs.ESLint = tsjs.FlagSet.Bool("eslint", false, "setup 'eslint' globally")
 	tsjs.ESLintLocal = tsjs.FlagSet.Bool("eslint-local", false, "setup 'eslint' in the Project")
@@ -24,7 +24,7 @@ type GoFlags struct {
 
 func SetupGoFlags() GoFlags {
 	var gofs GoFlags
-	gofs.FlagSet = flag.NewFlagSet("go", flag.ExitOnError)
+	gofs.FlagSet = flag.NewFlagSet("'vs init go'", flag.ExitOnError) // TODO flag 名字修改
 	gofs.Cilint = gofs.FlagSet.Bool("cilint", false, "setup 'golangci-lint' globally")
 	gofs.CilintLocal = gofs.FlagSet.Bool("cilint-local", false, "setup 'golangci-lint' in this Project")
 

@@ -3,6 +3,7 @@ package python
 import (
 	_ "embed" // for go:embed file use
 	"fmt"
+	"os"
 
 	"local/src/util"
 )
@@ -35,6 +36,14 @@ var filesAndContent = []util.FileContent{
 }
 
 func InitProject() error {
+	if len(os.Args) > 3 && (os.Args[3] == "-h" || os.Args[3] == "-help" || os.Args[3] == "--help") {
+		fmt.Println("Usage of 'vs init py': no flags")
+		os.Exit(0)
+	} else if len(os.Args) > 3 {
+		util.HelpMsg()
+		os.Exit(2)
+	}
+
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
 	fmt.Println("init Python project")

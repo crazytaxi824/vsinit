@@ -167,7 +167,7 @@ func (ff *FoldersAndFiles) InstallMissingDependencies() error {
 			} else {
 				fmt.Printf("npm installing following dependencies at %s:\n", dep.prefix)
 			}
-			fmt.Println("    " + strings.Join(dep.dependencies, "\n    "))
+			fmt.Println("  " + strings.Join(dep.dependencies, "\n  "))
 
 			err := npmInstallDependencies(dep)
 			if err != nil {
@@ -238,7 +238,7 @@ func createDir(folderPath string) error {
 
 // create and write files.
 func createAndWriteFile(fc FileContent) error {
-	fmt.Printf("    %s ... ", fc.Path)
+	fmt.Printf("  %s ... ", fc.Path)
 	f, err := os.OpenFile(fc.Path, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Println("failed")
