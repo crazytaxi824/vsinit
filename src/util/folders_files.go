@@ -18,12 +18,12 @@ type FileContent struct {
 
 // 在不同情况下添加不同的文件夹和文件，以便于最后统一写文件。
 type FoldersAndFiles struct {
-	folders []string      // 需要创建的文件夹
-	files   []FileContent // 需要写入项目的文件
-	tsjs    struct {
+	folders     []string      // 需要创建的文件夹
+	files       []FileContent // 需要写入项目的文件
+	suggestions []*Suggestion // 需要手动设置的建议
+	lintPath    string        // lint 配置文件的地址，golangci-lint, eslint
+	tsjs        struct {
 		dependencies []dependenciesInstall // 需要安装的 npm 依赖
-		suggestions  []*Suggestion         // 需要手动设置的建议
-		lintPath     string                // lint 配置文件的地址
 	}
 }
 
@@ -36,11 +36,11 @@ func InitFoldersAndFiles(folders []string, files []FileContent) *FoldersAndFiles
 }
 
 func (ff *FoldersAndFiles) SetLintPath(lintPath string) {
-	ff.tsjs.lintPath = lintPath
+	ff.lintPath = lintPath
 }
 
 func (ff *FoldersAndFiles) LintPath() string {
-	return ff.tsjs.lintPath
+	return ff.lintPath
 }
 
 func (ff *FoldersAndFiles) AddFiles(files ...FileContent) {
@@ -52,12 +52,12 @@ func (ff *FoldersAndFiles) AddFolders(folders ...string) {
 }
 
 func (ff *FoldersAndFiles) AddSuggestions(sug ...*Suggestion) {
-	ff.tsjs.suggestions = append(ff.tsjs.suggestions, sug...)
+	ff.suggestions = append(ff.suggestions, sug...)
 }
 
 func (ff *FoldersAndFiles) Suggestions() []*Suggestion {
-	if len(ff.tsjs.suggestions) > 0 {
-		return ff.tsjs.suggestions
+	if len(ff.suggestions) > 0 {
+		return ff.suggestions
 	}
 
 	return nil
@@ -188,7 +188,7 @@ func (ff *FoldersAndFiles) AddLintConfigAndLintPath(lintPath string, lincCfgFile
 	})
 
 	// eslintrc-ts.json 的文件路径
-	ff.tsjs.lintPath = lintPath
+	ff.lintPath = lintPath
 }
 
 // 写入所需文件
