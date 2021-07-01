@@ -6,6 +6,7 @@ import (
 	"errors"
 	"local/src/util"
 	"os"
+	"strings"
 )
 
 // FIXME
@@ -13,6 +14,10 @@ const GolintciCmd = "vs init go -cilint <path>"
 
 // 需要安装的插件
 var extensions = []string{"golang.go", "humao.rest-client"}
+
+// go 插件所需 tools
+var goTools = []string{"gopkgs", "go-outline", "gotests",
+	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
 
 func CheckGO(lintFlag bool) ([]*util.Suggestion, error) {
 	return checkGOENV(lintFlag)
@@ -46,7 +51,7 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	// plugins:gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
 	// 检查 vscode extension 工具链.
 	// go get xxxx 安装.
-	sug = util.CheckCMDInstall(util.GoTools...)
+	sug = checkGoTools(goTools...)
 	if sug != nil {
 		suggs = append(suggs, sug)
 	}
@@ -126,4 +131,43 @@ func checkGolangciLint() (*util.Suggestion, error) {
 
 	// 能够打开说明已经设置成功
 	return nil, nil
+}
+
+func checkGoTools(tools ...string) *util.Suggestion {
+	var solutions []string
+	for _, tool := range tools {
+		if !util.CheckCommandExist(tool) {
+			solutions = append(solutions, goToolsSuggestion(tool))
+		}
+	}
+
+	return &util.Suggestion{
+		Problem:  "need to install following goTools:",
+		Solution: strings.Join(solutions, "; \\\n"),
+	}
+}
+
+// 检查 vscode 中 go 插件所需要的工具.
+func goToolsSuggestion(tool string) string {
+	switch tool {
+	case "gopkgs":
+		return "go get github.com/uudashr/gopkgs/v2/cmd/gopkgs"
+	case "go-outline":
+		return "go get github.com/ramya-rao-a/go-outline"
+	case "gotests":
+		return "go get github.com/cweill/gotests/gotests"
+	case "impl":
+		return "go get github.com/josharian/impl"
+	case "dlv":
+		return "go get github.com/go-delve/delve/cmd/dlv"
+	case "gopls":
+		return "go get golang.org/x/tools/gopls"
+	case "golangci-lint":
+		return "go get github.com/golangci/golangci-lint/cmd/golangci-lint"
+	case "gomodifytags":
+		return "go get github.com/fatih/gomodifytags"
+	case "debug-cmd":
+		return "this is a debug test solution."
+	}
+	return util.InternalErrMsg
 }

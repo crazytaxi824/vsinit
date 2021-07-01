@@ -4,39 +4,21 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
-	"strings"
 )
 
-var GoTools = []string{"gopkgs", "go-outline", "gotests",
-	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
-
 // 检查是否安装了命令行工具
-func CheckCMDInstall(langs ...string) *Suggestion {
-	var result []string
-	for _, lang := range langs {
-		if !checkCommandExist(lang) {
-			result = append(result, lang)
+func CheckCMDInstall(lang string) *Suggestion {
+	if !CheckCommandExist(lang) {
+		return &Suggestion{
+			Problem:  fmt.Sprintf("need to intall '%s':", lang),
+			Solution: solutionMsg(lang),
 		}
 	}
-
-	if len(result) == 0 {
-		return nil
-	}
-
-	var solutions []string
-	for _, v := range result {
-		solut := solutionMsg(v)
-		solutions = append(solutions, solut)
-	}
-
-	return &Suggestion{
-		Problem:  fmt.Sprintf("need to intall '%s':", strings.Join(result, ", ")),
-		Solution: strings.Join(solutions, "; \\\n"),
-	}
+	return nil
 }
 
 // 'which <cmd>'
-func checkCommandExist(cmdName string) bool {
+func CheckCommandExist(cmdName string) bool {
 	cmd := exec.Command(whichCmd(), cmdName)
 	err := cmd.Run()
 	return err == nil
@@ -54,16 +36,16 @@ func whichCmd() string {
 func solutionMsg(cmdName string) string {
 	switch cmdName {
 	case "code":
-		return "download it at https://code.visualstudio.com, or run:\nbrew install vscode"
+		return "download vscode at https://code.visualstudio.com, or run:\nbrew install vscode"
 
 	case "go":
-		return "download it at https://golang.org/, or run:\nbrew install go"
+		return "download go at https://golang.org/, or run:\nbrew install go"
 
 	case "node", "npm":
-		return "download it at https://nodejs.org/, or run:\nbrew install node"
+		return "download node at https://nodejs.org/, or run:\nbrew install node"
 
 	case "python", "python3":
-		return "download it at https://www.python.org/, or run:\nbrew install python3"
+		return "download python at https://www.python.org/, or run:\nbrew install python3"
 
 	case "tsc":
 		return "npm i -g typescript"
@@ -73,36 +55,7 @@ func solutionMsg(cmdName string) string {
 
 	case "eslint":
 		return "npm i -g eslint"
-
-	case "debug-cmd", "gopkgs", "go-outline", "gotests", "gomodifytags", "impl", "dlv", "golangci-lint", "gopls":
-		// DEBUG
-		return checkGoTools(cmdName)
 	}
 
-	return InternalErrMsg
-}
-
-// 检查 vscode 中 go 插件所需要的工具.
-func checkGoTools(tool string) string {
-	switch tool {
-	case "gopkgs":
-		return "go get github.com/uudashr/gopkgs/v2/cmd/gopkgs"
-	case "go-outline":
-		return "go get github.com/ramya-rao-a/go-outline"
-	case "gotests":
-		return "go get github.com/cweill/gotests/gotests"
-	case "impl":
-		return "go get github.com/josharian/impl"
-	case "dlv":
-		return "go get github.com/go-delve/delve/cmd/dlv"
-	case "gopls":
-		return "go get golang.org/x/tools/gopls"
-	case "golangci-lint":
-		return "go get github.com/golangci/golangci-lint/cmd/golangci-lint"
-	case "gomodifytags":
-		return "go get github.com/fatih/gomodifytags"
-	case "debug-cmd":
-		return "this is a debug test solution."
-	}
 	return InternalErrMsg
 }

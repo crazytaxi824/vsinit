@@ -32,7 +32,8 @@ func Test_Errors(t *testing.T) {
 }
 
 func Test_CheckCmdInstall(t *testing.T) {
-	fmt.Println(CheckCMDInstall("vscode", "omg", "haha"))
+	fmt.Println(CheckCMDInstall("vscode"))
+	fmt.Println(CheckCMDInstall("code"))
 }
 
 func Test_MakeDirAlreadyExist(t *testing.T) {
