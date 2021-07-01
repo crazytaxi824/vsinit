@@ -42,13 +42,14 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
   ],
   "rules": {
     "no-console": 0, // DEBUG use only.
+
     "no-prototype-builtins": "off",
     "import/extensions": ["error", "always", { "ignorePackages": true }], // import 文件需要后缀名。
     "import/prefer-default-export": "off",
     // "import/no-default-export": "error",
-    "curly": "error", // FIXME not working, 强制 if/for/do/while 使用一致的括号风格
     "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
     "complexity": "warn", // default 20
+    "no-param-reassign": "off", // 不能给函数入参赋值，引用类型应该可以赋值。
     // NOTE lack of no-null-keyword checks.
 
     // 功能检查
