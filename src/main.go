@@ -53,7 +53,7 @@ func main() {
 	case "ts":
 		suggestions, err = ts.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 	case "js":
-		err = js.InitProject(tsjsSet, jestflag)
+		suggestions, err = js.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 	case "envcheck":
 		suggestions, err = golang.CheckGO(false) // DEBUG
 	default:
