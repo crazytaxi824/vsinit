@@ -47,7 +47,7 @@ func createDir(folderPath string) error {
 
 // create and write files.
 func createAndWriteFile(fc FileContent) error {
-	fmt.Printf("writing file: %s ... ", fc.Path)
+	fmt.Printf("    %s ... ", fc.Path)
 	f, err := os.OpenFile(fc.Path, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		fmt.Println("failed")

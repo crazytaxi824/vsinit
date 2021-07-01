@@ -3,9 +3,11 @@ package util
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type FoldersAndFiles struct {
@@ -66,12 +68,23 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 		return err
 	}
 
-	if len(libs) > 0 {
-		ff._addDependencies(dependenciesInstall{
-			dependencies: libs,
-			prefix:       prefix,
-		})
+	if len(libs) == 0 {
+		return nil
 	}
+
+	// TODO 判断 global & prefix 是否相同，如果相同直接 append 到里面
+	for i, v := range ff.tsjs.dependencies {
+		if v.prefix == prefix {
+			ff.tsjs.dependencies[i].dependencies = append(ff.tsjs.dependencies[i].dependencies, libs...)
+			return nil
+		}
+	}
+
+	// 如果没有相同的 prefix & global 则整个 append.
+	ff._addDependencies(dependenciesInstall{
+		dependencies: libs,
+		prefix:       prefix,
+	})
 
 	return nil
 }
@@ -80,11 +93,19 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 func (ff *FoldersAndFiles) InstallMissingDependencies() error {
 	if len(ff.tsjs.dependencies) > 0 {
 		for _, dep := range ff.tsjs.dependencies {
-			err := npmInstallDependencies(dep.prefix, dep.global, dep.dependencies...)
+			if dep.prefix == "" {
+				fmt.Printf("npm installing following dependencies at Project Root:\n")
+			} else {
+				fmt.Printf("npm installing following dependencies at %s:\n", dep.prefix)
+			}
+			fmt.Println("    " + strings.Join(dep.dependencies, "\n    "))
+
+			err := npmInstallDependencies(dep)
 			if err != nil {
 				return err
 			}
 		}
+		fmt.Println()
 	}
 
 	return nil
@@ -154,7 +175,15 @@ func _filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string
 
 // 写入所需文件
 func (ff *FoldersAndFiles) WriteAllFiles() error {
-	return WriteFoldersAndFiles(ff.folders, ff.files)
+	fmt.Println("writing file: ")
+
+	err := WriteFoldersAndFiles(ff.folders, ff.files)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println()
+	return nil
 }
 
 // 生成 lint 配置文件，记录 lint 配置文件地址。
