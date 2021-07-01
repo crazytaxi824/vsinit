@@ -1,7 +1,6 @@
 package ts
 
 import (
-	"flag"
 	"local/src/util"
 	"os"
 )
@@ -13,11 +12,11 @@ var extensions = []string{"esbenp.prettier-vscode",
 	"dbaeumer.vscode-eslint",
 }
 
-func CheckTS(tsSet *flag.FlagSet, jest, eslint *bool) ([]*util.Suggestion, error) {
+func CheckTS(tsjs util.TSJSFlags) ([]*util.Suggestion, error) {
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	tsSet.Parse(os.Args[3:])
+	tsjs.FlagSet.Parse(os.Args[3:])
 
-	return checkTS(*jest, *eslint)
+	return checkTS(*tsjs.Jest, *tsjs.ESLint)
 }
 
 func checkTS(jest, eslint bool) ([]*util.Suggestion, error) {

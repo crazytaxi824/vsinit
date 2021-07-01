@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -22,6 +23,16 @@ type VscConfigJSON struct {
 		TS string `json:"typescript,omitempty"`
 		JS string `json:"javascript,omitempty"`
 	} `json:"eslint,omitempty"`
+}
+
+// 全局 vsc 配置文件地址 ~/.vsc
+func GetVscConfigDir() (string, error) {
+	home := os.Getenv("HOME")
+	if home == "" {
+		return "", errors.New("$HOME is not exist, please set $HOME env")
+	}
+
+	return home + vscDirectory, nil
 }
 
 func (vs *VscConfigJSON) ReadFromDir(vscDir string) error {
@@ -50,12 +61,35 @@ func (vs *VscConfigJSON) JSONIndentFormat() ([]byte, error) {
 	return json.MarshalIndent(vs, "", "  ")
 }
 
-// 全局 vsc 配置文件地址 ~/.vsc
-func GetVscConfigDir() (string, error) {
-	home := os.Getenv("HOME")
-	if home == "" {
-		return "", errors.New("$HOME is not exist, please set $HOME env")
+// 读取 .vscode/settings.json 文件, 获取想要的值
+func ReadSettingJSON(v interface{}) error {
+	// 读取 .vscode/settings.json
+	settingsPath, err := filepath.Abs(SettingsJSONPath)
+	if err != nil {
+		return err
 	}
 
-	return home + vscDirectory, nil
+	sf, err := os.Open(settingsPath)
+	if err != nil {
+		return err
+	}
+	defer sf.Close()
+
+	// json 反序列化 settings.json
+	jsonc, err := io.ReadAll(sf)
+	if err != nil {
+		return err
+	}
+
+	js, err := JSONCToJSON(jsonc)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(js, v)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -6,17 +6,24 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
+// 需要写入项目的文件
+type FileContent struct {
+	Path      string // 文件地址
+	Content   []byte // 文件内容
+	Overwrite bool   // 是否需要覆盖文件内容
+}
+
+// 在不同情况下添加不同的文件夹和文件，以便于最后统一写文件。
 type FoldersAndFiles struct {
-	folders []string
-	files   []FileContent
+	folders []string      // 需要创建的文件夹
+	files   []FileContent // 需要写入项目的文件
 	tsjs    struct {
-		dependencies []dependenciesInstall
-		suggestions  []*Suggestion
-		lintPath     string
+		dependencies []dependenciesInstall // 需要安装的 npm 依赖
+		suggestions  []*Suggestion         // 需要手动设置的建议
+		lintPath     string                // lint 配置文件的地址
 	}
 }
 
@@ -89,33 +96,11 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 	return nil
 }
 
-// 安装所有缺失的依赖
-func (ff *FoldersAndFiles) InstallMissingDependencies() error {
-	if len(ff.tsjs.dependencies) > 0 {
-		for _, dep := range ff.tsjs.dependencies {
-			if dep.prefix == "" {
-				fmt.Printf("npm installing following dependencies at Project Root:\n")
-			} else {
-				fmt.Printf("npm installing following dependencies at %s:\n", dep.prefix)
-			}
-			fmt.Println("    " + strings.Join(dep.dependencies, "\n    "))
-
-			err := npmInstallDependencies(dep)
-			if err != nil {
-				return err
-			}
-		}
-		fmt.Println()
-	}
-
-	return nil
-}
-
 // 查看 package.json 是否下载了所需要的依赖.
 //  - package.json 可以是 local 也可以是 global，需要手动填写文件地址.
 func checkMissingdependencies(dependencies []string, packageJSONPath string) (libs []string, err error) {
 	// open package.json 文件
-	pkgMap, err := _readPkgJSONToMap(packageJSONPath)
+	pkgMap, err := readPkgJSONToMap(packageJSONPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	} else if errors.Is(err, os.ErrNotExist) {
@@ -125,11 +110,11 @@ func checkMissingdependencies(dependencies []string, packageJSONPath string) (li
 
 	// 查看 devDependencies 是否有下载
 	// npm install ts-jest @types/jest
-	return _filterDependencies(pkgMap, dependencies)
+	return filterDependencies(pkgMap, dependencies)
 }
 
 // 读取 package.json 文件, json 反序列化到 map 中.
-func _readPkgJSONToMap(packageJSONPath string) (map[string]interface{}, error) {
+func readPkgJSONToMap(packageJSONPath string) (map[string]interface{}, error) {
 	pkgFile, err := os.Open(packageJSONPath)
 	if err != nil {
 		return nil, err
@@ -150,7 +135,7 @@ func _readPkgJSONToMap(packageJSONPath string) (map[string]interface{}, error) {
 }
 
 // 筛选 "devDependencies" 中没有下载的依赖.
-func _filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
+func filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string, error) {
 	var result []string
 
 	devDependencies, ok := pkgMap["devDependencies"]
@@ -173,16 +158,25 @@ func _filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string
 	return result, nil
 }
 
-// 写入所需文件
-func (ff *FoldersAndFiles) WriteAllFiles() error {
-	fmt.Println("writing file: ")
+// 安装所有缺失的依赖
+func (ff *FoldersAndFiles) InstallMissingDependencies() error {
+	if len(ff.tsjs.dependencies) > 0 {
+		for _, dep := range ff.tsjs.dependencies {
+			if dep.prefix == "" {
+				fmt.Printf("npm installing following dependencies at Project Root:\n")
+			} else {
+				fmt.Printf("npm installing following dependencies at %s:\n", dep.prefix)
+			}
+			fmt.Println("    " + strings.Join(dep.dependencies, "\n    "))
 
-	err := WriteFoldersAndFiles(ff.folders, ff.files)
-	if err != nil {
-		return err
+			err := npmInstallDependencies(dep)
+			if err != nil {
+				return err
+			}
+		}
+		fmt.Println()
 	}
 
-	fmt.Println()
 	return nil
 }
 
@@ -197,35 +191,90 @@ func (ff *FoldersAndFiles) AddLintConfigAndLintPath(lintPath string, lincCfgFile
 	ff.tsjs.lintPath = lintPath
 }
 
-// 读取 .vscode/settings.json 文件, 获取想要的值
-func ReadSettingJSON(v interface{}) error {
-	// 读取 .vscode/settings.json
-	settingsPath, err := filepath.Abs(SettingsJSONPath)
+// 写入所需文件
+func (ff *FoldersAndFiles) WriteAllFiles() error {
+	fmt.Println("writing file: ")
+
+	err := writeFoldersAndFiles(ff.folders, ff.files)
 	if err != nil {
 		return err
 	}
 
-	sf, err := os.Open(settingsPath)
-	if err != nil {
-		return err
-	}
-	defer sf.Close()
+	fmt.Println()
+	return nil
+}
 
-	// json 反序列化 settings.json
-	jsonc, err := io.ReadAll(sf)
-	if err != nil {
-		return err
-	}
-
-	js, err := JSONCToJSON(jsonc)
-	if err != nil {
-		return err
+// create folders and write project files.
+func writeFoldersAndFiles(folders []string, fileContents []FileContent) error {
+	// create folders
+	for _, v := range folders {
+		err := createDir(v)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = json.Unmarshal(js, v)
-	if err != nil {
-		return err
+	// write files
+	for _, fc := range fileContents {
+		err := createAndWriteFile(fc)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func createDir(folderPath string) error {
+	err := os.Mkdir(folderPath, 0750)
+	if err != nil && !errors.Is(err, os.ErrExist) { // 判断 dir 是否已经存在
+		return fmt.Errorf("create %s Dir error: %w", folderPath, err)
+	} else if errors.Is(err, os.ErrExist) {
+		// 如果文件夹已经存在
+		return nil
 	}
 
+	return nil
+}
+
+// create and write files.
+func createAndWriteFile(fc FileContent) error {
+	fmt.Printf("    %s ... ", fc.Path)
+	f, err := os.OpenFile(fc.Path, os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		fmt.Println("failed")
+		return fmt.Errorf("create %s Files error: %w", fc.Path, err)
+	}
+	defer f.Close()
+
+	fi, err := f.Stat()
+	if err != nil {
+		fmt.Println("failed")
+		return fmt.Errorf("get %s File status error: %w", fc.Path, err)
+	}
+
+	// file is not empty, DO NOT TOUCH. Unless Overwrite
+	if fi.Size() != 0 && !fc.Overwrite {
+		fmt.Println("skip")
+		return nil
+	}
+
+	if fc.Overwrite { // 如果重写文件需要 truncate
+		if _, er := f.Seek(0, io.SeekStart); er != nil {
+			return er
+		}
+
+		if er := f.Truncate(0); er != nil {
+			return er
+		}
+	}
+
+	// write file content
+	_, err = f.Write(fc.Content)
+	if err != nil {
+		fmt.Println("failed")
+		return fmt.Errorf("write file %s error: %w", fc.Path, err)
+	}
+
+	fmt.Println("done")
 	return nil
 }

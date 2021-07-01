@@ -35,9 +35,8 @@ var filesAndContent = []util.FileContent{
 }
 
 func InitProject() error {
-	folders := createFolders
-	files := filesAndContent
+	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
 	fmt.Println("init Python project")
-	return util.WriteFoldersAndFiles(folders, files)
+	return ff.WriteAllFiles()
 }

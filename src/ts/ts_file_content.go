@@ -3,7 +3,6 @@ package ts
 import (
 	_ "embed" // for go:embed file use
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -55,29 +54,29 @@ var filesAndContent = []util.FileContent{
 	{Path: "src/main.ts", Content: mainTS},
 }
 
-func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (suggs []*util.Suggestion, err error) {
+func InitProject(tsjs util.TSJSFlags) (suggs []*util.Suggestion, err error) {
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	tsjsSet.Parse(os.Args[3:])
+	tsjs.FlagSet.Parse(os.Args[3:])
 
 	// 初始化
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
 	// 写入 test 相关文件
-	if *jestflag {
+	if *tsjs.Jest {
 		err = initJest(ff)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if *eslint && *eslintLocal {
+	if *tsjs.ESLint && *tsjs.ESLintLocal {
 		// 如果两个选项都有，则报错
 		return nil, errors.New("can not setup eslint globally and locally at same time")
-	} else if *eslint && !*eslintLocal {
+	} else if *tsjs.ESLint && !*tsjs.ESLintLocal {
 		// 设置 global eslint
 		err = initGlobalEslint(ff)
-	} else if !*eslint && *eslintLocal {
+	} else if !*tsjs.ESLint && *tsjs.ESLintLocal {
 		// 设置 local eslint
 		err = initLocalEslint(ff)
 	} else {

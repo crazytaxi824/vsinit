@@ -4,7 +4,6 @@ package golang
 
 import (
 	"errors"
-	"flag"
 	"local/src/util"
 	"os"
 	"strings"
@@ -20,11 +19,11 @@ var extensions = []string{"golang.go", "humao.rest-client"}
 var goTools = []string{"gopkgs", "go-outline", "gotests",
 	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
 
-func CheckGO(goset *flag.FlagSet, cilint *bool) ([]*util.Suggestion, error) {
+func CheckGO(gofs util.GoFlags) ([]*util.Suggestion, error) {
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	goset.Parse(os.Args[3:])
+	gofs.FlagSet.Parse(os.Args[3:])
 
-	return checkGOENV(*cilint)
+	return checkGOENV(*gofs.Cilint)
 }
 
 // 检查所有 GO 运行环境
