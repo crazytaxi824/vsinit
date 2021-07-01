@@ -2,6 +2,17 @@
   // 选择 python version
   "python.pythonPath": "/usr/local/bin/python3",
 
+  // python linter
+  "python.linting.flake8Enabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.languageServer": "Pylance",
+  "python.formatting.provider": "autopep8", // default
+  "[python]": {
+    // "editor.formatOnSave": true,
+    "editor.defaultFormatter": "ms-python.python" // python 不能用 prettier 格式化
+  },
+
   // search.exclude 用来忽略搜索的文件夹
   // files.exclude 用来忽略工程打开的文件夹
   // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，

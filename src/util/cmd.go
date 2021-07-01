@@ -62,6 +62,9 @@ func solutionMsg(cmdName string) string {
 	case "node", "npm":
 		return "download it at https://nodejs.org/, or run:\nbrew install node"
 
+	case "python", "python3":
+		return "download it at https://www.python.org/, or run:\nbrew install python3"
+
 	case "tsc":
 		return "npm i -g typescript"
 

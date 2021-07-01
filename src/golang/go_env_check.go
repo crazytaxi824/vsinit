@@ -13,6 +13,13 @@ import (
 // FIXME
 const GolintciCmd = "vs init go -cilint <path>"
 
+// vscode go 插件 suggestion
+var golangSuggestion = util.Suggestion{
+	Problem: "need to install vscode extension 'golang.go'",
+	Solution: "you can install it in the vscode extentsion market, or run:\n" +
+		"code --install-extension golang.go",
+}
+
 func CheckGO(lintFlag bool) ([]*util.Suggestion, error) {
 	return checkGOENV(lintFlag)
 }
@@ -36,11 +43,7 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	// 检查 vscode and extensions,
 	sug = util.CheckCMDInstall("code")
 	if sug != nil {
-		suggs = append(suggs, sug, &util.Suggestion{ // 安装 vscode 插件 GO
-			Problem: "need to install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market, or run:\n" +
-				"code --install-extension golang.go",
-		})
+		suggs = append(suggs, sug, &golangSuggestion)
 	} else {
 		su, er := checkVscodeExtensions()
 		if er != nil {
@@ -87,11 +90,7 @@ func checkVscodeExtensions() (*util.Suggestion, error) {
 	}
 
 	if !bytes.Contains(out, []byte("golang.go")) {
-		return &util.Suggestion{
-			Problem: "need to install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market, or run:\n" +
-				"code --install-extension golang.go",
-		}, nil
+		return &golangSuggestion, nil
 	}
 	return nil, nil
 }
