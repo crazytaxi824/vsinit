@@ -1,7 +1,9 @@
 package ts
 
 import (
+	"flag"
 	"local/src/util"
+	"os"
 )
 
 // 需要安装的插件
@@ -11,7 +13,14 @@ var extensions = []string{"esbenp.prettier-vscode",
 	"dbaeumer.vscode-eslint",
 }
 
-func CheckTS(jest, eslint bool) ([]*util.Suggestion, error) {
+func CheckTS(tsSet *flag.FlagSet, jest, eslint *bool) ([]*util.Suggestion, error) {
+	// nolint // flag.ExitOnError will do the os.Exit(2)
+	tsSet.Parse(os.Args[3:])
+
+	return checkTS(*jest, *eslint)
+}
+
+func checkTS(jest, eslint bool) ([]*util.Suggestion, error) {
 	var suggs []*util.Suggestion
 
 	// 检查 node 是否安装

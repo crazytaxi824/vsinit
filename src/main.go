@@ -25,8 +25,37 @@ func helpMsg() {
 	fmt.Println("eg: vsinit go")
 }
 
+type tsjsFlags struct {
+	flagSet                   *flag.FlagSet
+	jest, eslint, eslintLocal *bool
+}
+
+func initTSJSFlags() tsjsFlags {
+	var tsjs tsjsFlags
+	tsjs.flagSet = flag.NewFlagSet("ts/js", flag.ExitOnError)
+	tsjs.jest = tsjs.flagSet.Bool("jest", false, "add 'jest' locally")
+	tsjs.eslint = tsjs.flagSet.Bool("eslint", false, "add 'eslint' globally")
+	tsjs.eslintLocal = tsjs.flagSet.Bool("eslint-local", false, "add 'eslint' in this Project")
+
+	return tsjs
+}
+
+type golangFlags struct {
+	flagSet             *flag.FlagSet
+	cilint, cilintLocal *bool
+}
+
+func initGoFlags() golangFlags {
+	var gofs golangFlags
+	gofs.flagSet = flag.NewFlagSet("go", flag.ExitOnError)
+	gofs.cilint = gofs.flagSet.Bool("cilint", false, "add 'golangci-lint' globally")
+	gofs.cilintLocal = gofs.flagSet.Bool("cilint-local", false, "add 'golangci-lint' in this Project")
+
+	return gofs
+}
+
 func main() {
-	if len(os.Args) < 2 {
+	if len(os.Args) < 3 {
 		helpMsg()
 		os.Exit(2)
 	}
@@ -45,25 +74,37 @@ func main() {
 		err         error
 		suggestions []*util.Suggestion
 	)
-	switch os.Args[1] {
-	case "go":
-		suggestions, err = golang.InitProject(goSet, cilintflag, cilintProjectflag)
-	case "py":
-		err = python.InitProject()
-	case "ts":
-		suggestions, err = ts.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
-	case "js":
-		suggestions, err = js.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
 
-		// TODO
-	case "envcheck-go":
-		suggestions, err = golang.CheckGO(true)
-	case "envcheck-ts":
-		suggestions, err = ts.CheckTS(true, true)
-	case "envcheck-js":
-		suggestions, err = js.CheckJS(true, true)
-	case "envcheck-py":
-		suggestions, err = python.CheckPython()
+	switch os.Args[1] {
+	case "init":
+		switch os.Args[2] {
+		case "go":
+			suggestions, err = golang.InitProject(goSet, cilintflag, cilintProjectflag)
+		case "py":
+			err = python.InitProject()
+		case "ts":
+			suggestions, err = ts.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
+		case "js":
+			suggestions, err = js.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
+		default:
+			helpMsg()
+			os.Exit(2)
+		}
+
+	case "envcheck":
+		switch os.Args[2] {
+		case "go":
+			suggestions, err = golang.CheckGO(goSet, cilintflag)
+		case "py":
+			suggestions, err = python.CheckPython()
+		case "ts":
+			suggestions, err = ts.CheckTS(tsjsSet, jestflag, eslintflag)
+		case "js":
+			suggestions, err = js.CheckJS(tsjsSet, jestflag, eslintflag)
+		default:
+			helpMsg()
+			os.Exit(2)
+		}
 
 	default:
 		helpMsg()

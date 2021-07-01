@@ -45,7 +45,7 @@ var filesAndContent = []util.FileContent{
 
 func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs []*util.Suggestion, err error) {
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	goSet.Parse(os.Args[2:])
+	goSet.Parse(os.Args[3:])
 
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 

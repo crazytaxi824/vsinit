@@ -1,7 +1,9 @@
 package js
 
 import (
+	"flag"
 	"local/src/util"
+	"os"
 )
 
 var extensions = []string{"esbenp.prettier-vscode",
@@ -10,7 +12,14 @@ var extensions = []string{"esbenp.prettier-vscode",
 	"dbaeumer.vscode-eslint",
 }
 
-func CheckJS(jest, eslint bool) ([]*util.Suggestion, error) {
+func CheckJS(jsSet *flag.FlagSet, jest, eslint *bool) ([]*util.Suggestion, error) {
+	// nolint // flag.ExitOnError will do the os.Exit(2)
+	jsSet.Parse(os.Args[3:])
+
+	return checkJS(*jest, *eslint)
+}
+
+func checkJS(jest, eslint bool) ([]*util.Suggestion, error) {
 	var suggs []*util.Suggestion
 
 	// 检查 node, typescript 是否安装

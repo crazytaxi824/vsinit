@@ -19,9 +19,6 @@ var (
 	//go:embed cfgfiles/launch.json
 	launchJSON []byte
 
-	//go:embed cfgfiles/settings.json
-	settingsJSON []byte
-
 	//go:embed cfgfiles/settings_template.txt
 	settingTemplate []byte
 
@@ -50,7 +47,6 @@ function main() {
 // filesAndContent JS project files
 var filesAndContent = []util.FileContent{
 	{Path: util.LaunchJSONPath, Content: launchJSON},
-	{Path: util.SettingsJSONPath, Content: settingsJSON},
 	{Path: util.GitignorePath, Content: gitignore},
 	{Path: "package.json", Content: packageJSON},
 	{Path: "src/main.js", Content: mainJS},
@@ -68,7 +64,7 @@ var jestFileContent = util.FileContent{
 func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (suggs []*util.Suggestion, err error) {
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	tsjsSet.Parse(os.Args[2:])
+	tsjsSet.Parse(os.Args[3:])
 
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 

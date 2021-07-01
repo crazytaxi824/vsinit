@@ -58,7 +58,7 @@ var filesAndContent = []util.FileContent{
 func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (suggs []*util.Suggestion, err error) {
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	tsjsSet.Parse(os.Args[2:])
+	tsjsSet.Parse(os.Args[3:])
 
 	// 初始化
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
