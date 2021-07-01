@@ -5,6 +5,7 @@ import (
 	"errors"
 	"local/src/util"
 	"os"
+	"strings"
 )
 
 const (
@@ -22,9 +23,7 @@ const (
 )
 
 // golangci-lint setting
-var (
-	golangcilintconfig = []byte(`
-  // golangci-lint 设置
+var golangcilintconfig = `  // golangci-lint 设置
   "go.lintTool": "golangci-lint",
 
   // NOTE save 时 golangci-lint 整个 package，使用 'file' 时，
@@ -36,9 +35,7 @@ var (
 
     // golangci-lint 配置文件地址
     "--config=` + configPlaceHolder + `"
-  ],
-`)
-)
+  ],`
 
 // 通过 vsc-config.json 获取 golangci 配置文件地址.
 //  - 如果 vsc-config.json 不存在，生成 vsc-config.json, golangci.yml 文件.
@@ -124,10 +121,10 @@ func addSettingJSON(ff *util.FoldersAndFiles) error {
 
 	// 如果 settings.json 文件存在，而且 config != cipath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
-	lintConfig := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ff.LintPath()))
+	lintConfig := strings.ReplaceAll(golangcilintconfig, configPlaceHolder, ff.LintPath())
 	ff.AddSuggestions(&util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
-		Solution: string(lintConfig),
+		Solution: "{\n" + lintConfig + "\n}",
 	})
 
 	return nil
@@ -144,10 +141,10 @@ func newSettingsJSONwith(ciPath string) util.FileContent {
 	}
 
 	// go.lint 中的 ${configPlaceHolder} 替换成 cilint 配置文件的地址
-	r := bytes.ReplaceAll(golangcilintconfig, []byte(configPlaceHolder), []byte(ciPath))
+	r := "\n" + strings.ReplaceAll(golangcilintconfig, configPlaceHolder, ciPath) + "\n"
 	return util.FileContent{
 		Path: util.SettingsJSONPath,
 		// 将 setting template 中的 ${golangcilintPlaceHolder} 替换成整个 cilint 的设置.
-		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
+		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), []byte(r)),
 	}
 }

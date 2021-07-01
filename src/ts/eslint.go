@@ -5,6 +5,7 @@ import (
 	"errors"
 	"local/src/util"
 	"os"
+	"strings"
 )
 
 // eslint dependencies
@@ -37,8 +38,7 @@ const (
 )
 
 // ESLint setting
-var eslintconfig = []byte(`
-  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于配置 eslint.
+var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于配置 eslint.
   "eslint.debug": true,
 
   // save 的时候运行 eslint
@@ -58,8 +58,7 @@ var eslintconfig = []byte(`
     // https://eslint.org/docs/developer-guide/nodejs-api#cliengine
     // eslint 配置文件地址
     "configFile": "` + configPlaceHolder + `"
-  },
-`)
+  },`
 
 // 通过 vsc-config.json 获取 eslint.TS 配置文件地址.
 //  - 如果 vsc-config.json 不存在, 则生成 vsc-config.json, eslintrc-ts.json 文件.
@@ -146,10 +145,10 @@ func addSettingJSON(ff *util.FoldersAndFiles) error {
 
 	// 如果 settings.json 文件存在，而且 configFile != lintpath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
-	lintConfig := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(ff.LintPath()))
+	lintConfig := strings.ReplaceAll(eslintconfig, configPlaceHolder, ff.LintPath())
 	ff.AddSuggestions(&util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
-		Solution: string(lintConfig),
+		Solution: "{\n" + lintConfig + "\n}",
 	})
 
 	return nil
@@ -166,10 +165,11 @@ func newSettingsJSONwith(esPath string) util.FileContent {
 	}
 
 	// ESLint 中的 ${configPlaceHolder} 替换成 ESLint 配置文件的地址
-	r := bytes.ReplaceAll(eslintconfig, []byte(configPlaceHolder), []byte(esPath))
+	r := "\n" + strings.ReplaceAll(eslintconfig, configPlaceHolder, esPath) + "\n"
+
 	return util.FileContent{
 		Path: util.SettingsJSONPath,
 		// 将 setting template 中的 ${eslintPlaceHolder} 替换成整个 ESLint 的设置.
-		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), r),
+		Content: bytes.ReplaceAll(settingTemplate, []byte(lintPlaceHolder), []byte(r)),
 	}
 }
