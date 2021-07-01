@@ -51,7 +51,7 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 		suggs = append(suggs, sus...)
 	}
 
-	// plugins:gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
+	// goTools: gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
 	// 检查 vscode extension 工具链.
 	// go get xxxx 安装.
 	sug = checkGoTools(goTools...)
@@ -136,6 +136,8 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	return nil, nil
 }
 
+// 检查 gotools 安装情况
+// goTools: gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
 func checkGoTools(tools ...string) *util.Suggestion {
 	var solutions []string
 	for _, tool := range tools {

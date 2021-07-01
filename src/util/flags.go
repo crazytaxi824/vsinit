@@ -12,7 +12,7 @@ func SetupTSJSFlags() TSJSFlags {
 	tsjs.FlagSet = flag.NewFlagSet("ts/js", flag.ExitOnError)
 	tsjs.Jest = tsjs.FlagSet.Bool("jest", false, "add 'jest' locally")
 	tsjs.ESLint = tsjs.FlagSet.Bool("eslint", false, "add 'eslint' globally")
-	tsjs.ESLintLocal = tsjs.FlagSet.Bool("eslint-local", false, "add 'eslint' in this Project")
+	tsjs.ESLintLocal = tsjs.FlagSet.Bool("eslint-local", false, "add 'eslint' in the Project")
 
 	return tsjs
 }
