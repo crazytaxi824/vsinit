@@ -59,9 +59,9 @@ func main() {
 	case "envcheck-go":
 		suggestions, err = golang.CheckGO(true)
 	case "envcheck-ts":
-		suggestions, err = ts.CheckTS()
+		suggestions, err = ts.CheckTS(true, true)
 	case "envcheck-js":
-		suggestions, err = js.CheckJS()
+		suggestions, err = js.CheckJS(true, true)
 	case "envcheck-py":
 		suggestions, err = python.CheckPython()
 

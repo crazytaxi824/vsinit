@@ -3,7 +3,6 @@ package util
 import (
 	"fmt"
 	"os/exec"
-	"runtime"
 )
 
 // 检查是否安装了命令行工具
@@ -19,17 +18,9 @@ func CheckCMDInstall(lang string) *Suggestion {
 
 // 'which <cmd>'
 func CheckCommandExist(cmdName string) bool {
-	cmd := exec.Command(whichCmd(), cmdName)
+	cmd := exec.Command("which", cmdName)
 	err := cmd.Run()
 	return err == nil
-}
-
-// linux & mac(darwin) using which, windows using where
-func whichCmd() string {
-	if runtime.GOOS == "windows" {
-		return "where"
-	}
-	return "which"
 }
 
 // 如果缺失以下 command line 工具，则提示以下内容.

@@ -10,7 +10,7 @@ var extensions = []string{"esbenp.prettier-vscode",
 	"dbaeumer.vscode-eslint",
 }
 
-func CheckJS() ([]*util.Suggestion, error) {
+func CheckJS(jest, eslint bool) ([]*util.Suggestion, error) {
 	var suggs []*util.Suggestion
 
 	// 检查 node, typescript 是否安装
@@ -29,6 +29,19 @@ func CheckJS() ([]*util.Suggestion, error) {
 	}
 
 	// TODO jest, eslint
+	if jest {
+		sug = checkJest()
+		if sug != nil {
+			suggs = append(suggs, sug)
+		}
+	}
+
+	if eslint {
+		sug = checkESLint()
+		if sug != nil {
+			suggs = append(suggs, sug)
+		}
+	}
 
 	// 检查返回是否为空
 	if len(suggs) == 0 {
