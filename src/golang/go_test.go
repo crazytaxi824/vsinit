@@ -38,8 +38,8 @@ func Test_writeNewSettingFile(t *testing.T) {
 }
 
 func Test_cilintFilePath(t *testing.T) {
-	vscDir, _ := util.GetVscConfigDir()
+	vsiDir, _ := util.GetVsiConfigDir()
 
-	t.Log(vscDir + util.VscConfigFilePath)
-	t.Log(vscDir + golangciDirector + cilintFilePath)
+	t.Log(vsiDir + util.VsiConfigFilePath)
+	t.Log(vsiDir + golangciDirector + cilintFilePath)
 }

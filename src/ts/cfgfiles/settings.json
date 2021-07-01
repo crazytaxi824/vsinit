@@ -21,7 +21,7 @@
     // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用。
     // https://eslint.org/docs/developer-guide/nodejs-api#cliengine
     // eslint config file
-    "configFile": "/Users/ray/projects/lints/ts/eslintrc-ts.json"
+    "configFile": "xxx"
   },
 
   // search.exclude 用来忽略搜索的文件夹

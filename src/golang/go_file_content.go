@@ -108,18 +108,18 @@ func initLocalCiLint(ff *util.FoldersAndFiles) error {
 }
 
 // 设置 global golangci-lint:
-//  - 写入 ~/.vsc/golangci/golangci.yml 文件.
+//  - 写入 ~/.vsi/golangci/golangci.yml 文件.
 //  - 写入 <project>/.vscode/settings.json 文件.
-//  - 写入 ~/.vsc/vsc-config.json 全局配置文件.
+//  - 写入 ~/.vsi/vsi-config.json 全局配置文件.
 func initGlobalLint(ff *util.FoldersAndFiles) error {
-	// 获取 .vsc 文件夹地址
-	vscDir, err := util.GetVscConfigDir()
+	// 获取 .vsi 文件夹地址
+	vsiDir, err := util.GetVsiConfigDir()
 	if err != nil {
 		return err
 	}
 
-	// 从 vsc-config.json 文件获取 golangci 配置文件的地址。
-	err = readCilintPathFromVscCfgJSON(ff, vscDir)
+	// 从 vsi-config.json 文件获取 golangci 配置文件的地址。
+	err = readCilintPathFromVsiCfgJSON(ff, vsiDir)
 	if err != nil {
 		return err
 	}

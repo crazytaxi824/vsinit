@@ -1,5 +1,3 @@
-// vsc envcheck go -lint
-
 package golang
 
 import (
@@ -66,7 +64,7 @@ func checkGOPATH() *util.Suggestion {
 		return &util.Suggestion{
 			Problem: "need to setup $GOPATH in ~/.bash_profile OR ./zshrc",
 			Solution: "# golang setting\n" +
-				"export GOPATH=/Users/ray/gopath\n" +
+				"export GOPATH=/Users/ray/gopath\n" + // FIXME
 				"export GOBIN=$GOPATH/bin\n" +
 				"export PATH=$PATH:$GOBIN\n" +
 				"export GO111MODULE=on",
