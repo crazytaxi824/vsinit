@@ -3,18 +3,27 @@
 package golang
 
 import (
-	"bytes"
 	"errors"
 	"local/src/util"
 	"os"
-	"os/exec"
+	"strings"
 )
 
 // FIXME
 const GolintciCmd = "vs init go -cilint <path>"
 
-func CheckGO(lintFlag bool) ([]*util.Suggestion, error) {
-	return checkGOENV(lintFlag)
+// 需要安装的插件
+var extensions = []string{"golang.go", "humao.rest-client"}
+
+// go 插件所需 tools
+var goTools = []string{"gopkgs", "go-outline", "gotests",
+	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
+
+func CheckGO(gofs util.GoFlags) ([]*util.Suggestion, error) {
+	// nolint // flag.ExitOnError will do the os.Exit(2)
+	gofs.FlagSet.Parse(os.Args[3:])
+
+	return checkGOENV(*gofs.Cilint)
 }
 
 // 检查所有 GO 运行环境
@@ -27,34 +36,25 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 		suggs = append(suggs, sug)
 	}
 
-	// 检查 go 是否安装 // 检查 code 安装
+	// 检查 go 是否安装
 	sug = util.CheckCMDInstall("go")
 	if sug != nil {
 		suggs = append(suggs, sug)
 	}
 
-	// 检查 vscode and extensions,
-	sug = util.CheckCMDInstall("code")
-	if sug != nil {
-		suggs = append(suggs, sug, &util.Suggestion{ // 安装 vscode 插件 GO
-			Problem: "need to install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market, or run:\n" +
-				"code --install-extension golang.go",
-		})
-	} else {
-		su, er := checkVscodeExtensions()
-		if er != nil {
-			return nil, er
-		}
-		if su != nil {
-			suggs = append(suggs, su)
-		}
+	// 检查 vscode 和 vscode extensions
+	sus, err := util.CheckVscodeAndExtensions(extensions)
+	if err != nil {
+		return nil, err
+	}
+	if len(sus) > 0 {
+		suggs = append(suggs, sus...)
 	}
 
-	// plugins:gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
+	// goTools: gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
 	// 检查 vscode extension 工具链.
 	// go get xxxx 安装.
-	sug = util.CheckCMDInstall(util.GoTools...)
+	sug = checkGoTools(goTools...)
 	if sug != nil {
 		suggs = append(suggs, sug)
 	}
@@ -71,28 +71,10 @@ func checkGOENV(lintFlag bool) ([]*util.Suggestion, error) {
 	}
 
 	// 检查返回是否为空
-	if len(suggs) == 0 {
-		return nil, nil
+	if len(suggs) > 0 {
+		return suggs, nil
 	}
 
-	return suggs, nil
-}
-
-// 检查 vscode 插件 GO
-func checkVscodeExtensions() (*util.Suggestion, error) {
-	cmd := exec.Command("code", "--list-extensions")
-	out, err := cmd.Output()
-	if err != nil {
-		return nil, err
-	}
-
-	if !bytes.Contains(out, []byte("golang.go")) {
-		return &util.Suggestion{
-			Problem: "need to install vscode extension 'golang.go'",
-			Solution: "you can install it in the vscode extentsion market, or run:\n" +
-				"code --install-extension golang.go",
-		}, nil
-	}
 	return nil, nil
 }
 
@@ -119,7 +101,7 @@ func checkGolangciLint() (*util.Suggestion, error) {
 	}
 
 	// 读取 vsc setting
-	var vscCfgJSON *util.VscConfigJSON
+	var vscCfgJSON util.VscConfigJSON
 	err = vscCfgJSON.ReadFromDir(vscDir)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return nil, err
@@ -152,4 +134,49 @@ func checkGolangciLint() (*util.Suggestion, error) {
 
 	// 能够打开说明已经设置成功
 	return nil, nil
+}
+
+// 检查 gotools 安装情况
+// goTools: gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint,gopls
+func checkGoTools(tools ...string) *util.Suggestion {
+	var solutions []string
+	for _, tool := range tools {
+		if !util.CheckCommandExist(tool) {
+			solutions = append(solutions, goToolsSuggestion(tool))
+		}
+	}
+
+	if len(solutions) > 0 {
+		return &util.Suggestion{
+			Problem:  "need to install following goTools:",
+			Solution: strings.Join(solutions, "; \\\n"),
+		}
+	}
+
+	return nil
+}
+
+// 检查 vscode 中 go 插件所需要的工具.
+func goToolsSuggestion(tool string) string {
+	switch tool {
+	case "gopkgs":
+		return "go get github.com/uudashr/gopkgs/v2/cmd/gopkgs"
+	case "go-outline":
+		return "go get github.com/ramya-rao-a/go-outline"
+	case "gotests":
+		return "go get github.com/cweill/gotests/gotests"
+	case "impl":
+		return "go get github.com/josharian/impl"
+	case "dlv":
+		return "go get github.com/go-delve/delve/cmd/dlv"
+	case "gopls":
+		return "go get golang.org/x/tools/gopls"
+	case "golangci-lint":
+		return "go get github.com/golangci/golangci-lint/cmd/golangci-lint"
+	case "gomodifytags":
+		return "go get github.com/fatih/gomodifytags"
+	case "debug-cmd":
+		return "this is a debug test solution."
+	}
+	return util.InternalErrMsg
 }

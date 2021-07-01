@@ -5,7 +5,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -26,36 +25,25 @@ func helpMsg() {
 }
 
 func main() {
-	if len(os.Args) < 2 {
+	if len(os.Args) < 3 {
 		helpMsg()
 		os.Exit(2)
 	}
 
-	// flag.ExitOnError will os.Exit(2) if subcommand Parse() error.
-	tsjsSet := flag.NewFlagSet("ts/js", flag.ExitOnError)
-	jestflag := tsjsSet.Bool("jest", false, "add 'jest' - unit test components")
-	eslintflag := tsjsSet.Bool("eslint", false, "setup eslint globally")
-	eslintProjectflag := tsjsSet.Bool("eslint-local", false, "setup eslint in project")
-
-	goSet := flag.NewFlagSet("go", flag.ExitOnError)
-	cilintflag := goSet.Bool("cilint", false, "setup golangci-lint globally")
-	cilintProjectflag := goSet.Bool("cilint-local", false, "setup golangci-lint in project")
+	// 接受 flags
+	gofs := util.SetupGoFlags()
+	tsjs := util.SetupTSJSFlags()
 
 	var (
 		err         error
 		suggestions []*util.Suggestion
 	)
+
 	switch os.Args[1] {
-	case "go":
-		suggestions, err = golang.InitProject(goSet, cilintflag, cilintProjectflag)
-	case "py":
-		err = python.InitProject()
-	case "ts":
-		suggestions, err = ts.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
-	case "js":
-		suggestions, err = js.InitProject(tsjsSet, jestflag, eslintflag, eslintProjectflag)
+	case "init":
+		suggestions, err = initCommand(gofs, tsjs)
 	case "envcheck":
-		suggestions, err = golang.CheckGO(false) // DEBUG
+		suggestions, err = envCheckCommand(gofs, tsjs)
 	default:
 		helpMsg()
 		os.Exit(2)
@@ -69,6 +57,56 @@ func main() {
 
 	// 打印提醒
 	printSuggestions(suggestions)
+}
+
+func initCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Suggestion, err error) {
+	switch os.Args[2] {
+	case "go":
+		suggestions, err = golang.InitProject(gofs)
+	case "py":
+		err = python.InitProject()
+	case "ts":
+		suggestions, err = ts.InitProject(tsjs)
+	case "js":
+		suggestions, err = js.InitProject(tsjs)
+	default:
+		helpMsg()
+		os.Exit(2)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(suggestions) > 0 {
+		return suggestions, nil
+	}
+	return nil, nil
+}
+
+func envCheckCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Suggestion, err error) {
+	switch os.Args[2] {
+	case "go":
+		suggestions, err = golang.CheckGO(gofs)
+	case "py":
+		suggestions, err = python.CheckPython()
+	case "ts":
+		suggestions, err = ts.CheckTS(tsjs)
+	case "js":
+		suggestions, err = js.CheckJS(tsjs)
+	default:
+		helpMsg()
+		os.Exit(2)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(suggestions) > 0 {
+		return suggestions, nil
+	}
+	return nil, nil
 }
 
 func printSuggestions(suggestions []*util.Suggestion) {

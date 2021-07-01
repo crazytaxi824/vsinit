@@ -9,7 +9,7 @@ import (
 
 // 单行处理 jsonc 语句，不会改变原语句，只会指出原语句中最后一个有效字符的 index.
 // - multiLineComment 说明是否在多行注释中 /* */
-func lastValidChatInJSONCline(src []byte, start int) (lastValidCharIndex int, multiLineComment bool, err error) {
+func lastValidCharInJSONCline(src []byte, start int) (lastValidCharIndex int, multiLineComment bool, err error) {
 	l := len(src)
 
 	// NOTE lastIndex = -1, 说明该行是空行。
@@ -78,14 +78,6 @@ ForLoop:
 	}
 
 	return lastValidCharIndex, multiLineComment, nil
-}
-
-func toggle(b *bool) {
-	if *b {
-		*b = false
-	} else {
-		*b = true
-	}
 }
 
 // 处理单行 jsonc 语句，将有效字符写入 buf 中。会改变原本行的内容。
@@ -198,47 +190,6 @@ type jsoncStatment struct {
 	LastValidCharIndex int // 最后一个有效字符的 index，后面的 // comments 不算在内
 }
 
-// find second last line and lastCharIndex
-func findSecondLastLine(jsonc []byte) (secondLastLine, lastCharIndex int, err error) {
-	lines := bytes.Split(jsonc, []byte("\n"))
-
-	var (
-		result       []jsoncStatment
-		lastIndex    int
-		multiComment bool
-	)
-
-	for i, line := range lines {
-		start := 0
-		if multiComment {
-			ci := bytes.Index(line, []byte("*/"))
-			if ci == -1 {
-				continue
-			} else {
-				start = ci + 2
-			}
-		}
-
-		lastIndex, multiComment, err = lastValidChatInJSONCline(line, start)
-		if err != nil {
-			return 0, 0, err
-		}
-
-		// lastIndex == -1, 表示整行都是 comment, 或者是空行
-		if lastIndex != -1 {
-			result = append(result, jsoncStatment{i, lastIndex})
-		}
-	}
-
-	l := len(result)
-	var r jsoncStatment
-	if l > 1 {
-		r = result[l-2]
-	}
-
-	return r.LineIndex, r.LastValidCharIndex, nil
-}
-
 // 向 jsonc 末尾添加内容.
 func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 	if len(content) == 0 {
@@ -265,7 +216,7 @@ func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 			}
 		}
 
-		lastIndex, multiComment, err = lastValidChatInJSONCline(line, start)
+		lastIndex, multiComment, err = lastValidCharInJSONCline(line, start)
 		if err != nil {
 			return nil, err
 		}
@@ -319,4 +270,12 @@ func AppendToJSONC(jsonc, content []byte) ([]byte, error) {
 	}
 
 	return bytes.Join(newJSONC, []byte("\n")), nil
+}
+
+func toggle(b *bool) {
+	if *b {
+		*b = false
+	} else {
+		*b = true
+	}
 }

@@ -5,7 +5,6 @@ package js
 import (
 	_ "embed" // for go:embed file use
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,9 +17,6 @@ var createFolders = []string{".vscode", "src"}
 var (
 	//go:embed cfgfiles/launch.json
 	launchJSON []byte
-
-	//go:embed cfgfiles/settings.json
-	settingsJSON []byte
 
 	//go:embed cfgfiles/settings_template.txt
 	settingTemplate []byte
@@ -50,7 +46,6 @@ function main() {
 // filesAndContent JS project files
 var filesAndContent = []util.FileContent{
 	{Path: util.LaunchJSONPath, Content: launchJSON},
-	{Path: util.SettingsJSONPath, Content: settingsJSON},
 	{Path: util.GitignorePath, Content: gitignore},
 	{Path: "package.json", Content: packageJSON},
 	{Path: "src/main.js", Content: mainJS},
@@ -65,26 +60,26 @@ var jestFileContent = util.FileContent{
 	Content: exampleTestJS,
 }
 
-func InitProject(tsjsSet *flag.FlagSet, jestflag, eslint, eslintLocal *bool) (suggs []*util.Suggestion, err error) {
+func InitProject(tsjs util.TSJSFlags) (suggs []*util.Suggestion, err error) {
 	// parse arges first
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	tsjsSet.Parse(os.Args[2:])
+	tsjs.FlagSet.Parse(os.Args[3:])
 
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
-	if *jestflag {
+	if *tsjs.Jest {
 		// add jest example test file
 		ff.AddFolders(testFolder)
 		ff.AddFiles(jestFileContent)
 	}
 
-	if *eslint && *eslintLocal {
+	if *tsjs.ESLint && *tsjs.ESLintLocal {
 		// 如果两个选项都有，则报错
 		return nil, errors.New("can not setup eslint globally and locally at same time")
-	} else if *eslint && !*eslintLocal {
+	} else if *tsjs.ESLint && !*tsjs.ESLintLocal {
 		// 设置 global eslint
 		err = initGlobalEslint(ff)
-	} else if !*eslint && *eslintLocal {
+	} else if !*tsjs.ESLint && *tsjs.ESLintLocal {
 		// 设置 local eslint
 		err = initLocalEslint(ff)
 	} else {

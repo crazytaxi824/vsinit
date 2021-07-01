@@ -3,7 +3,6 @@ package golang
 import (
 	_ "embed" // for go:embed file use
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -43,19 +42,19 @@ var filesAndContent = []util.FileContent{
 	{Path: "src/main.go", Content: mainGO},
 }
 
-func InitProject(goSet *flag.FlagSet, cilintflag, cilintProjflag *bool) (suggs []*util.Suggestion, err error) {
+func InitProject(gofs util.GoFlags) (suggs []*util.Suggestion, err error) {
 	// nolint // flag.ExitOnError will do the os.Exit(2)
-	goSet.Parse(os.Args[2:])
+	gofs.FlagSet.Parse(os.Args[3:])
 
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
-	if *cilintflag && *cilintProjflag {
+	if *gofs.Cilint && *gofs.CilintLocal {
 		// 如果两个选项都有，则报错
 		return nil, errors.New("can not setup golangci-lint globally and locally at same time")
-	} else if *cilintflag && !*cilintProjflag {
+	} else if *gofs.Cilint && !*gofs.CilintLocal {
 		// 设置 global golangci-lint
 		err = initGlobalLint(ff)
-	} else if !*cilintflag && *cilintProjflag {
+	} else if !*gofs.Cilint && *gofs.CilintLocal {
 		// 设置 project golangci-lint
 		err = initLocalCiLint(ff)
 	} else {
