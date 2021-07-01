@@ -10,9 +10,9 @@ type TSJSFlags struct {
 func SetupTSJSFlags() TSJSFlags {
 	var tsjs TSJSFlags
 	tsjs.FlagSet = flag.NewFlagSet("ts/js", flag.ExitOnError)
-	tsjs.Jest = tsjs.FlagSet.Bool("jest", false, "add 'jest' locally")
-	tsjs.ESLint = tsjs.FlagSet.Bool("eslint", false, "add 'eslint' globally")
-	tsjs.ESLintLocal = tsjs.FlagSet.Bool("eslint-local", false, "add 'eslint' in the Project")
+	tsjs.Jest = tsjs.FlagSet.Bool("jest", false, "setup 'jest' in the Project")
+	tsjs.ESLint = tsjs.FlagSet.Bool("eslint", false, "setup 'eslint' globally")
+	tsjs.ESLintLocal = tsjs.FlagSet.Bool("eslint-local", false, "setup 'eslint' in the Project")
 
 	return tsjs
 }
@@ -25,8 +25,8 @@ type GoFlags struct {
 func SetupGoFlags() GoFlags {
 	var gofs GoFlags
 	gofs.FlagSet = flag.NewFlagSet("go", flag.ExitOnError)
-	gofs.Cilint = gofs.FlagSet.Bool("cilint", false, "add 'golangci-lint' globally")
-	gofs.CilintLocal = gofs.FlagSet.Bool("cilint-local", false, "add 'golangci-lint' in this Project")
+	gofs.Cilint = gofs.FlagSet.Bool("cilint", false, "setup 'golangci-lint' globally")
+	gofs.CilintLocal = gofs.FlagSet.Bool("cilint-local", false, "setup 'golangci-lint' in this Project")
 
 	return gofs
 }

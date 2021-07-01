@@ -43,7 +43,7 @@ func main() {
 	case "init":
 		suggestions, err = initCommand(gofs, tsjs)
 	case "envcheck":
-		suggestions, err = envCheckCommand(gofs, tsjs)
+		suggestions, err = envCheckCommand()
 	default:
 		helpMsg()
 		os.Exit(2)
@@ -84,16 +84,16 @@ func initCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Su
 	return nil, nil
 }
 
-func envCheckCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Suggestion, err error) {
+func envCheckCommand() (suggestions []*util.Suggestion, err error) {
 	switch os.Args[2] {
 	case "go":
-		suggestions, err = golang.CheckGO(gofs)
+		suggestions, err = golang.CheckGO()
 	case "py":
 		suggestions, err = python.CheckPython()
 	case "ts":
-		suggestions, err = ts.CheckTS(tsjs)
+		suggestions, err = ts.CheckTS()
 	case "js":
-		suggestions, err = js.CheckJS(tsjs)
+		suggestions, err = js.CheckJS()
 	default:
 		helpMsg()
 		os.Exit(2)
