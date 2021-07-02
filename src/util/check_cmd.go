@@ -29,7 +29,7 @@ func CheckCommandExist(cmdName string) bool {
 func solutionMsg(cmdName string) string {
 	switch cmdName {
 	case "code":
-		return "download vscode at https://code.visualstudio.com, or run:\nbrew install vscode"
+		return "download vscode at https://code.visualstudio.com, or run:\nbrew install --cask visual-studio-code"
 
 	case "go":
 		return "download go at https://golang.org/, or run:\nbrew install go"
