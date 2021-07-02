@@ -50,7 +50,6 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
     "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
     "complexity": "warn", // default 20
     "no-param-reassign": "off", // 不能给函数入参赋值，引用类型应该可以赋值。
-    // NOTE lack of no-null-keyword checks.
 
     // 功能检查
     "max-len": ["warn", { "code": 120 }],
