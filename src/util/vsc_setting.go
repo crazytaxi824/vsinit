@@ -35,6 +35,7 @@ func GetVsiConfigDir() (string, error) {
 	return home + vsiDirectory, nil
 }
 
+// 从指定 dir 中读取 vsi-config.json 文件
 func (vs *VsiConfigJSON) ReadFromDir(vsiDir string) error {
 	// read vsi config file
 	f, err := os.Open(vsiDir + VsiConfigFilePath)
@@ -44,7 +45,8 @@ func (vs *VsiConfigJSON) ReadFromDir(vsiDir string) error {
 	defer f.Close()
 
 	// ~/.vsi/vsi-config 文件存在, 读取文件
-	err = vs.readJSON(f)
+	de := json.NewDecoder(f)
+	err = de.Decode(vs)
 	if err != nil {
 		return err
 	}
@@ -52,11 +54,7 @@ func (vs *VsiConfigJSON) ReadFromDir(vsiDir string) error {
 	return nil
 }
 
-func (vs *VsiConfigJSON) readJSON(reader io.Reader) error {
-	de := json.NewDecoder(reader)
-	return de.Decode(vs)
-}
-
+// json 序列化格式化
 func (vs *VsiConfigJSON) JSONIndentFormat() ([]byte, error) {
 	return json.MarshalIndent(vs, "", "  ")
 }

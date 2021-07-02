@@ -2,6 +2,7 @@ package util
 
 import "flag"
 
+// TS/JS 用 flags
 type TSJSFlags struct {
 	FlagSet                   *flag.FlagSet
 	Jest, ESLint, ESLintLocal *bool
@@ -17,6 +18,7 @@ func SetupTSJSFlags() TSJSFlags {
 	return tsjs
 }
 
+// Golang 用 flags
 type GoFlags struct {
 	FlagSet             *flag.FlagSet
 	Cilint, CilintLocal *bool

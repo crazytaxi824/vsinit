@@ -27,6 +27,7 @@ type FoldersAndFiles struct {
 	}
 }
 
+// 初始化 FoldersAndFiles 对象
 func InitFoldersAndFiles(folders []string, files []FileContent) *FoldersAndFiles {
 	var ff FoldersAndFiles
 	ff.folders = folders
@@ -191,7 +192,7 @@ func (ff *FoldersAndFiles) AddLintConfigAndLintPath(lintPath string, lincCfgFile
 	ff.lintPath = lintPath
 }
 
-// 写入所需文件
+// 写入项目所需文件
 func (ff *FoldersAndFiles) WriteAllFiles() error {
 	fmt.Println("writing file: ")
 

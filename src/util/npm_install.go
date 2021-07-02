@@ -5,6 +5,7 @@ import (
 	"os/exec"
 )
 
+// 需要安装的依赖
 type dependenciesInstall struct {
 	dependencies []string
 	prefix       string

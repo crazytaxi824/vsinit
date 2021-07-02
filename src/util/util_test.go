@@ -3,7 +3,6 @@ package util
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
 	"testing"
 )
 
@@ -33,17 +32,6 @@ func Test_Errors(t *testing.T) {
 func Test_CheckCmdInstall(t *testing.T) {
 	fmt.Println(CheckCMDInstall("vscode"))
 	fmt.Println(CheckCMDInstall("code"))
-}
-
-func Test_ReadJSON(t *testing.T) {
-	var vs VsiConfigJSON
-	err := vs.readJSON(strings.NewReader(`{"golangci":"abc","eslint":"def"}`))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	t.Logf("%+v", vs)
 }
 
 func Test_StringToByte(t *testing.T) {

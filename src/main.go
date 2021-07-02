@@ -47,10 +47,11 @@ func main() {
 		os.Exit(2)
 	}
 
-	// 打印提醒
+	// 打印建议
 	printSuggestions(suggestions)
 }
 
+// vs init command
 func initCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Suggestion, err error) {
 	switch os.Args[2] {
 	case "go":
@@ -76,6 +77,7 @@ func initCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Su
 	return nil, nil
 }
 
+// vs envcheck command
 func envCheckCommand() (suggestions []*util.Suggestion, err error) {
 	switch os.Args[2] {
 	case "go":
@@ -101,15 +103,16 @@ func envCheckCommand() (suggestions []*util.Suggestion, err error) {
 	return nil, nil
 }
 
+// 遍历打印所有 suggestion
 func printSuggestions(suggestions []*util.Suggestion) {
-	if len(suggestions) == 0 {
-		fmt.Println("All Done! Happy Hunting.")
+	if len(suggestions) > 0 {
+		var builder strings.Builder
+		for _, sug := range suggestions {
+			builder.WriteString(sug.String())
+		}
+		fmt.Print(builder.String()) // 这里用 println 会多空一行
 		return
 	}
 
-	var builder strings.Builder
-	for _, sug := range suggestions {
-		builder.WriteString(sug.String())
-	}
-	fmt.Print(builder.String()) // 这里用 println 会多空一行
+	fmt.Println("All Done! Happy Hunting.")
 }
