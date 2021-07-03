@@ -2,13 +2,13 @@
   // "$schema": "https://json.schemastore.org/tsconfig",
   "compileOnSave": false,
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
-    "target": "es2015", // es6=es2015, 默认情况下使用es6，拥有 map & set
-    "lib": ["es2017", "DOM"], // 包含了声明文件列表，你仍然拥有较新的类型声明
+    "target": "es5", // es6=es2015, 默认情况下使用es6，拥有 map & set
+    "lib": ["dom", "dom.iterable", "esnext"], // 包含了声明文件列表，你仍然拥有较新的类型声明
     "sourceMap": true, // 必须为true，debug 用。
     "outDir": "dist", // NOTE important, ts转为js文件时的地址
-    "jsx": "react", // NOTE 指定 jsx 代码的生成: preserve | react | react-native
+    "jsx": "react-jsx", // 指定 jsx 代码的生成: preserve | react | react-jsx | react-native
     "allowJs": true, // 允许编译 js 文件.
     "strict": true, // 启用所有严格模式，6个严格规则
     "noImplicitReturns": true, // 强制定义出参类型
@@ -19,6 +19,8 @@
     "importHelpers": true, // NOTE import/export async/await function 用, 需要安装 npm i -D tslib
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true, // import 时，文件名大小写敏感
+    "resolveJsonModule": true, // 可以 import .json 文件
     "esModuleInterop": true,
     "skipLibCheck": true // 跳过默认库检查
     // NOTE product 环境下需要打开以下检查.
