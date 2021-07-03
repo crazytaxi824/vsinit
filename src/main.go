@@ -114,5 +114,5 @@ func printSuggestions(suggestions []*util.Suggestion) {
 		return
 	}
 
-	fmt.Println("All Done! Happy Hunting.")
+	fmt.Println("Happy Coding!")
 }
