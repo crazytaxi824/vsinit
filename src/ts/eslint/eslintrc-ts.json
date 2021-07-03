@@ -12,17 +12,22 @@ prettier
 需要 npm 安装的库:
 eslint (npm i -g)
 jest (npm i -g)
-eslint-plugin-import
-eslint-plugin-jsx-a11y
-eslint-plugin-react
-eslint-plugin-react-hooks
-eslint-plugin-jest  // jest unit test
-eslint-plugin-promise // promise 用法
-@typescript-eslint/eslint-plugin
-eslint-config-airbnb-typescript
-eslint-config-prettier  // 这个包主要是用来 disable 某些有冲突的 rules, 所以要放到最后
-eslint-config-airbnb-base // js 专用 lint
-// @typescript-eslint/parser    // parser
+
+@typescript-eslint/eslint-plugin  // 必须
+eslint-config-airbnb-typescript   // airbnb line
+eslint-plugin-jest                // jest unit test
+eslint-plugin-promise             // promise 语法 lint
+eslint-config-prettier            // prettier 主要是用来 disable 某些有冲突的 rules, 一定要放在最后
+
+附带会被下载的依赖：
+@typescript-eslint/eslint-plugin:
+  - @typescript-eslint/parser
+
+eslint-config-airbnb-typescript:
+  - eslint-plugin-import
+  - eslint-plugin-jsx-a11y
+  - eslint-plugin-react
+  - eslint-plugin-react-hooks
 
 如果需要使用 react:
 "extends": ["airbnb-typescript", "airbnb/hooks"]

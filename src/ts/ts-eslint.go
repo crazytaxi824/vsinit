@@ -10,17 +10,12 @@ import (
 
 // eslint dependencies
 var eslintDependencies = []string{
-	"eslint-plugin-import",
-	"eslint-plugin-jsx-a11y",
-	"eslint-plugin-react",
-	"eslint-plugin-react-hooks",
-	"@typescript-eslint/parser", // parser
-	"@typescript-eslint/eslint-plugin",
-	"eslint-plugin-jest",              // jest unit test
-	"eslint-plugin-promise",           // promise 用法
-	"eslint-config-airbnb-typescript", // ts 用
-	"eslint-config-prettier",          // 解决 vscode 插件中 prettier 造成的代码问题
-	"eslint-config-airbnb-base",       // js 专用 lint
+	"@typescript-eslint/eslint-plugin", // 必须
+	"eslint-plugin-jest",               // jest unit test
+	"eslint-plugin-promise",            // promise 用法
+	"eslint-config-airbnb-typescript",  // ts 用
+	"eslint-config-prettier",           // 解决 vscode 插件中 prettier 造成的代码问题
+	"eslint-config-airbnb-base",        // js 专用 lint
 }
 
 const (
