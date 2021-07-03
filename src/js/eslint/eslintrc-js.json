@@ -44,7 +44,11 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
     "no-console": 0, // DEBUG use only.
 
     "no-prototype-builtins": "off",
-    "import/extensions": ["error", "always", { "ignorePackages": true }], // import 文件需要后缀名。
+    "import/extensions": [
+      "error", // error 警告
+      "always", // import 文件的时候需要后缀名
+      { "ignorePackages": true } // import package 不需要后缀名
+    ],
     "import/prefer-default-export": "off",
     // "import/no-default-export": "error",
     "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~

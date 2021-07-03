@@ -79,6 +79,14 @@ eslint-config-airbnb-base // js 专用 lint
     // 以下为常用 lint.
     "no-prototype-builtins": "off",
     "import/prefer-default-export": "off",
+    "import/extensions": [
+      "error", // error 警告
+      "never", // import 的时候不需要文件后缀名，除了 json 文件外
+      {
+        "ignorePackages": true, // import package 不需要后缀名
+        "pattern": { "json": "always" } // import json 文件需要写后缀名
+      }
+    ],
     // "import/no-default-export": "error", // 没有 export default 在文件中。
     "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
     "complexity": "warn", // default 20
