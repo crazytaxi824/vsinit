@@ -75,8 +75,8 @@ eslint-config-airbnb-typescript:
 
     // 以下为常用 lint.
     "no-prototype-builtins": "off", // Too restrictive
-    "import/prefer-default-export": "off", // 优先使用 default export: off
-    "import/no-default-export": "warn", // 不允许使用 exports default
+    "import/prefer-default-export": "off", // 优先使用 export default: off
+    "import/no-default-export": "warn", // 不允许使用 export default
     "import/extensions": [
       "error", // error 警告
       "never", // import 的时候不需要文件后缀名，除了 json 文件外
@@ -90,7 +90,7 @@ eslint-config-airbnb-typescript:
     "no-param-reassign": "off", // 不能给函数入参赋值，引用类型应该可以赋值。
 
     // NOTE react use only
-    // "react/destructuring-assignment": "off", // too restrictive
+    // "react/destructuring-assignment": "off", // Too restrictive
     // "react/jsx-filename-extension": "off", // no .jsx extension
 
     // 功能检查
