@@ -6,12 +6,14 @@ import (
 	"strings"
 )
 
-// 需要安装的插件
-var extensions = []string{"golang.go", "humao.rest-client"}
+var (
+	// 需要安装的 vscode 插件
+	extensions = []string{"golang.go", "humao.rest-client"}
 
-// go 插件所需 tools
-var goTools = []string{"gopkgs", "go-outline", "gotests",
-	"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
+	// go 插件所需 tools
+	goTools = []string{"gopkgs", "go-outline", "gotests",
+		"gomodifytags", "impl", "dlv", "golangci-lint", "gopls"}
+)
 
 func CheckGO() ([]*util.Suggestion, error) {
 	return checkGOENV()

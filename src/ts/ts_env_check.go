@@ -4,7 +4,7 @@ import (
 	"local/src/util"
 )
 
-// 需要安装的插件
+// 需要安装的 vscode 插件
 var extensions = []string{"esbenp.prettier-vscode",
 	"VisualStudioExptTeam.vscodeintellicode",
 	"christian-kohler.path-intellisense",
