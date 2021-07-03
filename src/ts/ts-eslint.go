@@ -52,6 +52,11 @@ var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于�
     "javascript"
   ],
 
+  // 自动修复 eslint rules
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
   // 单独设置 eslint 配置文件
   "eslint.options": {
     // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用。
