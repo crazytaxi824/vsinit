@@ -28,7 +28,6 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
   "env": {
     "node": true,
     "browser": true,
-    "es6": true,
     "jest/globals": true
   },
   "plugins": ["promise", "jest"],
