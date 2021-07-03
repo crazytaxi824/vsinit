@@ -6,8 +6,8 @@
     "moduleResolution": "node",
     "target": "es5", // es6=es2015, 默认情况下使用es6，拥有 map & set
     "lib": ["dom", "dom.iterable", "esnext"], // 包含了声明文件列表，你仍然拥有较新的类型声明
-    "sourceMap": true, // 必须为true，debug 用。
-    "outDir": "dist", // NOTE important, ts转为js文件时的地址
+    "outDir": "dist", // important, ts 转为 js 文件时的地址.
+    "sourceMap": true, // 必须为true，debug 用. 和 outDir 配合使用.
     "jsx": "react-jsx", // 指定 jsx 代码的生成: preserve | react | react-jsx | react-native
     "allowJs": true, // 允许编译 js 文件.
     "strict": true, // 启用所有严格模式，6个严格规则
@@ -16,7 +16,7 @@
     "experimentalDecorators": true, // 使用装饰器
     "emitDecoratorMetadata": true, // 为装饰器提供元数据的支持
     // 使用 tsc --importHelpers, 当 async/await 文件中有 import/export (自己是 module)的时候。
-    "importHelpers": true, // NOTE import/export async/await function 用, 需要安装 npm i -D tslib
+    "importHelpers": true, // import/export async/await function 用, 需要安装 `npm i -D tslib`
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true, // import 时，文件名大小写敏感
