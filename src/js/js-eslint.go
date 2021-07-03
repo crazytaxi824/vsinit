@@ -37,6 +37,11 @@ var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于�
   // save 的时候运行 eslint
   "eslint.run": "onSave",
 
+  // 自动修复 eslint rules
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
   // eslint 检查文件类型
   "eslint.validate": [
     "javascript"

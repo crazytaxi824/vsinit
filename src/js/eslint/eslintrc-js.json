@@ -12,7 +12,7 @@ prettier
 需要 npm 安装的库:
 eslint (npm i -g)
 jest (npm i -g)
-eslint-config-airbnb-base // js 专用 lint
+eslint-config-airbnb-base // js 专用 lint - 不带 react
 eslint-plugin-promise // promise 用法
 eslint-plugin-jest  // jest unit test
 eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 rules, 所以要放到最后
@@ -28,7 +28,6 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
   "env": {
     "node": true,
     "browser": true,
-    "es6": true,
     "jest/globals": true
   },
   "plugins": ["promise", "jest"],
@@ -44,7 +43,11 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
     "no-console": 0, // DEBUG use only.
 
     "no-prototype-builtins": "off",
-    "import/extensions": ["error", "always", { "ignorePackages": true }], // import 文件需要后缀名。
+    "import/extensions": [
+      "error", // error 警告
+      "always", // import 文件的时候需要后缀名
+      { "ignorePackages": true } // import package 不需要后缀名
+    ],
     "import/prefer-default-export": "off",
     // "import/no-default-export": "error",
     "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
@@ -55,7 +58,7 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
     "max-len": ["warn", { "code": 120 }],
     "max-lines": ["warn", 500], // 文件不超过 n 行
 
-    // js 专用
+    // JS 专用
     "no-use-before-define": [
       "error",
       { "functions": false, "classes": true, "variables": true }
