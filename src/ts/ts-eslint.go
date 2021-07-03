@@ -11,11 +11,10 @@ import (
 // eslint dependencies
 var eslintDependencies = []string{
 	"@typescript-eslint/eslint-plugin", // 必须
+	"eslint-config-airbnb-typescript",  // ts 用
 	"eslint-plugin-jest",               // jest unit test
 	"eslint-plugin-promise",            // promise 用法
-	"eslint-config-airbnb-typescript",  // ts 用
 	"eslint-config-prettier",           // 解决 vscode 插件中 prettier 造成的代码问题
-	"eslint-config-airbnb-base",        // js 专用 lint
 }
 
 const (

@@ -37,7 +37,6 @@ eslint-config-airbnb-typescript:
 {
   "extends": [
     // "eslint:recommended",
-    // "airbnb-base", // js 专用
     // "airbnb/hooks", // react 用
     // "airbnb-typescript", // ts 用, with react
     "airbnb-typescript/base", // ts 用
@@ -50,19 +49,12 @@ eslint-config-airbnb-typescript:
   "env": {
     "node": true,
     "browser": true,
-    "es6": true,
     "jest/globals": true
   },
   "plugins": ["@typescript-eslint", "jest", "promise"],
   // parser config
-  "parser": "@typescript-eslint/parser",
+  // "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 6, // es6 = es2015
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "impliedStrict": true,
-    "sourceType": "module", // script | module
     "project": "./tsconfig.json" // NOTE important, ts项目用
   },
   // 不需要 eslint 检查的文件
@@ -105,13 +97,7 @@ eslint-config-airbnb-typescript:
     "max-len": ["warn", { "code": 120 }],
     "max-lines": ["warn", 500], // 文件不超过 n 行
 
-    // js 专用
-    // "no-use-before-define": [
-    //   "error",
-    //   { "functions": false, "classes": true, "variables": true }
-    // ],
-
-    // TS
+    // TS 专用
     // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/member-ordering.md
     "@typescript-eslint/member-ordering": "warn", // class 中 member 排序
     "@typescript-eslint/consistent-type-definitions": "error", // 使用统一的类型定义
