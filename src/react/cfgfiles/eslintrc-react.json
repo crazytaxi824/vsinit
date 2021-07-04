@@ -60,8 +60,6 @@ eslint-config-airbnb-typescript:
   // 不需要 eslint 检查的文件
   "ignorePatterns": [
     ".vscode",
-    "out",
-    "dist",
     "node_modules",
     "**/vendor/",
     "/coverage", // jest --coverage

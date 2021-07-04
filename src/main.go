@@ -12,6 +12,7 @@ import (
 	"local/src/golang"
 	"local/src/js"
 	"local/src/python"
+	"local/src/react"
 	"local/src/ts"
 	"local/src/util"
 )
@@ -62,6 +63,8 @@ func initCommand(gofs util.GoFlags, tsjs util.TSJSFlags) (suggestions []*util.Su
 		suggestions, err = ts.InitProject(tsjs)
 	case "js":
 		suggestions, err = js.InitProject(tsjs)
+	case "react":
+		suggestions, err = react.InitProject()
 	default:
 		util.HelpMsg()
 		os.Exit(2)
