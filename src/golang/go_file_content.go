@@ -22,7 +22,7 @@ var (
 	//go:embed cfgfiles/gitignore
 	gitignore []byte
 
-	//go:embed golangci-lint/golangci.yml
+	//go:embed cfgfiles/golangci.yml
 	golangciYML []byte
 )
 
