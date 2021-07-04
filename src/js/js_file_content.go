@@ -31,7 +31,7 @@ var (
 	//go:embed cfgfiles/example.test.js
 	exampleTestJS []byte
 
-	//go:embed eslint/eslintrc-js.json
+	//go:embed cfgfiles/eslintrc-js.json
 	eslintrcJSON []byte
 )
 

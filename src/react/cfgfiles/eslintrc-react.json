@@ -37,9 +37,9 @@ eslint-config-airbnb-typescript:
 {
   "extends": [
     // "eslint:recommended",
-    // "airbnb/hooks", // react 用
-    // "airbnb-typescript", // ts 用, with react
-    "airbnb-typescript/base", // ts 用
+    // "airbnb-typescript/base", // ts 用
+    "airbnb/hooks", // react 用
+    "airbnb-typescript", // ts 用, with react
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:jest/recommended",
@@ -60,8 +60,6 @@ eslint-config-airbnb-typescript:
   // 不需要 eslint 检查的文件
   "ignorePatterns": [
     ".vscode",
-    "out",
-    "dist",
     "node_modules",
     "**/vendor/",
     "/coverage", // jest --coverage
@@ -74,30 +72,22 @@ eslint-config-airbnb-typescript:
     "@typescript-eslint/no-unused-vars": "off", // DEBUG，未使用的 var 和 function
 
     // 以下为常用 lint.
-    "no-prototype-builtins": "off",
-    "import/prefer-default-export": "off",
-    "import/extensions": [
-      "error", // error 警告
-      "never", // import 的时候不需要文件后缀名，除了 json 文件外
-      {
-        "ignorePackages": true, // import package 不需要后缀名
-        "pattern": { "json": "always" } // import json 文件需要写后缀名
-      }
-    ],
-    // "import/no-default-export": "error", // 没有 export default 在文件中。
+    "no-prototype-builtins": "off", // Too restrictive
+    "import/prefer-default-export": "off", // 优先使用 export default: off
+    "import/no-default-export": "warn", // 不允许使用 export default
     "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
     "complexity": "warn", // default 20
     "no-param-reassign": "off", // 不能给函数入参赋值，引用类型应该可以赋值。
 
     // NOTE react use only
-    // "react/destructuring-assignment": "off",
-    // "react/jsx-filename-extension": "off",
+    "react/destructuring-assignment": "off", // Too restrictive
+    "react/jsx-filename-extension": "off", // no .jsx extension
 
     // 功能检查
     "max-len": ["warn", { "code": 120 }],
     "max-lines": ["warn", 500], // 文件不超过 n 行
 
-    // TS 专用
+    // TS
     // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/member-ordering.md
     "@typescript-eslint/member-ordering": "warn", // class 中 member 排序
     "@typescript-eslint/consistent-type-definitions": "error", // 使用统一的类型定义
@@ -124,12 +114,6 @@ eslint-config-airbnb-typescript:
         }
       }
     ]
-  },
-  // VVI set jest version
-  "settings": {
-    "jest": {
-      "version": 27
-    }
   },
   "overrides": [
     {
