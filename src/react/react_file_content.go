@@ -86,17 +86,24 @@ func InitProject() ([]*util.Suggestion, error) {
 		return nil, err
 	}
 
-	// 返回 suggestion
-	if len(ff.Suggestions()) > 0 {
-		return ff.Suggestions(), nil
+	// 写入所需文件
+	fmt.Println("init TypeScript project")
+	if err := ff.WriteAllFiles(); err != nil {
+		return nil, err
 	}
 
-	return nil, nil
+	// 安装所有缺失的依赖
+	if err := ff.InstallMissingDependencies(); err != nil {
+		return nil, err
+	}
+
+	// 返回 suggestion
+	return ff.Suggestions(), nil
 }
 
 // .gitignore 添加 /.vscode /eslintrc-react.json
 func changeGitignore(ff *util.FoldersAndFiles) error {
-	gf, err := os.Open("./gitignore")
+	gf, err := os.Open(util.GitignorePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
@@ -189,6 +196,6 @@ func checkTsconfig(ff *util.FoldersAndFiles) error {
 func packageSuggestion(ff *util.FoldersAndFiles) {
 	ff.AddSuggestions(&util.Suggestion{
 		Problem:  "please add following to 'package.json' eslintConfig.extends:",
-		Solution: ".\"" + eslintFilePath + "\"",
+		Solution: "\"." + eslintFilePath + "\"",
 	})
 }
