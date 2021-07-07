@@ -40,8 +40,10 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
     "**/*.config.js"
   ],
   "rules": {
-    "no-console": 0, // DEBUG use only.
+    // DEBUG use only，生产模式需要设置为 error
+    "no-console": 0, // console 打印
 
+    // 代码规范，不影响程序执行
     "no-prototype-builtins": "off", // Too restrictive
     "import/prefer-default-export": "off", // 优先使用 export default: off
     "import/no-default-export": "warn", // 不允许使用 export default
@@ -50,7 +52,7 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
       "always", // import 文件的时候需要后缀名
       { "ignorePackages": true } // import package 不需要后缀名
     ],
-    "no-bitwise": "off", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
+    "no-bitwise": "warn", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
     "complexity": "warn", // default 20
     "no-param-reassign": "off", // 不能给函数入参赋值，引用类型应该可以赋值。
 
