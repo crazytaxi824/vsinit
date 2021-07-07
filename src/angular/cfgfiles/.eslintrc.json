@@ -58,7 +58,7 @@
         "@angular-eslint/no-empty-lifecycle-method": "warn", // ngOnInit, ngOnDestroy ... 为空函数
 
         // 代码规范，不影响执行
-        "class-methods-use-this": "warn", // class 内的 method 必须有 this
+        "class-methods-use-this": "off", // class 内的 method 必须有 this
         "no-bitwise": "warn", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
         "complexity": "warn", // default 20
         "no-param-reassign": "off", // 不能给函数入参赋值。
