@@ -101,7 +101,7 @@ func InitProject() ([]*util.Suggestion, error) {
 	return ff.Suggestions(), nil
 }
 
-// .gitignore 添加 /.vscode /eslintrc-react.json
+// .gitignore 添加 /.vscode & /eslintrc-react.json
 func changeGitignore(ff *util.FoldersAndFiles) error {
 	gf, err := os.Open(util.GitignorePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
