@@ -54,13 +54,16 @@
         // 自己的设置
         // DEBUG use only. 生产环境下需要改为 error.
         "no-console": 0, // console 打印
+        "max-classes-per-file": "off", // 每个文件只允许一个 class
         "@typescript-eslint/no-unused-vars": "warn", // 未使用的 var 和 function
         "@angular-eslint/no-empty-lifecycle-method": "warn", // ngOnInit, ngOnDestroy ... 为空函数
 
         // 代码规范，不影响执行
+        "promise/no-promise-in-callback": "off", // 不能在回调函数中使用 Promise, 不适合 angular
         "class-methods-use-this": "off", // class 内的 method 必须有 this
         "no-bitwise": "warn", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
         "complexity": "warn", // default 20
+        "@typescript-eslint/unbound-method": "off", // 影响使用 angular Validators 表单验证
         "no-param-reassign": "off", // 不能给函数入参赋值。
         "import/prefer-default-export": "off", // 优先使用 export default: off
         "import/no-default-export": "warn", // 不允许使用 export default
@@ -71,6 +74,15 @@
           {
             "ignorePackages": true, // import package 不需要后缀名
             "pattern": { "json": "always" } // import json 文件需要写后缀名
+          }
+        ],
+        "@typescript-eslint/no-use-before-define": [
+          "error",
+          {
+            "functions": false,
+            "classes": true,
+            "variables": true,
+            "typedefs": true
           }
         ]
       }
