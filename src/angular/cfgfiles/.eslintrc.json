@@ -57,10 +57,10 @@
         "max-classes-per-file": "off", // 每个文件只允许一个 class
         "@typescript-eslint/no-unused-vars": "warn", // 未使用的 var 和 function
         "@angular-eslint/no-empty-lifecycle-method": "warn", // ngOnInit, ngOnDestroy ... 为空函数
+        "class-methods-use-this": "warn", // class 内的 method 必须有 this, 如果没有 this 可以改成 static method
 
         // 代码规范，不影响执行
         "promise/no-promise-in-callback": "off", // 不能在回调函数中使用 Promise, 不适合 angular
-        "class-methods-use-this": "off", // class 内的 method 必须有 this
         "no-bitwise": "warn", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
         "complexity": "warn", // default 20
         "@typescript-eslint/unbound-method": "off", // 影响使用 angular Validators 表单验证
