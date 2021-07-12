@@ -69,8 +69,9 @@ eslint-config-airbnb-typescript:
     "**/*.config.ts"
   ],
   "rules": {
+    // OFF = 0, WARN = 1, ERROR = 2;
     // DEBUG use only，生产模式需要设置为 error
-    "no-console": 0, // console 打印
+    "no-console": "off", // console 打印
     "@typescript-eslint/no-unused-vars": "off", // 未使用的 var 和 function
 
     // 代码规范，不影响程序执行

@@ -51,9 +51,9 @@
             "style": "kebab-case"
           }
         ],
-        // 自己的设置
-        // DEBUG use only. 生产环境下需要改为 error.
-        "no-console": 0, // console 打印
+        // 自己的设置, OFF = 0, WARN = 1, ERROR = 2;
+        // DEBUG use only，生产模式需要设置为 error
+        "no-console": "off", // console 打印
         "max-classes-per-file": "off", // 每个文件只允许一个 class
         "@typescript-eslint/no-unused-vars": "warn", // 未使用的 var 和 function
         "@angular-eslint/no-empty-lifecycle-method": "warn", // ngOnInit, ngOnDestroy ... 为空函数

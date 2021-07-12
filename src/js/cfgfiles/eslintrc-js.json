@@ -40,8 +40,9 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
     "**/*.config.js"
   ],
   "rules": {
+    // OFF = 0, WARN = 1, ERROR = 2;
     // DEBUG use only，生产模式需要设置为 error
-    "no-console": 0, // console 打印
+    "no-console": "off", // console 打印
 
     // 代码规范，不影响程序执行
     "no-prototype-builtins": "off", // Too restrictive
