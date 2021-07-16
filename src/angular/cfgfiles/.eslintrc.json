@@ -1,4 +1,4 @@
-// .eslintrc.json 是 angular 命令行 'ng add @angular-eslint/schematics' 生成的
+// .eslintrc.json 是 angular 命令行 'ng add @angular-eslint/schematics' 生成的, 只需要修改就可以了
 // angular 测试工具是 karma，所以不需要下载 jest
 // 下载依赖：
 //  - "@typescript-eslint/eslint-plugin"

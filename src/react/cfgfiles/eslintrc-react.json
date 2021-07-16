@@ -83,6 +83,7 @@ eslint-config-airbnb-typescript:
     // NOTE react use only
     "react/destructuring-assignment": "off", // Too restrictive
     "react/jsx-filename-extension": "off", // no .jsx extension
+    "react/jsx-props-no-spreading": "off", // 不允许使用展开模式 {...props}
     // 解决 formik 自定义 Field work with label 的问题, depth 默认为 2
     "jsx-a11y/label-has-associated-control": ["error", { "depth": 3 }],
 
