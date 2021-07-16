@@ -25,6 +25,7 @@ var eslintDependencies = []string{
 	"eslint-plugin-jest",               // jest unit test
 	"eslint-plugin-promise",            // promise 用法
 	"eslint-config-prettier",           // 解决 vscode 插件中 prettier 造成的代码问题
+	"@types/react-router-dom",          // react-router-dom typescript
 }
 
 var ErrCreateReactFirst = errors.New("need to create-react-app first")
