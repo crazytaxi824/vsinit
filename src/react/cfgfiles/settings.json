@@ -21,6 +21,14 @@
     "source.fixAll.eslint": true
   },
 
+  // 单独设置 eslint 配置文件
+  "eslint.options": {
+    // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用。
+    // https://eslint.org/docs/developer-guide/nodejs-api#cliengine
+    // eslint 配置文件地址
+    "configFile": "${configPlaceHolder}"
+  },
+
   // search.exclude 用来忽略搜索的文件夹
   // files.exclude 用来忽略工程打开的文件夹
   // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，

@@ -16,6 +16,7 @@ import (
 	"io"
 	"local/src/util"
 	"os"
+	"path/filepath"
 )
 
 // eslint dependencies
@@ -42,13 +43,15 @@ var (
 
 	// ESLint 配置文件名
 	eslintFilePath = "/eslintrc-react.json" // NOTE JS 要改
+
+	// setting.json 文件中 "eslint.options{configFile}" 的占位符
+	configPlaceHolder = "${configPlaceHolder}" // eslint config 地址占位符
 )
 
 var (
 	createFolders = []string{".vscode"}
 
 	filesAndContent = []util.FileContent{
-		{Path: util.SettingsJSONPath, Content: settingsJSON},
 		{Path: "eslintrc-react.json", Content: eslintrcJSON},
 	}
 )
@@ -66,8 +69,14 @@ func InitProject() ([]*util.Suggestion, error) {
 	// 添加 .vscode/settings.json, eslintrc-react.json 文件
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
+	// 添加 setting 文件
+	err := addSettingJSON(ff)
+	if err != nil {
+		return nil, err
+	}
+
 	// 修改 gitignore 文件
-	err := changeGitignore(ff)
+	err = changeGitignore(ff)
 	if err != nil {
 		return nil, err
 	}
@@ -207,4 +216,19 @@ func packageSuggestion(ff *util.FoldersAndFiles) {
     }
   },`,
 	})
+}
+
+func addSettingJSON(ff *util.FoldersAndFiles) error {
+	// 获取项目的绝对地址
+	projectPath, err := filepath.Abs(".")
+	if err != nil {
+		return err
+	}
+
+	ff.AddFiles(util.FileContent{
+		Path:    util.SettingsJSONPath,
+		Content: bytes.ReplaceAll(settingsJSON, []byte(configPlaceHolder), []byte(projectPath+eslintFilePath)),
+	})
+
+	return nil
 }
