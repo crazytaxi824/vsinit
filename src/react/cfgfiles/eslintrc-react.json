@@ -73,7 +73,7 @@ eslint-config-airbnb-typescript:
     "@typescript-eslint/no-unused-vars": "off", // 未使用的 var 和 function
 
     // 代码规范，不影响程序执行
-    "no-prototype-builtins": "off", // Too restrictive
+    // "no-prototype-builtins": "off", // Too restrictive
     "import/prefer-default-export": "off", // 优先使用 export default: off
     "import/no-default-export": "warn", // 不允许使用 export default
     "no-bitwise": "warn", // 不允许使用特殊运算符 &, &=, |, |=, ^, ^=, <<, <<=, >>, >>=, >>>, >>>=, ~
@@ -95,7 +95,7 @@ eslint-config-airbnb-typescript:
     // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/member-ordering.md
     "@typescript-eslint/member-ordering": "warn", // class 中 member 排序
     "@typescript-eslint/consistent-type-definitions": "error", // 使用统一的类型定义
-    "@typescript-eslint/lines-between-class-members": "off", // class 内属性必须空一行
+    "@typescript-eslint/lines-between-class-members": "off", // class 内属性定义之间必须空一行
     "@typescript-eslint/no-use-before-define": [
       "error",
       {

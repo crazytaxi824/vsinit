@@ -196,7 +196,15 @@ func checkTsconfig(ff *util.FoldersAndFiles) error {
 // 建议修改 package.json 文件，package.json 里面可能会有很多东西需要调整，就不用程序调整了。
 func packageSuggestion(ff *util.FoldersAndFiles) {
 	ff.AddSuggestions(&util.Suggestion{
-		Problem:  "please add following to 'package.json' eslintConfig.extends:",
-		Solution: "\"." + eslintFilePath + "\"",
+		Problem: "please add following to 'package.json' eslintConfig:",
+		Solution: `  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": "off"
+    }
+  },`,
 	})
 }
