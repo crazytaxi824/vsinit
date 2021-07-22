@@ -16,6 +16,7 @@ import (
 	"io"
 	"local/src/util"
 	"os"
+	"path/filepath"
 )
 
 // eslint dependencies
@@ -25,6 +26,7 @@ var eslintDependencies = []string{
 	"eslint-plugin-jest",               // jest unit test
 	"eslint-plugin-promise",            // promise 用法
 	"eslint-config-prettier",           // 解决 vscode 插件中 prettier 造成的代码问题
+	"@types/react-router-dom",          // react-router-dom typescript
 }
 
 var ErrCreateReactFirst = errors.New("need to create-react-app first")
@@ -41,13 +43,15 @@ var (
 
 	// ESLint 配置文件名
 	eslintFilePath = "/eslintrc-react.json" // NOTE JS 要改
+
+	// setting.json 文件中 "eslint.options{configFile}" 的占位符
+	configPlaceHolder = "${configPlaceHolder}" // eslint config 地址占位符
 )
 
 var (
 	createFolders = []string{".vscode"}
 
 	filesAndContent = []util.FileContent{
-		{Path: util.SettingsJSONPath, Content: settingsJSON},
 		{Path: "eslintrc-react.json", Content: eslintrcJSON},
 	}
 )
@@ -65,8 +69,14 @@ func InitProject() ([]*util.Suggestion, error) {
 	// 添加 .vscode/settings.json, eslintrc-react.json 文件
 	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
+	// 添加 setting 文件
+	err := addSettingJSON(ff)
+	if err != nil {
+		return nil, err
+	}
+
 	// 修改 gitignore 文件
-	err := changeGitignore(ff)
+	err = changeGitignore(ff)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +205,30 @@ func checkTsconfig(ff *util.FoldersAndFiles) error {
 // 建议修改 package.json 文件，package.json 里面可能会有很多东西需要调整，就不用程序调整了。
 func packageSuggestion(ff *util.FoldersAndFiles) {
 	ff.AddSuggestions(&util.Suggestion{
-		Problem:  "please add following to 'package.json' eslintConfig.extends:",
-		Solution: "\"." + eslintFilePath + "\"",
+		Problem: "please add following to 'package.json' eslintConfig:",
+		Solution: `  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "@typescript-eslint/no-unused-vars": "off"
+    }
+  },`,
 	})
+}
+
+func addSettingJSON(ff *util.FoldersAndFiles) error {
+	// 获取项目的绝对地址
+	projectPath, err := filepath.Abs(".")
+	if err != nil {
+		return err
+	}
+
+	ff.AddFiles(util.FileContent{
+		Path:    util.SettingsJSONPath,
+		Content: bytes.ReplaceAll(settingsJSON, []byte(configPlaceHolder), []byte(projectPath+eslintFilePath)),
+	})
+
+	return nil
 }
