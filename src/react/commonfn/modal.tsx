@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const Modal = React.forwardRef(
+export const Modal = React.forwardRef(
   (
     props: unknown,
     mRef: React.Ref<{ sendMsg: (m: string) => void }>
