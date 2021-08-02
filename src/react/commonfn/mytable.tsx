@@ -83,7 +83,7 @@ export class Table<T> {
 
     this.tableName = tableName;
 
-    // 创建 http 请求实例，⚠️⚠️⚠️ 本示例中请求未使用 auth，根据情况自行添加
+    // 创建 http 请求实例，// TODO 本示例中请求未使用身份凭证 auth，根据情况自行添加
     this.httpInstance = axios.create({ baseURL, timeout: 5000 });
 
     if (columns) {
