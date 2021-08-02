@@ -10,7 +10,8 @@ interface ITableReqOption {
   pageSize?: number;
   sortField?: string;
   sortOrder?: Order;
-  filter?: string; // TODO
+  // TODO 本示例未实现 filter，根据项目实际情况实现 filter
+  filter?: string; 
 }
 
 // 数据结构，用于接受 http 数据
