@@ -1,13 +1,13 @@
 {
   // 选择 python version
-  "python.pythonPath": "/usr/local/bin/python3",
+  "python.defaultInterpreterPath": "/usr/local/bin/python3",
 
   // python linter
   "python.linting.flake8Enabled": true,
   "python.linting.mypyEnabled": true,
   "python.linting.pylintEnabled": false,
   "python.languageServer": "Pylance",
-  "python.formatting.provider": "autopep8", // default
+  // "python.formatting.provider": "autopep8", // default value
   "[python]": {
     // "editor.formatOnSave": true,
     "editor.defaultFormatter": "ms-python.python" // python 不能用 prettier 格式化
