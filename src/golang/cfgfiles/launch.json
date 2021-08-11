@@ -5,7 +5,7 @@
     {
       "name": "Auto Main",
       "type": "go",
-      "request": "launch", // attach | launch
+      "request": "launch", // attach(远程debug) | launch
       "mode": "auto",
       "debugAdapter": "legacy", // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式。
       "host": "127.0.0.1", // debug server addr
