@@ -92,7 +92,7 @@ function CustomErrorOverlay() {
 
 // footer 显示 page 和 pageSize
 function CustomFooter(props: { table: Table<ITableData> }) {
-  // ⚠️⚠️⚠️ state & apiRef 中是 <DataGrid> forwardRef 过来的内置属性和方法!!
+  // ⚠️⚠️⚠️ useGridSlotComponentProps() 可以获取 DataGrid 内置的方法和属性。
   const { state, apiRef } = useGridSlotComponentProps();
 
   return (

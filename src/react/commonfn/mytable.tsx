@@ -6,11 +6,12 @@ type Order = 'asc' | 'desc' | null | undefined;
 
 // 用于数据请求
 interface ITableReqOption {
-  page?: number;
-  pageSize?: number;
+  page: number;
+  pageSize: number;
   sortField?: string;
   sortOrder?: Order;
-  filter?: string; // TODO
+  // TODO 本示例未实现 filter，根据项目实际情况实现 filter
+  filter?: string; 
 }
 
 // 数据结构，用于接受 http 数据
@@ -37,6 +38,9 @@ export class Table<T> {
   // columns 一旦实例化不可修改
   private readonly columns?: string;
 
+  // axios 请求实例, 一旦实例化不可修改
+  private readonly httpInstance: AxiosInstance;
+
   // 默认请求数据
   private req: ITableReqOption = {
     page: 0, // page 从 0 开始计算，否则 <DataGrid> 中 rowCount 属性工作不正常。
@@ -57,9 +61,6 @@ export class Table<T> {
     editable: true, // data cell 是否可以编辑
     selection: true, // 是否显示 select 勾选框
   };
-
-  // axios 请求实例
-  private httpInstance: AxiosInstance;
 
   // ⚠️ delay 请求，如果限时时间内重新发起请求用 clearTimeout() 方法终止之前的 http 请求。
   private delayHttpReq?: NodeJS.Timeout;
@@ -83,7 +84,7 @@ export class Table<T> {
 
     this.tableName = tableName;
 
-    // 创建 http 请求实例，⚠️⚠️⚠️ 本示例中请求未使用 auth，根据情况自行添加
+    // 创建 http 请求实例，// TODO 本示例中请求未使用身份凭证 auth，根据情况自行添加
     this.httpInstance = axios.create({ baseURL, timeout: 5000 });
 
     if (columns) {
@@ -109,7 +110,11 @@ export class Table<T> {
 
   // ⚠️ 请求 list 数据, 使用延迟发送, 减少请求次数。
   getList(
-    config: { api?: string; reqOpt?: ITableReqOption; delay?: number } = {
+    config: {
+      api?: string;
+      reqOpt?: Partial<ITableReqOption>;
+      delay?: number;
+    } = {
       api: '',
       delay: 300,
     }
@@ -190,14 +195,12 @@ export class Table<T> {
 
   // update Item, 使用 cacheUpdateItems 缓存需要更新的数据
   addUpdateItems(item: { id: string; field: string; value: unknown }): void {
-    const editItem = {};
-
-    // 反射赋值给 object
-    Reflect.set(editItem, item.field, item.value);
     // 记录到 cacheUpdateItems
     this.cacheUpdateItems[item.id] = {
       ...this.cacheUpdateItems[item.id],
-      ...editItem,
+
+      // ⚠️ 使用 item.field 的值作为 key 的写法
+      ...{ [item.field]: item.value },
     };
 
     // DEBUG
@@ -261,6 +264,7 @@ export class Table<T> {
   }
 
   // ⚠️ 使用 Readonly 返回 table 数据拷贝，确保 table 属性不会被外部更改。
+  // ⚠️ ReadOnly<Table> 只能保护Table属性不会修改，不能保护Table子层级属性不被修改。
   get view(): Readonly<ITableReqOption & ITableResp<T>> {
     return { ...this.req, ...this.resp };
   }
