@@ -5,11 +5,12 @@
     {
       "name": "Auto Main",
       "type": "go",
-      "request": "launch",
+      "request": "launch", // attach | launch
       "mode": "auto",
-      "cwd": "${workspaceRoot}", // 只在 debug 模式时有用
+      "debugAdapter": "legacy", // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式。
       "host": "127.0.0.1", // debug server addr
-      "port": 12345, // debug server port
+      "port": 54321, // debug server port
+      "cwd": "${workspaceRoot}", // current working directory, 执行 debug 的目录
       "program": "${workspaceRoot}/src", // main.go 路径
       // 传入的 enviroment 参数, 程序中可以通过 os.Environ() 获取
       //   "env": { "GO111MODULE": "on" },
