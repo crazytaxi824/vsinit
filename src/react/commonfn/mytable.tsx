@@ -195,14 +195,12 @@ export class Table<T> {
 
   // update Item, 使用 cacheUpdateItems 缓存需要更新的数据
   addUpdateItems(item: { id: string; field: string; value: unknown }): void {
-    const editItem = {};
-
-    // 反射赋值给 object
-    Reflect.set(editItem, item.field, item.value);
     // 记录到 cacheUpdateItems
     this.cacheUpdateItems[item.id] = {
       ...this.cacheUpdateItems[item.id],
-      ...editItem,
+
+      // ⚠️ 使用 item.field 的值作为 key 的写法
+      ...{ [item.field]: item.value },
     };
 
     // DEBUG
