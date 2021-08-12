@@ -1,22 +1,27 @@
 {
-  // plugins:gopls,gopkgs,go-outline,gotests,gomodifytags,impl,dlv,golangci-lint
+  // plugins:gopls,gopkgs,go-outline,gotests,gomodifytags,impl,dlv,dlv-dap,golangci-lint
   "version": "0.2.0",
   "configurations": [
     {
       "name": "Auto Main",
       "type": "go",
-      "request": "launch", // attach | launch
+      "request": "launch", // attach(远程debug) | launch
       "mode": "auto",
-      "debugAdapter": "legacy", // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式。
       "host": "127.0.0.1", // debug server addr
       "port": 54321, // debug server port
       "cwd": "${workspaceRoot}", // current working directory, 执行 debug 的目录
       "program": "${workspaceRoot}/src", // main.go 路径
+
       // 传入的 enviroment 参数, 程序中可以通过 os.Environ() 获取
       //   "env": { "GO111MODULE": "on" },
       // 编译后的程序运行所需参数，通过 flag.Parse() / os.Args 设置/获取
       //   "args": ["-c", "/xxx/config.yml"],
+
       "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
+
+      // 以下是显示 debug 程序时的日志
+      // "trace": "log",
+      // "logOutput": "rpc,debugger,dap",
       "showLog": true // show logs in debug mode
     }
   ]
