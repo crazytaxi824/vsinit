@@ -8,7 +8,7 @@
       "request": "launch", // attach(远程debug) | launch
       "mode": "auto",
       "host": "127.0.0.1", // debug server addr
-      "port": 54321, // debug server port
+      // "port": 12345, // debug server port
       "cwd": "${workspaceRoot}", // current working directory, 执行 debug 的目录
       "program": "${workspaceRoot}/src", // main.go 路径
 
