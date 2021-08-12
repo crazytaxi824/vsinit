@@ -38,6 +38,12 @@
   // gotests 打印详请
   "go.testFlags": ["-v"],
 
+  // dlv debug 设置, go 插件 v0.27.0 默认使用 dlv-dap
+  "go.delveConfig": {
+    "showGlobalVariables": true, // debug 时显示全局变量
+    "debugAdapter": "legacy" // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式。
+  },
+
   // gomodifytags json 配置, 改之前看文档
   // https://github.com/golang/vscode-go/blob/HEAD/docs/settings.md
   "go.addTags": {
