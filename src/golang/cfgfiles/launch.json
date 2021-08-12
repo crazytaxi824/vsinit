@@ -20,9 +20,9 @@
       "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
 
       // 以下是显示 debug 程序时的日志
-      // "trace": "log",
-      // "logOutput": "rpc,debugger,dap",
-      "showLog": true // show logs in debug mode
+      // "trace": "verbose", // 日志打印级别，默认 error 级别
+      // "logOutput": "rpc,debugger,dap", // 日志打印内容
+      "showLog": true // 打印日志到 console
     }
   ]
 }
