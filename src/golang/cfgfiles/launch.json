@@ -5,7 +5,7 @@
     {
       "name": "Auto Main",
       "type": "go",
-      "request": "launch", // attach(远程debug) | launch
+      "request": "launch",
       "mode": "auto",
       "cwd": "${workspaceRoot}", // current working directory, 执行 debug 的目录
       "program": "${workspaceRoot}/src", // main.go 路径
@@ -23,9 +23,9 @@
       "showLog": true // 打印日志到 console
     },
     {
-      "name": "Attach running process Pid",
+      "name": "Debug Running Process - Pid",
       "type": "go",
-      "request": "attach", // attach(远程debug) | launch
+      "request": "attach",
       "mode": "local", // 连接本地已运行程序
 
       "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
@@ -36,9 +36,9 @@
       "showLog": true // 打印日志到 console
     },
     {
-      "name": "Remote Debugging",
+      "name": "Debug Remote Process",
       "type": "go",
-      "request": "attach", // attach(远程debug) | launch
+      "request": "attach",
       "mode": "remote", // 连接远程服务器
       "host": "192.168.x.x", // debug server addr
       "port": 12345, // debug server port
