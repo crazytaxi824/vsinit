@@ -40,18 +40,18 @@
 
   // dlv debug 设置, go 插件 v0.27.0 默认使用 dlv-dap
   "go.delveConfig": {
-    "showGlobalVariables": true, // debug 时显示全局变量
-    "debugAdapter": "legacy" // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式。
+    // "debugAdapter": "legacy", // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式。
+    "showGlobalVariables": true // debug 时显示全局变量
   },
 
   // gomodifytags json 配置, 改之前看文档
   // https://github.com/golang/vscode-go/blob/HEAD/docs/settings.md
   "go.addTags": {
     "tags": "json",
-    "options": /* omg*/ "json=omitempty",
+    "options": "json=omitempty",
     "promptForTags": true, // user tags
     "template": "",
-    "transform": "snakecase"
+    "transform": "camelcase"
   },
 ${golangcilintPlaceHolder}
   // search.exclude 用来忽略搜索的文件夹
