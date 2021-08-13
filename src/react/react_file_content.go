@@ -66,52 +66,52 @@ func InitProject() ([]*util.Suggestion, error) {
 	}
 
 	// 添加 .vscode/settings.json, eslintrc-react.json 文件
-	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
+	ctx := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
 	// 添加 setting 文件
-	err := addSettingJSON(ff)
+	err := addSettingJSON(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// 修改 gitignore 文件
-	err = changeGitignore(ff)
+	err = changeGitignore(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// 修改 tsconfig.json 文件
-	err = checkTsconfig(ff)
+	err = checkTsconfig(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// 修改 package.json 文件
-	packageSuggestion(ff)
+	packageSuggestion(ctx)
 
 	// 下载 dependencies
-	err = ff.AddMissingDependencies(eslintDependencies, "package.json", "")
+	err = ctx.AddMissingDependencies(eslintDependencies, "package.json", "")
 	if err != nil {
 		return nil, err
 	}
 
 	// 写入所需文件
 	fmt.Println("init TypeScript project")
-	if err := ff.WriteAllFiles(); err != nil {
+	if err := ctx.WriteAllFiles(); err != nil {
 		return nil, err
 	}
 
 	// 安装所有缺失的依赖
-	if err := ff.InstallMissingDependencies(); err != nil {
+	if err := ctx.InstallMissingDependencies(); err != nil {
 		return nil, err
 	}
 
 	// 返回 suggestion
-	return ff.Suggestions(), nil
+	return ctx.Suggestions(), nil
 }
 
 // .gitignore 添加 /.vscode & /eslintrc-react.json
-func changeGitignore(ff *util.FoldersAndFiles) error {
+func changeGitignore(ctx *util.VSContext) error {
 	gf, err := os.Open(util.GitignorePath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
@@ -127,7 +127,7 @@ func changeGitignore(ff *util.FoldersAndFiles) error {
 	// 内容添加在最后
 	r = append(r, []byte("\n# dev environment\n/.vscode\n"+eslintFilePath+"\n")...)
 
-	ff.AddFiles(util.FileContent{
+	ctx.AddFiles(util.FileContent{
 		Path:      util.GitignorePath,
 		Content:   r,
 		Overwrite: true,
@@ -158,7 +158,7 @@ type tsconfig struct {
 }
 
 // 主要目的是为了检查 create-react-app 新版本中对 tsconfig.json 是否有调整。
-func checkTsconfig(ff *util.FoldersAndFiles) error {
+func checkTsconfig(ctx *util.VSContext) error {
 	tf, err := os.Open("tsconfig.json")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
@@ -183,7 +183,7 @@ func checkTsconfig(ff *util.FoldersAndFiles) error {
 	de.DisallowUnknownFields() // 如果 json 中有字段而结构体中没有则会报错
 	err = de.Decode(&tsc)
 	if err != nil {
-		ff.AddSuggestions(&util.Suggestion{
+		ctx.AddSuggestions(&util.Suggestion{
 			Problem: fmt.Sprintf("error: %s, please add following to 'tsconfig.json' file", err.Error()),
 			Solution: `"noImplicitReturns": true, // 强制定义出参类型
 			"exclude": ["node_modules", "**/*.spec.ts", "**/*.config.js"]`,
@@ -192,7 +192,7 @@ func checkTsconfig(ff *util.FoldersAndFiles) error {
 	}
 
 	// 如果没有问题，则直接写入新的 tsconfig.json 文件
-	ff.AddFiles(util.FileContent{
+	ctx.AddFiles(util.FileContent{
 		Path:      "tsconfig.json",
 		Content:   tsconfigJSON,
 		Overwrite: true,
@@ -202,8 +202,8 @@ func checkTsconfig(ff *util.FoldersAndFiles) error {
 }
 
 // 建议修改 package.json 文件，package.json 里面可能会有很多东西需要调整，就不用程序调整了。
-func packageSuggestion(ff *util.FoldersAndFiles) {
-	ff.AddSuggestions(&util.Suggestion{
+func packageSuggestion(ctx *util.VSContext) {
+	ctx.AddSuggestions(&util.Suggestion{
 		Problem: "please add following to 'package.json' eslintConfig:",
 		Solution: `  "eslintConfig": {
     "extends": [
@@ -217,14 +217,14 @@ func packageSuggestion(ff *util.FoldersAndFiles) {
 	})
 }
 
-func addSettingJSON(ff *util.FoldersAndFiles) error {
+func addSettingJSON(ctx *util.VSContext) error {
 	// 获取项目的绝对地址
 	projectPath, err := filepath.Abs(".")
 	if err != nil {
 		return err
 	}
 
-	ff.AddFiles(util.FileContent{
+	ctx.AddFiles(util.FileContent{
 		Path:    util.SettingsJSONPath,
 		Content: bytes.ReplaceAll(settingsJSON, []byte(configPlaceHolder), []byte(projectPath+eslintFilePath)),
 	})

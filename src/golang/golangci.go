@@ -41,7 +41,7 @@ var golangcilintconfig = `  // golangci-lint 设置
 //  - 如果 vsi-config.json 不存在，生成 vsi-config.json, golangci.yml 文件.
 //  - 如果 vsi-config.json 存在，但是没有设置 golangci 配置文件地址，则 overwite vsi-config.json, golangci.yml 文件.
 //  - 如果 vsi-config.json 存在，同时也设置了 golangci 配置文件地址，直接读取配置文件地址.
-func readCilintPathFromVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string) error {
+func readCilintPathFromVsiCfgJSON(ctx *util.VSContext, vsiDir string) error {
 	// 读取 ~/.vsi/vsi-config.json 文件
 	var vsiCfgJSON util.VsiConfigJSON
 	err := vsiCfgJSON.ReadFromDir(vsiDir)
@@ -49,37 +49,37 @@ func readCilintPathFromVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string) error
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsi/vsi-config.json 文件不存在, 则生成该文件.
-		return addVsiCfgJSON(ff, vsiDir, vsiCfgJSON, false)
+		return addVsiCfgJSON(ctx, vsiDir, vsiCfgJSON, false)
 	}
 
 	// 检查 golangci 设置
 	if vsiCfgJSON.Golangci == "" {
 		// 没有设置 golangci-lint 的情况, //NOTE overwrite vsi-config.json 文件.
-		return addVsiCfgJSON(ff, vsiDir, vsiCfgJSON, true)
+		return addVsiCfgJSON(ctx, vsiDir, vsiCfgJSON, true)
 	}
 
 	// 已经设置 golangci-lint，直接返回已有的 golangci lint 配置文件地址
-	ff.SetLintPath(vsiCfgJSON.Golangci)
+	ctx.SetLintPath(vsiCfgJSON.Golangci)
 	return nil
 }
 
 // 添加 ~/.vsi/vsi-config.json 文件
-func addVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string, vsiCfgJSON util.VsiConfigJSON, overwrite bool) error {
+func addVsiCfgJSON(ctx *util.VSContext, vsiDir string, vsiCfgJSON util.VsiConfigJSON, overwrite bool) error {
 	// 全局设置需要多添加多个 folder.
-	ff.AddFolders(vsiDir, vsiDir+golangciDirector)
+	ctx.AddFolders(vsiDir, vsiDir+golangciDirector)
 
 	// 设置 vsi-config 文件之前需要生成 golangci.yml 文件, 并获取文件地址.
-	ff.AddLintConfigAndLintPath(vsiDir+golangciDirector+cilintFilePath, golangciYML)
+	ctx.AddLintConfigAndLintPath(vsiDir+golangciDirector+cilintFilePath, golangciYML)
 
 	// 设置 vsi-config.json 文件中的 golangci 配置文件地址
-	vsiCfgJSON.Golangci = ff.LintPath()
+	vsiCfgJSON.Golangci = ctx.LintPath()
 
 	b, er := vsiCfgJSON.JSONIndentFormat()
 	if er != nil {
 		return er
 	}
 
-	ff.AddFiles(util.FileContent{
+	ctx.AddFiles(util.FileContent{
 		Path:      vsiDir + util.VsiConfigFilePath,
 		Content:   b,
 		Overwrite: overwrite,
@@ -89,10 +89,10 @@ func addVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string, vsiCfgJSON util.VsiC
 }
 
 // 添加 .vscode/settings.json 文件，如果文件存在则给出建议
-func addSettingJSON(ff *util.FoldersAndFiles) error {
-	if ff.LintPath() == "" {
+func addSettingJSON(ctx *util.VSContext) error {
+	if ctx.LintPath() == "" {
 		// 不设置 golangci-lint 的情况
-		ff.AddFiles(newSettingsJSONwith(""))
+		ctx.AddFiles(newSettingsJSONwith(""))
 		return nil
 	}
 
@@ -108,21 +108,21 @@ func addSettingJSON(ff *util.FoldersAndFiles) error {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// settings.json 不存在, 生成新的 settings.json 文件
-		ff.AddFiles(newSettingsJSONwith(ff.LintPath()))
+		ctx.AddFiles(newSettingsJSONwith(ctx.LintPath()))
 		return nil
 	}
 
 	// 判断 --config 地址是否和要设置的 cipath 相同, 如果相同则不更新 setting 文件。
 	for _, v := range settings.GolingFlags {
-		if v == "--config="+ff.LintPath() { // 相同的路径
+		if v == "--config="+ctx.LintPath() { // 相同的路径
 			return nil
 		}
 	}
 
 	// 如果 settings.json 文件存在，而且 config != cipath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
-	lintConfig := strings.ReplaceAll(golangcilintconfig, configPlaceHolder, ff.LintPath())
-	ff.AddSuggestions(&util.Suggestion{
+	lintConfig := strings.ReplaceAll(golangcilintconfig, configPlaceHolder, ctx.LintPath())
+	ctx.AddSuggestions(&util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
 		Solution: "{\n" + lintConfig + "\n}",
 	})

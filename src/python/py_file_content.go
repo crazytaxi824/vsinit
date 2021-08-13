@@ -44,8 +44,8 @@ func InitProject() error {
 		os.Exit(2)
 	}
 
-	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
+	ctx := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
 	fmt.Println("init Python project")
-	return ff.WriteAllFiles()
+	return ctx.WriteAllFiles()
 }

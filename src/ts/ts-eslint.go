@@ -63,7 +63,7 @@ var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于�
 //  - 如果 vsi-config.json 不存在, 则生成 vsi-config.json, eslintrc-ts.json 文件.
 //  - 如果 vsi-config.json 存在，但是没有设置 eslint.TS 配置文件地址, 则 overwite vsi-config.json, eslintrc-ts.json 文件.
 //  - 如果 vsi-config.json 存在，同时也设置了 eslint.TS 配置文件地址, 直接读取配置文件地址.
-func readEslintPathFromVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string) error {
+func readEslintPathFromVsiCfgJSON(ctx *util.VSContext, vsiDir string) error {
 	// 读取 ~/.vsi/vsi-config.json 文件
 	var vsiCfgJSON util.VsiConfigJSON
 	err := vsiCfgJSON.ReadFromDir(vsiDir)
@@ -71,37 +71,37 @@ func readEslintPathFromVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string) error
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// ~/.vsi/vsi-config.json 文件不存在, 则生成该文件.
-		return addVsiCfgJSON(ff, vsiDir, vsiCfgJSON, false)
+		return addVsiCfgJSON(ctx, vsiDir, vsiCfgJSON, false)
 	}
 
 	// 检查 eslint 设置情况
 	if vsiCfgJSON.Eslint.TS == "" { // NOTE JS 要改
 		// 没有设置 golangci-lint 的情况, //NOTE overwrite vsi-config.json 文件.
-		return addVsiCfgJSON(ff, vsiDir, vsiCfgJSON, true)
+		return addVsiCfgJSON(ctx, vsiDir, vsiCfgJSON, true)
 	}
 
 	// 已经设置 eslint，直接返回已有的 eslint 配置文件地址
-	ff.SetLintPath(vsiCfgJSON.Eslint.TS) // NOTE JS 要改
+	ctx.SetLintPath(vsiCfgJSON.Eslint.TS) // NOTE JS 要改
 	return nil
 }
 
 // 添加 ~/.vsi/vsi-config.json 文件
-func addVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string, vsiCfgJSON util.VsiConfigJSON, overwrite bool) error {
+func addVsiCfgJSON(ctx *util.VSContext, vsiDir string, vsiCfgJSON util.VsiConfigJSON, overwrite bool) error {
 	// 全局设置需要多添加多个 folder
-	ff.AddFolders(vsiDir, vsiDir+eslintDirector)
+	ctx.AddFolders(vsiDir, vsiDir+eslintDirector)
 
 	// 设置 vsi-config 文件之前需要生成 eslint 配置文件, 并获取文件地址.
-	ff.AddLintConfigAndLintPath(vsiDir+eslintDirector+eslintFilePath, eslintrcJSON)
+	ctx.AddLintConfigAndLintPath(vsiDir+eslintDirector+eslintFilePath, eslintrcJSON)
 
 	// 设置 vsi-config.json 文件中的 ESLint 配置文件地址
-	vsiCfgJSON.Eslint.TS = ff.LintPath() // NOTE JS 要改
+	vsiCfgJSON.Eslint.TS = ctx.LintPath() // NOTE JS 要改
 
 	b, er := vsiCfgJSON.JSONIndentFormat()
 	if er != nil {
 		return er
 	}
 
-	ff.AddFiles(util.FileContent{
+	ctx.AddFiles(util.FileContent{
 		Path:      vsiDir + util.VsiConfigFilePath,
 		Content:   b,
 		Overwrite: overwrite,
@@ -111,10 +111,10 @@ func addVsiCfgJSON(ff *util.FoldersAndFiles, vsiDir string, vsiCfgJSON util.VsiC
 }
 
 // 添加 .vscode/settings.json 文件，如果文件存在则给出建议
-func addSettingJSON(ff *util.FoldersAndFiles) error {
-	if ff.LintPath() == "" {
+func addSettingJSON(ctx *util.VSContext) error {
+	if ctx.LintPath() == "" {
 		// 不设置 eslint 的情况
-		ff.AddFiles(newSettingsJSONwith(""))
+		ctx.AddFiles(newSettingsJSONwith(""))
 		return nil
 	}
 
@@ -132,20 +132,20 @@ func addSettingJSON(ff *util.FoldersAndFiles) error {
 		return err
 	} else if errors.Is(err, os.ErrNotExist) {
 		// settings.json 不存在, 生成新的 settings.json 文件
-		ff.AddFiles(newSettingsJSONwith(ff.LintPath()))
+		ctx.AddFiles(newSettingsJSONwith(ctx.LintPath()))
 		return nil
 	}
 
 	// settings.json 存在的情况
 	// 判断 configFile 地址是否和要设置的 espath 相同, 如果相同则不更新 setting 文件.
-	if settings.EslintOption.ConfigFile == ff.LintPath() {
+	if settings.EslintOption.ConfigFile == ctx.LintPath() {
 		return nil
 	}
 
 	// 如果 settings.json 文件存在，而且 configFile != lintpath, 则需要 suggestion
 	// 建议手动添加设置到 .vscode/settings.json 中
-	lintConfig := strings.ReplaceAll(eslintconfig, configPlaceHolder, ff.LintPath())
-	ff.AddSuggestions(&util.Suggestion{
+	lintConfig := strings.ReplaceAll(eslintconfig, configPlaceHolder, ctx.LintPath())
+	ctx.AddSuggestions(&util.Suggestion{
 		Problem:  "please add following in '.vscode/settings.json':",
 		Solution: "{\n" + lintConfig + "\n}",
 	})

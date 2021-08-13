@@ -17,7 +17,7 @@ type FileContent struct {
 }
 
 // 在不同情况下添加不同的文件夹和文件，以便于最后统一写文件。
-type FoldersAndFiles struct {
+type VSContext struct {
 	folders     []string      // 需要创建的文件夹
 	files       []FileContent // 需要写入项目的文件
 	suggestions []*Suggestion // 需要手动设置的建议
@@ -28,48 +28,48 @@ type FoldersAndFiles struct {
 }
 
 // 初始化 FoldersAndFiles 对象
-func InitFoldersAndFiles(folders []string, files []FileContent) *FoldersAndFiles {
-	var ff FoldersAndFiles
-	ff.folders = folders
-	ff.files = files
+func InitFoldersAndFiles(folders []string, files []FileContent) *VSContext {
+	var ctx VSContext
+	ctx.folders = folders
+	ctx.files = files
 
-	return &ff
+	return &ctx
 }
 
-func (ff *FoldersAndFiles) SetLintPath(lintPath string) {
-	ff.lintPath = lintPath
+func (ctx *VSContext) SetLintPath(lintPath string) {
+	ctx.lintPath = lintPath
 }
 
-func (ff *FoldersAndFiles) LintPath() string {
-	return ff.lintPath
+func (ctx *VSContext) LintPath() string {
+	return ctx.lintPath
 }
 
-func (ff *FoldersAndFiles) AddFiles(files ...FileContent) {
-	ff.files = append(ff.files, files...)
+func (ctx *VSContext) AddFiles(files ...FileContent) {
+	ctx.files = append(ctx.files, files...)
 }
 
-func (ff *FoldersAndFiles) AddFolders(folders ...string) {
-	ff.folders = append(ff.folders, folders...)
+func (ctx *VSContext) AddFolders(folders ...string) {
+	ctx.folders = append(ctx.folders, folders...)
 }
 
-func (ff *FoldersAndFiles) AddSuggestions(sug ...*Suggestion) {
-	ff.suggestions = append(ff.suggestions, sug...)
+func (ctx *VSContext) AddSuggestions(sug ...*Suggestion) {
+	ctx.suggestions = append(ctx.suggestions, sug...)
 }
 
-func (ff *FoldersAndFiles) Suggestions() []*Suggestion {
-	if len(ff.suggestions) > 0 {
-		return ff.suggestions
+func (ctx *VSContext) Suggestions() []*Suggestion {
+	if len(ctx.suggestions) > 0 {
+		return ctx.suggestions
 	}
 
 	return nil
 }
 
-func (ff *FoldersAndFiles) _addDependencies(dependencies ...dependenciesInstall) {
-	ff.tsjs.dependencies = append(ff.tsjs.dependencies, dependencies...)
+func (ctx *VSContext) _addDependencies(dependencies ...dependenciesInstall) {
+	ctx.tsjs.dependencies = append(ctx.tsjs.dependencies, dependencies...)
 }
 
 // 添加缺失的依赖
-func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, packageJSONPath, prefix string) error {
+func (ctx *VSContext) AddMissingDependencies(dependencies []string, packageJSONPath, prefix string) error {
 	// 检查本地 package.json 文件
 	libs, err := checkMissingdependencies(dependencies, packageJSONPath)
 	if err != nil {
@@ -81,15 +81,15 @@ func (ff *FoldersAndFiles) AddMissingDependencies(dependencies []string, package
 	}
 
 	// NOTE 判断 global & prefix 是否相同，如果相同直接 append 到里面
-	for i, v := range ff.tsjs.dependencies {
+	for i, v := range ctx.tsjs.dependencies {
 		if v.prefix == prefix {
-			ff.tsjs.dependencies[i].dependencies = append(ff.tsjs.dependencies[i].dependencies, libs...)
+			ctx.tsjs.dependencies[i].dependencies = append(ctx.tsjs.dependencies[i].dependencies, libs...)
 			return nil
 		}
 	}
 
 	// 如果没有相同的 prefix & global 则整个 append.
-	ff._addDependencies(dependenciesInstall{
+	ctx._addDependencies(dependenciesInstall{
 		dependencies: libs,
 		prefix:       prefix,
 	})
@@ -160,9 +160,9 @@ func filterDependencies(pkgMap map[string]interface{}, libs []string) ([]string,
 }
 
 // 安装所有缺失的依赖 // TODO 是否提示需要安装？(y/n)
-func (ff *FoldersAndFiles) InstallMissingDependencies() error {
-	if len(ff.tsjs.dependencies) > 0 {
-		for _, dep := range ff.tsjs.dependencies {
+func (ctx *VSContext) InstallMissingDependencies() error {
+	if len(ctx.tsjs.dependencies) > 0 {
+		for _, dep := range ctx.tsjs.dependencies {
 			if dep.prefix == "" {
 				fmt.Printf("npm installing following dependencies at Project Root:\n")
 			} else {
@@ -182,21 +182,21 @@ func (ff *FoldersAndFiles) InstallMissingDependencies() error {
 }
 
 // 生成 lint 配置文件，记录 lint 配置文件地址。
-func (ff *FoldersAndFiles) AddLintConfigAndLintPath(lintPath string, lincCfgFile []byte) {
-	ff.AddFiles(FileContent{
+func (ctx *VSContext) AddLintConfigAndLintPath(lintPath string, lincCfgFile []byte) {
+	ctx.AddFiles(FileContent{
 		Path:    lintPath,
 		Content: lincCfgFile,
 	})
 
 	// eslintrc-ts.json 的文件路径
-	ff.lintPath = lintPath
+	ctx.lintPath = lintPath
 }
 
 // 写入项目所需文件
-func (ff *FoldersAndFiles) WriteAllFiles() error {
+func (ctx *VSContext) WriteAllFiles() error {
 	fmt.Println("writing file: ")
 
-	err := writeFoldersAndFiles(ff.folders, ff.files)
+	err := writeFoldersAndFiles(ctx.folders, ctx.files)
 	if err != nil {
 		return err
 	}

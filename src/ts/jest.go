@@ -28,15 +28,15 @@ var jestFileContent = util.FileContent{
 var jestDependencies = []string{"@types/jest", "ts-jest"}
 
 // 写入 Jest 相关文件，test/example.test.ts 文件. 添加 Jest 所需依赖.
-func initJest(ff *util.FoldersAndFiles) error {
+func initJest(ctx *util.VSContext) error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
 		return errors.New(sugg.String())
 	}
 
-	ff.AddFolders(testFolder)
-	ff.AddFiles(jestFileContent)
+	ctx.AddFolders(testFolder)
+	ctx.AddFiles(jestFileContent)
 
 	// 在本地添加 Jest 依赖
-	return ff.AddMissingDependencies(jestDependencies, "package.json", "")
+	return ctx.AddMissingDependencies(jestDependencies, "package.json", "")
 }

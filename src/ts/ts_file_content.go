@@ -60,11 +60,11 @@ func InitProject(tsjs util.TSJSFlags) (suggs []*util.Suggestion, err error) {
 	tsjs.FlagSet.Parse(os.Args[3:])
 
 	// 初始化
-	ff := util.InitFoldersAndFiles(createFolders, filesAndContent)
+	ctx := util.InitFoldersAndFiles(createFolders, filesAndContent)
 
 	// 写入 test 相关文件
 	if *tsjs.Jest {
-		err = initJest(ff)
+		err = initJest(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -75,13 +75,13 @@ func InitProject(tsjs util.TSJSFlags) (suggs []*util.Suggestion, err error) {
 		return nil, errors.New("can not setup eslint globally and locally at same time")
 	} else if *tsjs.ESLint && !*tsjs.ESLintLocal {
 		// 设置 global eslint
-		err = initGlobalEslint(ff)
+		err = initGlobalEslint(ctx)
 	} else if !*tsjs.ESLint && *tsjs.ESLintLocal {
 		// 设置 local eslint
-		err = initLocalEslint(ff)
+		err = initLocalEslint(ctx)
 	} else {
 		// 不设置 eslint, 只需要设置 settings.json 文件
-		err = initWithoutEslint(ff)
+		err = initWithoutEslint(ctx)
 	}
 
 	if err != nil {
@@ -90,22 +90,22 @@ func InitProject(tsjs util.TSJSFlags) (suggs []*util.Suggestion, err error) {
 
 	// 写入所需文件
 	fmt.Println("init TypeScript project")
-	if err := ff.WriteAllFiles(); err != nil {
+	if err := ctx.WriteAllFiles(); err != nil {
 		return nil, err
 	}
 
 	// 安装所有缺失的依赖
-	if err := ff.InstallMissingDependencies(); err != nil {
+	if err := ctx.InstallMissingDependencies(); err != nil {
 		return nil, err
 	}
 
-	return ff.Suggestions(), nil
+	return ctx.Suggestions(), nil
 }
 
 // 不设置 ESLint, 写入 <project>/.vscode/settings.json 文件.
-func initWithoutEslint(ff *util.FoldersAndFiles) error {
+func initWithoutEslint(ctx *util.VSContext) error {
 	// 直接写 settings.json 文件
-	err := addSettingJSON(ff)
+	err := addSettingJSON(ctx)
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func initWithoutEslint(ff *util.FoldersAndFiles) error {
 //  - 写入 <project>/eslint/eslintrc-ts.json 本地配置文件.
 //  - 写入 <project>/.vscode/settings.json 文件.
 //  - 安装 ESLint 缺失的本地依赖.
-func initLocalEslint(ff *util.FoldersAndFiles) error {
+func initLocalEslint(ctx *util.VSContext) error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
 		return errors.New(sugg.String())
@@ -129,17 +129,17 @@ func initLocalEslint(ff *util.FoldersAndFiles) error {
 	}
 
 	// 添加 <project>/eslint 文件夹，添加 eslintrc-ts.json 文件
-	// ff.addEslintJSONAndEspath(projectPath + eslintFilePath)
-	ff.AddLintConfigAndLintPath(projectPath+eslintFilePath, eslintrcJSON)
+	// ctx.addEslintJSONAndEspath(projectPath + eslintFilePath)
+	ctx.AddLintConfigAndLintPath(projectPath+eslintFilePath, eslintrcJSON)
 
 	// 设置 settings.json 文件, 将 config 设置为 eslint 配置文件地址
-	err = addSettingJSON(ff)
+	err = addSettingJSON(ctx)
 	if err != nil {
 		return err
 	}
 
 	// 添加 ESLint 缺失的本地依赖
-	return ff.AddMissingDependencies(eslintDependencies, "package.json", "")
+	return ctx.AddMissingDependencies(eslintDependencies, "package.json", "")
 }
 
 // 设置 global ESLint:
@@ -147,7 +147,7 @@ func initLocalEslint(ff *util.FoldersAndFiles) error {
 //  - 写入 ~/.vsi/vsi-config.json 全局配置文件.
 //  - 写入 <project>/.vscode/settings.json 文件.
 //  - 安装 ESLint 缺失的全局依赖.
-func initGlobalEslint(ff *util.FoldersAndFiles) error {
+func initGlobalEslint(ctx *util.VSContext) error {
 	// 检查 npm 是否安装，把 suggestion 当 error 返回，因为必须要安装依赖
 	if sugg := util.CheckCMDInstall("npm"); sugg != nil {
 		return errors.New(sugg.String())
@@ -160,13 +160,13 @@ func initGlobalEslint(ff *util.FoldersAndFiles) error {
 	}
 
 	// 通过 vsi-config.json 获取 eslint.TS 配置文件地址.
-	err = readEslintPathFromVsiCfgJSON(ff, vsiDir)
+	err = readEslintPathFromVsiCfgJSON(ctx, vsiDir)
 	if err != nil {
 		return err
 	}
 
 	// 设置 settings.json 文件, 将 configFile 设置为 eslint 配置文件地址
-	err = addSettingJSON(ff)
+	err = addSettingJSON(ctx)
 	if err != nil {
 		return err
 	}
@@ -174,5 +174,5 @@ func initGlobalEslint(ff *util.FoldersAndFiles) error {
 	// 添加 ESLint 缺失的全局依赖
 	eslintFolder := vsiDir + eslintDirector
 	pkgFilePath := eslintFolder + "/package.json"
-	return ff.AddMissingDependencies(eslintDependencies, pkgFilePath, eslintFolder)
+	return ctx.AddMissingDependencies(eslintDependencies, pkgFilePath, eslintFolder)
 }
