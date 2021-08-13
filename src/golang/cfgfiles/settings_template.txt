@@ -48,10 +48,10 @@
   // https://github.com/golang/vscode-go/blob/HEAD/docs/settings.md
   "go.addTags": {
     "tags": "json",
-    "options": /* omg*/ "json=omitempty",
+    "options": "json=omitempty",
     "promptForTags": true, // user tags
     "template": "",
-    "transform": "snakecase"
+    "transform": "camelcase"
   },
 ${golangcilintPlaceHolder}
   // search.exclude 用来忽略搜索的文件夹
