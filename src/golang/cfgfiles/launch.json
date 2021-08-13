@@ -7,8 +7,6 @@
       "type": "go",
       "request": "launch", // attach(远程debug) | launch
       "mode": "auto",
-      "host": "127.0.0.1", // debug server addr
-      // "port": 12345, // debug server port
       "cwd": "${workspaceRoot}", // current working directory, 执行 debug 的目录
       "program": "${workspaceRoot}/src", // main.go 路径
 
@@ -16,6 +14,34 @@
       //   "env": { "GO111MODULE": "on" },
       // 编译后的程序运行所需参数，通过 flag.Parse() / os.Args 设置/获取
       //   "args": ["-c", "/xxx/config.yml"],
+
+      "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
+
+      // 以下是显示 debug 程序时的日志
+      // "trace": "verbose", // 日志打印级别
+      // "logOutput": "rpc,debugger,dap", // 日志打印内容
+      "showLog": true // 打印日志到 console
+    },
+    {
+      "name": "Attach running process Pid",
+      "type": "go",
+      "request": "attach", // attach(远程debug) | launch
+      "mode": "local", // 连接本地已运行程序
+
+      "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
+
+      // 以下是显示 debug 程序时的日志
+      // "trace": "verbose", // 日志打印级别，默认 error 级别
+      // "logOutput": "rpc,debugger,dap", // 日志打印内容
+      "showLog": true // 打印日志到 console
+    },
+    {
+      "name": "Remote Debugging",
+      "type": "go",
+      "request": "attach", // attach(远程debug) | launch
+      "mode": "remote", // 连接远程服务器
+      "host": "192.168.x.x", // debug server addr
+      "port": 12345, // debug server port
 
       "internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
 
