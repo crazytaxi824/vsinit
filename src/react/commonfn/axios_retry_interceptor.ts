@@ -1,4 +1,18 @@
-import { AxiosInstance, AxiosError } from 'axios';
+// 使用拦截器来进行 retry 时，retryCount 对于每一个 AxiosInstance 都是全局的，
+// 如果使用同一个 AxiosInstance 进行不同的 http 请求，retryCount 不会重置为 0
+// 所以每次需要进行 retry 请求的时候，一定要重新生成新的 AxiosInstance.
+
+import axios, { AxiosInstance, AxiosError } from 'axios';
+
+// 返回一次性 AxiosInstance
+export function httpRetryInstance(retry = 3, delay = 1000): AxiosInstance {
+  const httpInstance = axios.create();
+
+  // 使用 retry 拦截器
+  retryInterceptor(httpInstance, retry, delay);
+
+  return httpInstance;
+}
 
 // 延迟请求用
 export function sleep(duration: number): Promise<unknown> {
@@ -8,7 +22,7 @@ export function sleep(duration: number): Promise<unknown> {
 }
 
 // retry 拦截器
-export function retryInterceptor(
+function retryInterceptor(
   httpInstance: AxiosInstance, // 传入 AxiosInstance
   retry = 3,
   delay = 1000
