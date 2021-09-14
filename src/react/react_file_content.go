@@ -22,6 +22,8 @@ import (
 // eslint dependencies
 var eslintDependencies = []string{
 	"@typescript-eslint/eslint-plugin", // 必须
+	"@typescript-eslint/parser",        // 必须
+	"eslint-config-airbnb",             // 依赖
 	"eslint-config-airbnb-typescript",  // ts 用
 	"eslint-plugin-jest",               // jest unit test
 	"eslint-plugin-promise",            // promise 用法

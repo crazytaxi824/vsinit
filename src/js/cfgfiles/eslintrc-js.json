@@ -30,7 +30,7 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
     "browser": true,
     "jest/globals": true
   },
-  "plugins": ["promise", "jest"],
+  "plugins": ["import", "promise", "jest"],
   // 不需要检查的文件
   "ignorePatterns": [
     ".vscode",

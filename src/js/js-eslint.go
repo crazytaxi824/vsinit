@@ -10,10 +10,11 @@ import (
 
 // eslint dependencies
 var eslintDependencies = []string{
-	"eslint-plugin-jest",        // jest unit test
-	"eslint-plugin-promise",     // promise 用法
-	"eslint-config-prettier",    // 解决 vscode 插件中 prettier 造成的代码问题
-	"eslint-config-airbnb-base", // js 专用 lint
+	"eslint-plugin-jest",     // jest unit test
+	"eslint-plugin-promise",  // promise 用法
+	"eslint-config-prettier", // 解决 vscode 插件中 prettier 造成的代码问题
+	"eslint-config-airbnb",   // js 专用 lint
+	// "eslint-config-airbnb-base", // js 专用 lint
 }
 
 const (
