@@ -12,6 +12,7 @@ prettier
 需要 npm 安装的库:
 eslint (npm i -g)
 jest (npm i -g)
+
 eslint-config-airbnb-base // js 专用 lint - 不带 react
 eslint-plugin-promise // promise 用法
 eslint-plugin-jest  // jest unit test
@@ -70,7 +71,7 @@ eslint-config-prettier // 这个包主要是用来 disable 某些有冲突的 ru
   // VVI set jest version
   "settings": {
     "jest": {
-      "version": 27
+      "version": 27 // 根据实际情况修改版本号
     }
   }
 }
