@@ -14,7 +14,9 @@ eslint (npm i -g)
 jest (npm i -g)
 
 @typescript-eslint/eslint-plugin  // 必须
-eslint-config-airbnb-typescript   // airbnb line
+@typescript-eslint/parser         // 必须
+eslint-config-airbnb              // airbnb-typescript 依赖
+eslint-config-airbnb-typescript   // airbnb lint
 eslint-plugin-jest                // jest unit test
 eslint-plugin-promise             // promise 语法 lint
 eslint-config-prettier            // prettier 主要是用来 disable 某些有冲突的 rules, 一定要放在最后
@@ -98,11 +100,11 @@ eslint-config-airbnb-typescript:
     "max-len": ["warn", { "code": 120 }],
     "max-lines": ["warn", 500], // 文件不超过 n 行
 
-    // TS 专用
+    // TS
     // https://github.com/typescript-eslint/typescript-eslint/blob/HEAD/packages/eslint-plugin/docs/rules/member-ordering.md
     "@typescript-eslint/member-ordering": "warn", // class 中 member 排序
     "@typescript-eslint/consistent-type-definitions": "error", // 使用统一的类型定义
-    "@typescript-eslint/lines-between-class-members": "off", // class 内属性必须空一行
+    "@typescript-eslint/lines-between-class-members": "off", // class 内属性定义之间必须空一行
     "@typescript-eslint/no-use-before-define": [
       "error",
       {
@@ -129,7 +131,7 @@ eslint-config-airbnb-typescript:
   // VVI set jest version
   "settings": {
     "jest": {
-      "version": 27
+      "version": 27 // 根据实际情况修改版本号
     }
   },
   "overrides": [
