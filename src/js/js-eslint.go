@@ -33,6 +33,10 @@ const (
 
 // ESLint setting
 var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于配置 eslint.
+  // 开启 eslint
+  // "eslint.enable": false,
+
+  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于配置 eslint.
   "eslint.debug": true,
 
   // save 的时候运行 eslint
@@ -48,12 +52,12 @@ var eslintconfig = `  // 在 OUTPUT -> ESlint 频道打印 debug 信息. 用于�
     "javascript"
   ],
 
-  // 单独设置 eslint 配置文件
+  // 这里需要使用 class API, eslint.options 中才能够使用 new ESLint API - overrideConfigFile
+  // https://eslint.org/docs/developer-guide/nodejs-api#eslint-class
+  "eslint.useESLintClass": true,
   "eslint.options": {
-    // NOTE eslint(cmd)<=v7.x 可以工作，但是 CLIEngine 已经弃用。
-    // https://eslint.org/docs/developer-guide/nodejs-api#cliengine
     // eslint 配置文件地址
-    "configFile": "` + configPlaceHolder + `"
+    "overrideConfigFile": "` + configPlaceHolder + `"
   },`
 
 // 通过 vsi-config.json 获取 eslint.JS 配置文件地址.
