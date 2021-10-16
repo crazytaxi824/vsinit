@@ -30,7 +30,7 @@ function retryInterceptor(
   let retryCount = 0;
 
   httpInstance.interceptors.response.use(
-    undefined,
+    undefined, // 返回成功的情况，不需要任何处理。
     async (error: AxiosError) => {
       const reqConfig = error.config; // 获取 http 请求参数
 
@@ -42,7 +42,7 @@ function retryInterceptor(
 
       await sleep(delay); // 延迟 n 之后再执行
 
-      return httpInstance(reqConfig); // 重新发起请求
+      return httpInstance(reqConfig); // ⭐️ 重新发起请求，递归
     }
   );
 }
