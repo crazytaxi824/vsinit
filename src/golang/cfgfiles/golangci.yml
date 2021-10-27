@@ -1,3 +1,4 @@
+# golangci-lint v1.42.1
 # https://golangci-lint.run/
 
 # 出现错误可以清除 lint 缓存
@@ -25,19 +26,16 @@ run:
   # build-tags:
   #   - mytag
 
-  # 默认跳过的目录
-  # - (^|/)vendor($|/)
-  # - (^|/)third_party($|/)
-  # - (^|/)testdata($|/)
-  # - (^|/)examples($|/)
-  # - (^|/)Godeps($|/)
-  # - (^|/)builtin($|/)
-  skip-dirs-use-default: true
-
   # 要跳过检查的目录，没成功过
+  # which dirs to skip: issues from them won't be reported;
   skip-dirs:
-    # - .vscode
-    # - .idea
+    - .vscode
+    - .idea
+
+  # 默认跳过的目录
+  # default is true. Enables skipping of directories:
+  #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
+  skip-dirs-use-default: true
 
   # 跳过文件
   skip-files:
@@ -60,6 +58,15 @@ output:
 
 # 质量检查配置
 linters-settings:
+  # 检查函数复杂度, gocyclo / gocognit / colop 三选一
+  cyclop:
+    # the maximal code complexity to report
+    max-complexity: 10
+    # the maximal average package complexity. If it's higher than 0.0 (float) the check is enabled (default 0.0)
+    package-average: 0.0
+    # should ignore tests (default false)
+    skip-tests: true
+
   # 超过n个返回值未接受，eg: x, _, _, _, := f()
   dogsled:
     # checks assignments with too many blank identifiers; default is 2
@@ -77,15 +84,37 @@ linters-settings:
     # 检查空标识符, num, _ := strconv.Atoi(numStr)
     # true-检查,false-不检查。
     check-blank: true
-    # 忽略文件
-    ignore: fmt:.*,io/ioutil:^Read.*
+    # list of functions to exclude from checking, where each entry is a single function to exclude.
+    # see https://github.com/kisielk/errcheck#excluding-functions for details
+    exclude-functions:
+      - io/ioutil.ReadFile
+      - io.Copy(*bytes.Buffer)
+      - io.Copy(os.Stdout)
 
+  errorlint:
+    # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
+    errorf: true
+    # Check for plain type assertions and type switches
+    asserts: true
+    # Check for plain error comparisons
+    comparison: true
+
+  exhaustive:
+    # check switch statements in generated files also
+    check-generated: false
+    # indicates that switch statements are to be considered exhaustive if a
+    # 'default' case is present, even if all enum members aren't listed in the
+    # switch
+    default-signifies-exhaustive: false
+
+  # 未使用。禁止使用的方法。
   forbidigo:
     # Forbid the following identifiers
     forbid:
       # - fmt.Errorf # consider errors.Errorf in github.com/pkg/errors
-      - fmt.Print.* # too much log noise
-      - log.Print.* # too much log noise
+      - ^print.*$
+      - 'fmt\.Print.*' # too much log noise
+      - 'log\.Print.*' # too much log noise
     # Exclude godoc examples from forbidigo checks.  Default is true.
     exclude_godoc_examples: true
 
@@ -94,16 +123,10 @@ linters-settings:
     lines: 100
     statements: 50
 
-  # 复杂度检查 for / if else / switch
-  # 类似 gocyclo - Cyclometic 但是权重不同。
+  # 复杂度检查 for / if else / switch, gocyclo / gocognit / colop 三选一
   gocognit:
     # 最小复杂性
     min-complexity: 10
-
-  # 检查深度嵌套的 if 语句
-  nestif:
-    # minimal complexity of if statements to report, 5 by default
-    min-complexity: 3
 
   # 可以用常量申明的重复字符串
   goconst:
@@ -128,14 +151,14 @@ linters-settings:
       - octalLiteral # 检测8进制数字，0开头的数字，有错误会检查到 0b 二进制开头的
       - whyNoLint # 必须为 // nolint 提供一个原因
       - wrapperFunc
-      - commentedOutCode # 移除代码中注释的code (正式发布时注释掉就行了)
+      - commentedOutCode # 移除代码中注释的 code (正式发布时注释掉就行了)
 
-  # 检查函数的复杂程度，gocognit 二选一
+  # 检查函数的复杂程度，gocyclo / gocognit / colop 三选一
   gocyclo:
     # 最小复杂性
     min-complexity: 15
 
-  # - TODO, DEBUG and FIXME 标记
+  # 未使用。- TODO, DEBUG and FIXME 标记
   godox:
     # these can be overwritten by this setting
     keywords:
@@ -152,11 +175,6 @@ linters-settings:
     # it's a comma-separated list of prefixes
     local-prefixes: github.com/golangci/golangci-lint
 
-  # 检查器
-  golint:
-    # minimal confidence for issues, default is 0.8
-    min-confidence: 0
-
   # 检查数字常量
   gomnd:
     settings:
@@ -165,7 +183,7 @@ linters-settings:
         # don't include the "operation" and "assign"
         checks: argument,case,condition,return # operation,assign
 
-  # 第三方 package 白名单。类似 depguard
+  # 第三方 package 白名单。和 depguard 二选一即可。
   gomodguard:
     allowed:
       modules: # List of allowed modules
@@ -185,6 +203,8 @@ linters-settings:
     excludes:
       - G204 # exec.Command(cmd, args...) - cmd/args 是变量的情况
       - G304 # ioutil.ReadFile(filename) - filename 是变量的情况
+    # Exclude generated files
+    exclude-generated: true
     # To specify the configuration of rules.
     # The configuration of rules is not fully documented by gosec:
     # https://github.com/securego/gosec#configuration
@@ -211,15 +231,15 @@ linters-settings:
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
           - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
 
-  # 引用第三方 package 白名单，有自己的config文件，https://github.com/OpenPeeDeeP/depguard
+  # 引用第三方 package 白名单, https://github.com/OpenPeeDeeP/depguard
   depguard:
     list-type: blacklist
     include-go-root: false
     packages:
-      - github.com/sirupsen/logrus
+      - github.com/sirupsen/logrus # 定义 logrus 包到 blacklist。
     packages-with-error-message:
       # specify an error message to output when a blacklisted package is used
-      - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
+      - github.com/sirupsen/logrus: 'this is a custom depguard error msg because of usage of "github.com/sirupsen/logrus"'
 
   # 一行代码的最大长度
   lll:
@@ -238,6 +258,56 @@ linters-settings:
   # 如果func的代码行数比这个设置的多，并且它的 return 是空的，就会产生报错，默认是30
   nakedret:
     max-func-lines: 30
+
+  # 检查深度嵌套的 if 语句
+  nestif:
+    # minimal complexity of if statements to report, 5 by default
+    min-complexity: 4
+
+  # 检查 return 的值中不会有 nil error 和 nil value 同时存在。
+  nilnil:
+    # By default, nilnil checks all returned types below.
+    checked-types:
+      - ptr
+      - func
+      - iface
+      - map
+      - chan
+
+  # 检查 // nolint 设置
+  # 写法 // nolint:structcheck,unused // my explanation
+  nolintlint:
+    # Enable to ensure that nolint directives are all used. Default is true.
+    # 是否允许 nolint 指定的规则是无效的？
+    allow-unused: false
+    # Disable to ensure that nolint directives don't have a leading space. Default is true.
+    # 最前面是否允许有一个空格？ 可以写为 //nolint 也可以写为 // nolint
+    allow-leading-space: true
+    # Exclude following linters from requiring an explanation.  Default is [].
+    # 不需要提供解释的 linter, 默认是空[], 表示所有 lint 都需要解释。
+    allow-no-explanation: []
+    # Enable to require an explanation after each nolint directive. Default is false.
+    # true - 使用 nolint 需要提供解释
+    require-explanation: false
+    # Enable to require an explanation after each nolint directive. Default is false.
+    # true - 需要指定哪个 linter 不检查，false - 不需要指定，所有 linter 都不检查.
+    require-specific: false
+
+  # 替代 golint, 目前使用 stylecheck 替代。
+  revive:
+    # see https://github.com/mgechev/revive#available-rules for details.
+    ignore-generated-header: true
+    severity: warning
+    rules:
+      - name: indent-error-flow
+        severity: warning
+      # - name: add-constant
+      #   severity: warning
+      #   arguments:
+      #     - maxLitCount: "3"
+      #       allowStrs: '""'
+      #       allowInts: "0,1,2"
+      #       allowFloats: "0.0,0.,1.0,1.,2.0,2."
 
   # 检查函数内没用到的入参，出参
   unparam:
@@ -273,75 +343,70 @@ linters-settings:
     # Allow leading comments to be separated with empty liens
     allow-separated-leading-comment: false
 
-  # 检查 // nolint 设置
-  # 写法 // nolint:structcheck,unused // my explanation
-  nolintlint:
-    # Enable to ensure that nolint directives are all used. Default is true.
-    # 是否允许 nolint 指定的规则是无效的？
-    allow-unused: false
-    # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    # 最前面是否允许有一个空格？ 可以写为 //nolint 也可以写为 // nolint
-    allow-leading-space: true
-    # Exclude following linters from requiring an explanation.  Default is [].
-    # 不需要提供解释的 linter, 默认是空[], 表示所有 lint 都需要解释。
-    allow-no-explanation: []
-    # Enable to require an explanation after each nolint directive. Default is false.
-    # true - 使用 nolint 需要提供解释
-    require-explanation: false
-    # Enable to require an explanation after each nolint directive. Default is false.
-    # true - 需要指定哪个 linter 不检查，false - 不需要指定，所有 linter 都不检查.
-    require-specific: false
-
 linters:
   disable-all: true
   enable:
-    - bodyclose # check HTTP res.Body is correctly closed.
+    ### 默认开启的 lints
     # - deadcode # 直接用 unused 就可以了
-    - depguard # dep 包管理工具，第三方 package 白名单，有自己的config文件，https://github.com/OpenPeeDeeP/depguard
-    # - gomodguard    # go mod 包管理工具，第三方 package 白名单。和 depguard 二选一
-    - dogsled # 超过n个返回值未接受，eg: x, _, _, _, := f()
-    - dupl # 检查重复代码
     - errcheck # 未处理的 error，eg: defer file.Close()
-    - exportloopref
-    - exhaustive
-    - funlen # function 长度检查
-    - gochecknoinits # 检查是否有 func init() 函数
-    - goconst # 查找是否有重复的 string 可以用常量 const 表示
-    - gocritic # 检查合集 https://go-critic.github.io/overview
-    - gocyclo # 检查函数的复杂程度，gocognit 二选一
-    # - gofmt # 和 goimports 二选一即可。
-    - goimports # 格式化工具
-    - golint # 检查合集，不想给每个函数写注释
-    - gomnd # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
-    # - goprintffuncname  # For example, myLog should be named myLogf
-    - gosec # security problems
     - gosimple # 简化代码
     - govet # 检查影子变量等...
     - ineffassign # 检测无效赋值
-    - lll # 同一行代码过长会报错
-    - misspell # 拼写错误
-    - nakedret # 如果函数长度超过设置，同时有返回值，不能只有return，必须有参数
-    - nolintlint # // nolint 设置
-    - rowserrcheck # 检查 sql.Rows.Err 是否正确处理，针对 sql.
     - staticcheck # 检查合集 https://staticcheck.io/docs/checks
-    - stylecheck # 检查合集 Stylecheck is a replacement for golint
     - structcheck # 结构体私有属性 tag 检查，对 tableName 支持不好
     - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
-    - unconvert # 检查不必要的类型转换
-    - unparam # 检查函数内没用到的入参，出参
     # - unused # NOTE 生产环境下打开
     - varcheck # 检查没用的全局变量
+
+    ### 自愿开启的 lints
+    - bodyclose # check HTTP res.Body is correctly closed.
+    # - contextcheck # NOTE unknown, 检查 context 使用是否有错误.
+    # - colop # NOTE unknown, 检查函数的复杂程度，gocyclo / gocognit / colop 三选一
+    - depguard # dep 包管理工具，第三方 package 白名单, depguard / gomodguard 二选一
+    - dogsled # 超过n个返回值未接受，eg: x, _, _, _, := f()
+    - dupl # 检查重复代码
+    - errorlint # 检查 error wrap 错误.
+    - exhaustive # 检查 switch 语法
+    - exportloopref # An analyzer that finds exporting pointers for loop variables. 
+    - funlen # function 长度检查
+    - gochecknoinits # 检查是否有 func init() 函数
+    - goconst  # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
+    - gocritic # [VVI], 检查合集 https://go-critic.github.io/overview
+    - gocyclo # 检查函数的复杂程度，gocyclo / gocognit / colop 三选一
+    # - gofmt # 和 goimports 二选一即可。
+    - goimports # 格式化工具
+    - gomnd # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
+    # - gomodguard    # go mod 包管理工具，第三方 package 白名单。depguard / gomodguard 二选一
+    # - goprintffuncname  # For example, myLog should be named myLogf
+    - gosec # [VVI], security problems
+    - ifshort # 简化 if 语法
+    - lll # 同一行代码过长会报错
+    - misspell # 拼写错误
+    - nakedret # 如果函数长度超过设置，同时有返回值，不能只有 return，必须有参数
+    - nilerr # 如果 err 不是 nil，则不能 return nil。如果 err 是 nil, 则必须 return nil.
+    # - nilnil # NOTE unknown, 检查 nil error 和 invalid value 不能同时返回。
+    - nolintlint # // nolint 设置
+    # - revive # 替代 golint, stylecheck / revive 二选一
+    - rowserrcheck # 检查 sql.Rows.Err 是否正确处理，针对 sql.
+    - stylecheck # 检查合集 Stylecheck is a replacement for golint. stylecheck / revive 二选一
+    - tparallel # 在 test 文件中错误使用 t.Parallel(). tparallel / paralleltest 二选一
+    - unconvert # 检查不必要的类型转换
+    - unparam # 检查函数内没用到的入参，出参
     - whitespace # detection of 开始和结尾的空行 leading and trailing whitespace
+    # - nilnil # 检查 return 的值中不会有 nil error 和 nil value 同时存在。
 
     ### 下面是不建议开启的
     # - asciicheck        # 检查代码是否包含 non-ASCII identifiers
     # - gochecknoglobals  # 检查是否有全局变量
-    # - gocognit      # 复杂度检查 for / if else / switch ，类似 gocyclo - Cyclometic, 但是权重不同。
+    # - gocognit      # 复杂度检查 for / if else / switch, gocyclo / gocognit / colop 三选一
     # - godot         # 检查注释是否句号结尾。
-    # - godox         # 检查是否有FIXME/TODO标记
+    # - godox         # 检查是否有 FIXME / TODO 标记
     # - goerr113      # 检查 error 表达式中的错误
+    # - golint        # 检查合集，已经不再更新，Replaced by revive.
     # - nestif        # 检查深度嵌套的 if 语句
+    # - nlreturn      # return 之前必须空一行.
     # - prealloc      # 查找可以被与先分配的 slice
+    # - paralleltest  # 有 bug. tparallel / paralleltest 二选一
     # - testpackage   # linter that makes you use a separate _test package
     # - wsl           # 需要使用空行的地方 - 和 whitespace 作用正好相反
 
@@ -397,10 +462,12 @@ issues:
     - linters:
         - structcheck
       source: "tablename struct{}" # 不检查 tableName 属性
+      source: "tableName struct{}" # 不检查 tableName 属性
 
     - linters:
         - unused
       source: tablename struct{} # 不检查 tableName 属性
+      source: tableName struct{} # 不检查 tableName 属性
 
     # Exclude lll issues for long lines with go:generate
     - linters:
@@ -435,3 +502,35 @@ issues:
 
   # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
   # max-same-issues: 0
+
+  # AutoFix found issues (if it's supported by the linter)
+  fix: true
+
+severity:
+  # Default value is empty string.
+  # Set the default severity for issues. If severity rules are defined and the issues
+  # do not match or no severity is provided to the rule this will be the default
+  # severity applied. Severities should match the supported severity names of the
+  # selected out format.
+  # - Code climate: https://docs.codeclimate.com/docs/issues#issue-severity
+  # -   Checkstyle: https://checkstyle.sourceforge.io/property_types.html#severity
+  # -       Github: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
+  default-severity: error
+
+  # The default value is false.
+  # If set to true severity-rules regular expressions become case sensitive.
+  case-sensitive: false
+
+  # Default value is empty list.
+  # When a list of severity rules are provided, severity information will be added to lint
+  # issues. Severity rules have the same filtering capability as exclude rules except you
+  # are allowed to specify one matcher per severity rule.
+  # Only affects out formats that support setting severity information.
+  rules:
+    - linters:
+      - dupl    # 重复代码
+      - lll     # 同一行代码过长会报错
+      - funlen  # 函数长度
+      - goconst # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
+      - gomnd   # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
+      severity: info
