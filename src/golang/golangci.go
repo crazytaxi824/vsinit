@@ -19,7 +19,7 @@ const (
 	golangciDirector = "/golangci"
 
 	// golangci-lint 配置文件名
-	cilintFilePath = "/golangci.yml"
+	cilintFilePath = "/.golangci.yml"
 )
 
 // golangci-lint setting
