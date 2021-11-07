@@ -295,12 +295,39 @@ linters-settings:
 
   # 替代 golint, 目前使用 stylecheck 替代。
   revive:
-    # see https://github.com/mgechev/revive#available-rules for details.
+    # https://github.com/mgechev/revive#available-rules
     ignore-generated-header: true
     severity: warning
+    # 需要开启的 linter 都需要在下面列出来.
     rules:
-      - name: indent-error-flow
+      - name: receiver-naming     # Conventions around the naming of receivers.
+        severity: error
+      - name: atomic              # Check for common mistaken usages of the sync/atomic package
+        severity: error
+      - name: argument-limit      # maximum num of args a function can receive.
+        argument: 4
+      - name: range               # Prevents redundant variables when iterating over a collection.
+      - name: time-naming         # Conventions around the naming of time variables.
+      - name: if-return
+      - name: unexported-return   # Warns when a public return is from unexported type.
         severity: warning
+      - name: time-naming         # Conventions around the naming of time variables.
+      - name: time-equal          # time.Time.Equal instead of == and != for equality check time.
+      - name: dot-imports         # Forbids . imports.
+      - name: exported            # Naming and commenting conventions on exported symbols.
+      - name: context-keys-type   # Disallows the usage of basic types in context.WithValue.
+      - name: context-as-argument # context.Context should be the first argument of a function.
+      - name: increment-decrement # Use i++ and i-- instead of i += 1 and i -= 1.
+      - name: var-naming          # Naming rules.
+      - name: var-declaration     # Reduces redundancies around variable declaration.
+      - name: errorf              # replace errors.New(fmt.Sprintf()) with fmt.Errorf()
+      - name: error-naming        # Naming of error variables.
+      - name: error-return        # The error return parameter should be last.
+      - name: error-string        # Conventions around error strings.
+      - name: indent-error-flow   # Prevents redundant else statements.
+      #- name: package-comments # package 必须有一个 comments
+      #  severity: error
+      #  disabled: true
       # - name: add-constant
       #   severity: warning
       #   arguments:
@@ -308,6 +335,25 @@ linters-settings:
       #       allowStrs: '""'
       #       allowInts: "0,1,2"
       #       allowFloats: "0.0,0.,1.0,1.,2.0,2."
+
+  stylecheck:
+    # Select the Go version to target. The default is '1.13'.
+    go: "1.17"
+
+    # https://staticcheck.io/docs/options#checks
+    # 开启全部检查, 去掉的基本都是 comments 检查.
+    checks: [ "all", "-ST1000", "-ST1006", "-ST1020", "-ST1021", "-ST1022" ]
+
+    # ST1001 - https://staticcheck.io/docs/options#dot_import_whitelist
+    dot-import-whitelist:
+      - fmt
+
+    # ST1003 - https://staticcheck.io/docs/options#initialisms
+    # 使用默认设置.
+    # initialisms: [ "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", ... ]
+
+    # ST1013 - https://staticcheck.io/docs/options#http_status_code_whitelist
+    http-status-code-whitelist: [ "200", "204", "400", "403", "404", "500" ]
 
   # 检查函数内没用到的入参，出参
   unparam:
