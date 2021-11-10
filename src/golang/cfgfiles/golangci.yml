@@ -300,31 +300,31 @@ linters-settings:
     severity: warning
     # 需要开启的 linter 都需要在下面列出来.
     rules:
-      - name: receiver-naming     # Conventions around the naming of receivers.
+      - name: receiver-naming # Conventions around the naming of receivers.
         severity: error
-      - name: atomic              # Check for common mistaken usages of the sync/atomic package
+      - name: atomic # Check for common mistaken usages of the sync/atomic package
         severity: error
-      - name: argument-limit      # maximum num of args a function can receive.
+      - name: argument-limit # maximum num of args a function can receive.
         arguments: 4
-      - name: range               # Prevents redundant variables when iterating over a collection.
-      - name: time-naming         # Conventions around the naming of time variables.
+      - name: range # Prevents redundant variables when iterating over a collection.
+      - name: time-naming # Conventions around the naming of time variables.
       - name: if-return
-      - name: unexported-return   # Warns when a public return is from unexported type.
-      - name: time-naming         # Conventions around the naming of time variables.
-      #- name: time-equal          # time.Time.Equal instead of == and != for equality check time.
-      - name: dot-imports         # Forbids . imports.
-      - name: context-keys-type   # Disallows the usage of basic types in context.WithValue.
+      - name: unexported-return # Warns when a public return is from unexported type.
+      - name: time-naming # Conventions around the naming of time variables.
+      #- name: time-equal # time.Time.Equal instead of == and != for equality check time.
+      - name: dot-imports # Forbids . imports.
+      - name: context-keys-type # Disallows the usage of basic types in context.WithValue.
       - name: context-as-argument # context.Context should be the first argument of a function.
       - name: increment-decrement # Use i++ and i-- instead of i += 1 and i -= 1.
-      - name: var-naming          # Naming rules.
-      - name: var-declaration     # Reduces redundancies around variable declaration.
-      - name: errorf              # replace errors.New(fmt.Sprintf()) with fmt.Errorf()
-      - name: error-naming        # Naming of error variables.
-      - name: error-return        # The error return parameter should be last.
-      - name: indent-error-flow   # Prevents redundant else statements.
-      #- name: exported            # 注释, Naming and commenting conventions on exported symbols.
+      - name: var-naming # Naming rules.
+      - name: var-declaration # Reduces redundancies around variable declaration.
+      - name: errorf # replace errors.New(fmt.Sprintf()) with fmt.Errorf()
+      - name: error-naming # Naming of error variables.
+      - name: error-return # The error return parameter should be last.
+      - name: indent-error-flow # Prevents redundant else statements.
+      #- name: exported # 注释, Naming and commenting conventions on exported symbols.
       #  severity: info
-      #- name: package-comments    # package 必须有一个注释.
+      #- name: package-comments # package 必须有一个注释.
       #  severity: info
 
   stylecheck:
@@ -333,7 +333,7 @@ linters-settings:
 
     # https://staticcheck.io/docs/options#checks
     # 开启全部检查, 去掉的基本都是 comments 检查.
-    checks: [ "all", "-ST1000", "-ST1006", "-ST1020", "-ST1021", "-ST1022" ]
+    checks: ["all", "-ST1000", "-ST1006", "-ST1020", "-ST1021", "-ST1022"]
 
     # ST1001 - https://staticcheck.io/docs/options#dot_import_whitelist
     dot-import-whitelist:
@@ -344,7 +344,7 @@ linters-settings:
     # initialisms: [ "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", ... ]
 
     # ST1013 - https://staticcheck.io/docs/options#http_status_code_whitelist
-    http-status-code-whitelist: [ "200", "204", "400", "403", "404", "500" ]
+    http-status-code-whitelist: ["200", "204", "400", "403", "404", "500"]
 
   # 检查函数内没用到的入参，出参
   unparam:
@@ -404,10 +404,10 @@ linters:
     - dupl # 检查重复代码
     - errorlint # 检查 error wrap 错误.
     - exhaustive # 检查 switch 语法
-    - exportloopref # An analyzer that finds exporting pointers for loop variables. 
+    - exportloopref # An analyzer that finds exporting pointers for loop variables.
     - funlen # function 长度检查
     - gochecknoinits # 检查是否有 func init() 函数
-    - goconst  # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
+    - goconst # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
     - gocritic # [VVI], 检查合集 https://go-critic.github.io/overview
     - gocyclo # 检查函数的复杂程度，gocyclo / gocognit / colop 三选一
     # - gofmt # 和 goimports 二选一即可。
@@ -498,13 +498,11 @@ issues:
     # 这里是指 structcheck 时，如果源代码中包含 tableName / tablename 则不检查错误。
     - linters:
         - structcheck
-      source: "tablename struct{}" # 不检查 tableName 属性
-      source: "tableName struct{}" # 不检查 tableName 属性
+      source: "table(n|N)ame struct{} `.*pg:.*`" # 不检查 tableName 属性
 
     - linters:
         - unused
-      source: tablename struct{} # 不检查 tableName 属性
-      source: tableName struct{} # 不检查 tableName 属性
+      source: "table(n|N)ame struct{} `.*pg:.*`" # 不检查 tableName 属性
 
     # Exclude lll issues for long lines with go:generate
     - linters:
@@ -565,9 +563,9 @@ severity:
   # Only affects out formats that support setting severity information.
   rules:
     - linters:
-      - dupl    # 重复代码
-      - lll     # 同一行代码过长会报错
-      - funlen  # 函数长度
-      - goconst # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
-      - gomnd   # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
+        - dupl # 重复代码
+        - lll # 同一行代码过长会报错
+        - funlen # 函数长度
+        - goconst # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
+        - gomnd # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
       severity: info
