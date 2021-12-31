@@ -87,7 +87,7 @@ func envCheckCommand() (suggestions []*util.Suggestion, err error) {
 		suggestions, err = golang.CheckGO()
 	case "py":
 		suggestions, err = python.CheckPython()
-	case "ts":
+	case "ts", "react":
 		suggestions, err = ts.CheckTS()
 	case "js":
 		suggestions, err = js.CheckJS()
