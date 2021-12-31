@@ -32,7 +32,7 @@ import "fmt"
 
 func main() {
 	fmt.Println("hello world")
-    // need to run "go mod init <name>" first.
+	// need to run "go mod init <name>" first.
 }
 `)
 

@@ -428,7 +428,7 @@ linters:
     - stylecheck # 检查合集 Stylecheck is a replacement for golint. stylecheck / revive 二选一
     - tparallel # 在 test 文件中错误使用 t.Parallel(). tparallel / paralleltest 二选一
     - unconvert # 检查不必要的类型转换
-    - unparam # 检查函数内没用到的入参，出参
+    #- unparam # NOTE 生产环境下打开，检查函数内没用到的入参，出参
     - whitespace # detection of 开始和结尾的空行 leading and trailing whitespace
     # - nilnil # 检查 return 的值中不会有 nil error 和 nil value 同时存在。
 
