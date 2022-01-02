@@ -515,6 +515,7 @@ issues:
   # Default value for this option is true.
   exclude-use-default: true
 
+  # https://golangci-lint.run/usage/configuration/
   include:
     # - EXC0001 # errcheck: 不检查某些特殊情况 eg: defer file.Close()
     # - EXC0002 # golint: comment on exported (method|function|type|const)

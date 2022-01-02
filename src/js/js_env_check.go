@@ -18,7 +18,7 @@ func CheckJS() ([]*util.Suggestion, error) {
 func checkJS() ([]*util.Suggestion, error) {
 	var suggs []*util.Suggestion
 
-	// 检查 node, typescript 是否安装
+	// 检查 node 是否安装
 	sug := util.CheckCMDInstall("node")
 	if sug != nil {
 		suggs = append(suggs, sug)

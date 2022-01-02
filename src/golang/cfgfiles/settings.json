@@ -56,14 +56,14 @@
 
   // NOTE save 时 golangci-lint 整个 package，使用 'file' 时，
   // 如果变量定义在别的文件中会造成 undeclared 错误。
-  "go.lintOnSave": "package",
+  "go.lintOnSave": "package", // package | file | workspace | off
 
   "go.lintFlags": [
     "--fast", // without --fast can freeze your editor.
 
     // golangci-lint 配置文件地址
     // "--config=${workspaceRoot}/golangci.yml" // 本地
-    "--config=~/.vsi/golangci/golangci.yml"
+    "--config=~/.vsi/golangci/golangci.yml" // 全局
   ],
 
   // search.exclude 用来忽略搜索的文件夹
