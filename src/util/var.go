@@ -10,7 +10,7 @@ const (
 	InternalErrMsg = "CMD is not in the list, please contact author"
 
 	// 支持的语言
-	languages = "go | py | ts | js"
+	languages = "go | py | ts | js | react"
 )
 
 // 固定文件路径

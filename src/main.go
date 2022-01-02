@@ -14,6 +14,8 @@ import (
 	"local/src/python"
 	"local/src/react"
 	"local/src/ts"
+
+	// 最主要的逻辑在 src/util/folders_files.go 文件中
 	"local/src/util"
 )
 
@@ -87,7 +89,7 @@ func envCheckCommand() (suggestions []*util.Suggestion, err error) {
 		suggestions, err = golang.CheckGO()
 	case "py":
 		suggestions, err = python.CheckPython()
-	case "ts":
+	case "ts", "react":
 		suggestions, err = ts.CheckTS()
 	case "js":
 		suggestions, err = js.CheckJS()
