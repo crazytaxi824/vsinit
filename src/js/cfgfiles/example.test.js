@@ -8,9 +8,9 @@
 // 或者 vscode debug 中选择的 Jest Current File
 
 function add(a, b) {
-  return a + b;
+	return a + b;
 }
 
-test('add function test', () => {
-  expect(add(1, 2)).toBe(3);
+test("add function test", () => {
+	expect(add(1, 2)).toBe(3);
 });
