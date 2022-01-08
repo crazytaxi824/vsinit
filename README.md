@@ -125,13 +125,5 @@ react - CRA (create react app) 项目中包含了其他文件.
 
 <br />
 
-# TODO
-
-react flags:
-
-- common-packages
-
-- common-functions
-
 
 

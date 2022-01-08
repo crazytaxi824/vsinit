@@ -6,11 +6,23 @@ package golang
 import (
 	"fmt"
 	"local/src/util"
+	"log"
+	"os"
 )
 
+var goFlags *util.GoFlags
+
 func InitGoProj() error {
+	// go flags only for -help
+	goFlags := util.SetGoFlags()
+	err := goFlags.FlagSet.Parse(os.Args[2:])
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
 	// ask before init project
-	err := util.AskBeforeProceed("Go")
+	err = util.AskBeforeProceed("Go")
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

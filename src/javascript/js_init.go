@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-// TODO change name
+// change name
 var jstsFlags *util.JSTSFlags
 
 func InitJSProj() error {

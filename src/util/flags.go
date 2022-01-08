@@ -5,6 +5,17 @@ import (
 	"fmt"
 )
 
+type GoFlags struct {
+	FlagSet *flag.FlagSet
+}
+
+func SetGoFlags() *GoFlags {
+	var gf GoFlags
+	gf.FlagSet = flag.NewFlagSet("'go' flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+
+	return &gf
+}
+
 // for javascript & typescript use only
 type JSTSFlags struct {
 	FlagSet     *flag.FlagSet
@@ -14,7 +25,7 @@ type JSTSFlags struct {
 
 func SetJSTSFlags() *JSTSFlags {
 	var tsfs JSTSFlags
-	tsfs.FlagSet = flag.NewFlagSet("ts flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+	tsfs.FlagSet = flag.NewFlagSet("'js/ts' flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
 	// eslint
 	tsfs.ESlintLocal = tsfs.FlagSet.Bool("eslint-local", false,
@@ -40,7 +51,7 @@ type ReactFlags struct {
 
 func SetReactFlags() *ReactFlags {
 	var rf ReactFlags
-	rf.FlagSet = flag.NewFlagSet("ts flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+	rf.FlagSet = flag.NewFlagSet("'react' flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
 	// eslint
 	rf.ESlintLocal = rf.FlagSet.Bool("eslint-local", false,
