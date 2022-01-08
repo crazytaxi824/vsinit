@@ -1,0 +1,57 @@
+{
+	// plugins:gopls,gopkgs,go-outline,gotests,gomodifytags,impl,dlv,dlv-dap,golangci-lint
+	"version": "0.2.0",
+	"configurations": [
+		{
+			// debug 正在开发的代码.
+			"name": "Auto Main",
+			"type": "go",
+			"request": "launch",
+			"mode": "auto",
+			"cwd": "${workspaceRoot}", // current working directory, 执行 debug 的目录
+			"program": "${workspaceRoot}/src", // main.go 路径
+
+			// 传入的 enviroment 参数, 程序中可以通过 os.Environ() 获取
+			//   "env": { "GO111MODULE": "on" },
+			// 编译后的程序运行所需参数，通过 flag.Parse() / os.Args 设置/获取
+			//   "args": ["-c", "/xxx/config.yml"],
+
+			"internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
+
+			// 以下是显示 debug 程序时的日志
+			// "trace": "verbose", // 日志打印级别
+			// "logOutput": "rpc,debugger,dap", // 日志打印内容
+			"showLog": true // 打印日志到 console
+		},
+		{
+			// 连接已经运行的本地 go 程序, 进行 debug.
+			"name": "Debug Running Process - Pid",
+			"type": "go",
+			"request": "attach",
+			"mode": "local", // 连接本地已运行程序
+
+			"internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
+
+			// 以下是显示 debug 程序时的日志
+			// "trace": "verbose", // 日志打印级别，默认 error 级别
+			// "logOutput": "rpc,debugger,dap", // 日志打印内容
+			"showLog": true // 打印日志到 console
+		},
+		{
+			// 连接远程 go 程序, 进行 debug.
+			"name": "Debug Remote Process",
+			"type": "go",
+			"request": "attach",
+			"mode": "remote", // 连接远程服务器
+			"host": "192.168.x.x", // debug server addr
+			"port": 12345, // debug server port
+
+			"internalConsoleOptions": "openOnSessionStart", // debug 时显示控制面板
+
+			// 以下是显示 debug 程序时的日志
+			// "trace": "verbose", // 日志打印级别，默认 error 级别
+			// "logOutput": "rpc,debugger,dap", // 日志打印内容
+			"showLog": true // 打印日志到 console
+		}
+	]
+}

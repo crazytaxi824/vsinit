@@ -1,34 +1,54 @@
 package util
 
-import "flag"
+import (
+	"flag"
+	"fmt"
+)
 
-// TS/JS 用 flags
-type TSJSFlags struct {
-	FlagSet                   *flag.FlagSet
-	Jest, ESLint, ESLintLocal *bool
+// for javascript & typescript use only
+type JSTSFlags struct {
+	FlagSet     *flag.FlagSet
+	ESlintLocal *bool // set eslintrc.json locally, default globally
+	Jest        *bool // test tool
 }
 
-func SetupTSJSFlags() TSJSFlags {
-	var tsjs TSJSFlags
-	tsjs.FlagSet = flag.NewFlagSet("'vs init ts|js'", flag.ExitOnError) // TODO flag 名字修改
-	tsjs.Jest = tsjs.FlagSet.Bool("jest", false, "setup 'jest' in the Project")
-	tsjs.ESLint = tsjs.FlagSet.Bool("eslint", false, "setup 'eslint' globally")
-	tsjs.ESLintLocal = tsjs.FlagSet.Bool("eslint-local", false, "setup 'eslint' in the Project")
+func SetJSTSFlags() *JSTSFlags {
+	var tsfs JSTSFlags
+	tsfs.FlagSet = flag.NewFlagSet("ts flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
-	return tsjs
+	// eslint
+	tsfs.ESlintLocal = tsfs.FlagSet.Bool("eslint-local", false,
+		"set eslint config file locally\n(default: globally)")
+
+	// alias
+	f := tsfs.FlagSet.Lookup("eslint-local")
+	tsfs.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s", f.Name))
+
+	// jest
+	tsfs.Jest = tsfs.FlagSet.Bool("jest", false, "install typescript jest environment")
+	j := tsfs.FlagSet.Lookup("jest")
+	tsfs.FlagSet.Var(j.Value, "j", fmt.Sprintf("alias to -%s", j.Name))
+
+	return &tsfs
 }
 
-// Golang 用 flags
-type GoFlags struct {
-	FlagSet             *flag.FlagSet
-	Cilint, CilintLocal *bool
+// for react use only
+type ReactFlags struct {
+	FlagSet     *flag.FlagSet
+	ESlintLocal *bool // set eslintrc.json locally, default globally
 }
 
-func SetupGoFlags() GoFlags {
-	var gofs GoFlags
-	gofs.FlagSet = flag.NewFlagSet("'vs init go'", flag.ExitOnError) // TODO flag 名字修改
-	gofs.Cilint = gofs.FlagSet.Bool("cilint", false, "setup 'golangci-lint' globally")
-	gofs.CilintLocal = gofs.FlagSet.Bool("cilint-local", false, "setup 'golangci-lint' in this Project")
+func SetReactFlags() *ReactFlags {
+	var rf ReactFlags
+	rf.FlagSet = flag.NewFlagSet("ts flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
-	return gofs
+	// eslint
+	rf.ESlintLocal = rf.FlagSet.Bool("eslint-local", false,
+		"set eslint config file locally\n(default: globally)")
+
+	// alias
+	f := rf.FlagSet.Lookup("eslint-local")
+	rf.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s", f.Name))
+
+	return &rf
 }

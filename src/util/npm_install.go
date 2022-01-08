@@ -1,39 +1,43 @@
 package util
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
-// 需要安装的依赖
-type dependenciesInstall struct {
-	dependencies []string
-	prefix       string
-	global       bool
+func NpmInstallPrefixDev(prefix string, packages []string) error {
+	args := []string{"i", "--prefix", prefix, "-D"}
+	args = append(args, packages...)
+
+	fmt.Printf("\n%snpm %s%s%s\n", COLOR_YELLOW, COLOR_GREEN, strings.Join(args, " "), COLOR_RESET)
+
+	cmd := exec.Command("npm", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
 
-// npm install libs to devDependencies
-// 指定位置安装 eslint 所需依赖
-func npmInstallDependencies(di dependenciesInstall) error {
-	if len(di.dependencies) == 0 {
-		return nil
-	}
+func NpmInstallDevLocal(packages []string) error {
+	args := []string{"i", "-D"}
+	args = append(args, packages...)
 
-	var args []string
-	if di.global {
-		args = []string{"i", "-g"}
-	} else {
-		args = []string{"i", "-D"}
-	}
+	fmt.Printf("\n%snpm %s%s%s\n", COLOR_YELLOW, COLOR_GREEN, strings.Join(args, " "), COLOR_RESET)
 
-	// 指定下载到什么地方
-	if di.prefix != "" {
-		// --prefix 将 node_modules 创建到 path下. <path>/node_modules
-		args = append(args, "--prefix", di.prefix)
-	}
+	cmd := exec.Command("npm", args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
 
-	// 执行命令
-	args = append(args, di.dependencies...)
+// install react commonly uesd packages
+func NpmInstallSaveLocal(packages []string) error {
+	args := []string{"i", "-S"}
+	args = append(args, packages...)
+
+	fmt.Printf("\n%snpm %s%s%s\n", COLOR_YELLOW, COLOR_GREEN, strings.Join(args, " "), COLOR_RESET)
+
 	cmd := exec.Command("npm", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

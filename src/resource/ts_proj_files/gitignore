@@ -4,14 +4,15 @@
 /.idea
 /*.iml
 /.history
+/out
+/dist
+/node_modules
+/coverage
 
 # 配置文件永远不要暴露在 github 上，防止密码泄露
 /config.*
 
 # 需要作用任何路径下用，使用 **/ 开头
 .DS_Store
-**/*.gorun
-**/debug
 **/vendor
-**/go.sum
 **/*.bak

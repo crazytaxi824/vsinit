@@ -1,0 +1,48 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			// run single file
+			"name": "current file",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": ["<node_internals>/**"],
+			"program": "${file}",
+			"preLaunchTask": "tsc: build - tsconfig.json", // tasks.json label
+			"console": "integratedTerminal",
+			"disableOptimisticBPs": true,
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"]
+		},
+		{
+			// launch project
+			"name": "src/main.ts",
+			"type": "node",
+			"request": "launch",
+			"skipFiles": ["<node_internals>/**"],
+			"program": "${workspaceFolder}/src/main.ts",
+			"preLaunchTask": "tsc: build - tsconfig.json",
+			"console": "integratedTerminal",
+			"disableOptimisticBPs": true,
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"]
+		},
+		{
+			// 使用 jest 单元测试需要安装 jest 命令行工具, npm i jest -g
+			// 项目中安装 npm i -D @types/jest ts-jest
+			// 测试文件必须以 *.test.ts 结尾
+
+			// 测试方法:
+			// jest                 // 所有文件
+			// jest test/*.test.ts  // 指定文件
+			// jest --coverage xxx  // 显示 coverage
+			// 或者 vscode debug 中选择的 Jest Current File
+			"name": "Jest Current File",
+			"type": "node",
+			"request": "launch",
+			"program": "/usr/local/bin/jest", // jest 命令行工具位置
+			"args": ["--coverage", "${file}"],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"disableOptimisticBPs": true
+		}
+	]
+}
