@@ -3,7 +3,14 @@ package util
 import (
 	"flag"
 	"fmt"
+	"os"
+	"strings"
 )
+
+// 获取命令行的前两个参数 - eg: "vs go"
+func getCmd() string {
+	return fmt.Sprintf("%q", strings.Join(os.Args[:2], " "))
+}
 
 // golang flags.
 type GoFlags struct {
@@ -12,7 +19,7 @@ type GoFlags struct {
 
 func SetGoFlags() *GoFlags {
 	var gf GoFlags
-	gf.FlagSet = flag.NewFlagSet("'go' flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+	gf.FlagSet = flag.NewFlagSet(getCmd(), flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
 	// golang 没有任何 flag, 这里只是为了 -h 命令.
 	return &gf
@@ -27,20 +34,20 @@ type JSTSFlags struct {
 
 func SetJSTSFlags() *JSTSFlags {
 	var tsfs JSTSFlags
-	tsfs.FlagSet = flag.NewFlagSet("'js/ts' flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+	tsfs.FlagSet = flag.NewFlagSet(getCmd(), flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
 	// eslint
 	tsfs.ESlintLocal = tsfs.FlagSet.Bool("eslint-local", false,
-		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)")
+		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)\n")
 
 	// alias
 	f := tsfs.FlagSet.Lookup("eslint-local")
-	tsfs.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s", f.Name))
+	tsfs.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s\n", f.Name))
 
 	// jest
-	tsfs.Jest = tsfs.FlagSet.Bool("jest", false, "install 'jest' related dependencies.")
+	tsfs.Jest = tsfs.FlagSet.Bool("jest", false, "install 'jest' related dependencies.\n")
 	j := tsfs.FlagSet.Lookup("jest")
-	tsfs.FlagSet.Var(j.Value, "j", fmt.Sprintf("alias to -%s", j.Name))
+	tsfs.FlagSet.Var(j.Value, "j", fmt.Sprintf("alias to -%s\n", j.Name))
 
 	return &tsfs
 }
@@ -53,15 +60,15 @@ type ReactFlags struct {
 
 func SetReactFlags() *ReactFlags {
 	var rf ReactFlags
-	rf.FlagSet = flag.NewFlagSet("'react' flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+	rf.FlagSet = flag.NewFlagSet(getCmd(), flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
 	// eslint
 	rf.ESlintLocal = rf.FlagSet.Bool("eslint-local", false,
-		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)")
+		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)\n")
 
 	// alias
 	f := rf.FlagSet.Lookup("eslint-local")
-	rf.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s", f.Name))
+	rf.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s\n", f.Name))
 
 	return &rf
 }
