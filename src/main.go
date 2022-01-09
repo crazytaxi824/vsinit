@@ -13,6 +13,12 @@ import (
 )
 
 func main() {
+	// 只输入了 'vs' 命令的情况下
+	if len(os.Args) < 2 {
+		fmt.Printf(helpMsg, util.COLOR_YELLOW, util.COLOR_RESET, util.COLOR_YELLOW, util.COLOR_RESET)
+		os.Exit(2)
+	}
+
 	switch os.Args[1] {
 	case "go":
 		if err := golang.InitGoProj(); err != nil {
