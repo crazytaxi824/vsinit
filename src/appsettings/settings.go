@@ -2,8 +2,8 @@ package appsettings
 
 // ESLint 设置
 const (
-	// eslint global install path without filename.
-	ESLintGlobalPath = "/Users/ray/.config/vsinit/lints/eslint/"
+	// eslint global install path without filename. dir 用 '/' 结尾
+	ESLintGlobalPath = "/Users/ray/.config/lints/"
 
 	// javascript eslint filename
 	JSESLintFileName = "eslintrc-js.json" // default: .eslintrc.json
