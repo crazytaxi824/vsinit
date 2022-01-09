@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// golang flags.
 type GoFlags struct {
 	FlagSet *flag.FlagSet
 }
@@ -13,6 +14,7 @@ func SetGoFlags() *GoFlags {
 	var gf GoFlags
 	gf.FlagSet = flag.NewFlagSet("'go' flags", flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
 
+	// golang 没有任何 flag, 这里只是为了 -h 命令.
 	return &gf
 }
 
@@ -29,14 +31,14 @@ func SetJSTSFlags() *JSTSFlags {
 
 	// eslint
 	tsfs.ESlintLocal = tsfs.FlagSet.Bool("eslint-local", false,
-		"set eslint config file locally\n(default: globally)")
+		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)")
 
 	// alias
 	f := tsfs.FlagSet.Lookup("eslint-local")
 	tsfs.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s", f.Name))
 
 	// jest
-	tsfs.Jest = tsfs.FlagSet.Bool("jest", false, "install typescript jest environment")
+	tsfs.Jest = tsfs.FlagSet.Bool("jest", false, "install 'jest' related dependencies.")
 	j := tsfs.FlagSet.Lookup("jest")
 	tsfs.FlagSet.Var(j.Value, "j", fmt.Sprintf("alias to -%s", j.Name))
 
@@ -55,7 +57,7 @@ func SetReactFlags() *ReactFlags {
 
 	// eslint
 	rf.ESlintLocal = rf.FlagSet.Bool("eslint-local", false,
-		"set eslint config file locally\n(default: globally)")
+		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)")
 
 	// alias
 	f := rf.FlagSet.Lookup("eslint-local")
