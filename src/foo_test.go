@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"local/src/resource"
+	"os/user"
 	"strings"
 	"testing"
 )
@@ -46,4 +47,18 @@ func Test_FS(t *testing.T) {
 			t.Log(string(b))
 		}
 	}
+}
+
+func Test_FilePath(t *testing.T) {
+	// src := "~/.config/coc"
+
+	u, err := user.Current()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	t.Log(u.HomeDir)
+
+	// t.Log(filepath.Abs(src))
 }
