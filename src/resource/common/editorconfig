@@ -16,12 +16,14 @@ indent_style = tab  # tab | space (所有 \t 都会被转成 space).
 indent_size = 4     # 格式化的宽度. soft tab 的宽度, 如果和编辑器的 tabstop 相同的时候会转成 \t, 如果小于 tabstop 则是 space.
 # tab_width = 4     # \t 的宽度. 默认值为 indent_size.
 end_of_line = lf    # lf = \n | cr = \r | crlf = \r\n
-# insert_final_newline = true  # 所有文件最后都添加一个空行.
-
-[*.md]
-trim_trailing_whitespace = false  # 删除行尾空白.
+trim_trailing_whitespace = true  # 删除行最后的空白
+# insert_final_newline = true    # 所有文件最后都添加一个空行.
 
 # prettier supported files
-[*.{htm,html,js,jsm,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,svg,vue,json,jsonc,vue,yaml,yml,graphql,md}]
+[*.{htm,html,js,jsx,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,svg,vue,json,jsonc,yaml,yml,graphql,md}]
+indent_style = space
 indent_size = 2
 
+# html js ts 相关语言使用单引号.
+[*.{htm,html,js,jsx,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,svg,vue}]
+quote_type = single
