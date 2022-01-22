@@ -28,3 +28,4 @@ indent_size = 2
 # html js ts 相关语言使用单引号.
 [*.{htm,html,js,jsx,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,svg,vue}]
 quote_type = single
+

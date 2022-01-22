@@ -59,6 +59,4 @@ func Test_FilePath(t *testing.T) {
 	}
 
 	t.Log(u.HomeDir)
-
-	// t.Log(filepath.Abs(src))
 }
