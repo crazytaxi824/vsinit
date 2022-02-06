@@ -542,7 +542,7 @@ issues:
   # max-same-issues: 0
 
   # AutoFix found issues (if it's supported by the linter)
-  fix: true
+  fix: false  # FIXME 自动修复有bug.
 
 severity:
   # Default value is empty string.
