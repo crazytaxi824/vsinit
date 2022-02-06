@@ -495,19 +495,15 @@ issues:
         - gomnd
       text: "Magic number" # 不检查 Magic number
 
-    # 这里是指 structcheck 时，如果源代码中包含 tableName / tablename 则不检查错误。
-    - linters:
-        - structcheck
-      source: "table(n|N)ame struct{} `.*pg:.*`" # 不检查 tableName 属性
-
-    - linters:
-        - unused
-      source: "table(n|N)ame struct{} `.*pg:.*`" # 不检查 tableName 属性
-
     # Exclude lll issues for long lines with go:generate
     - linters:
         - lll
       source: "^//go:generate" # 代码自动生成
+
+    # Exclude errcheck `defer xxx.Close()` error check
+    - linters:
+        - errcheck
+      source: "\\sdefer .*\\.Close()"   # \s 表示只要是空白不管是 space 或者 \t 都匹配
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
