@@ -243,7 +243,7 @@ linters-settings:
 
   # 一行代码的最大长度
   lll:
-    line-length: 140 # 长度
+    line-length: 120 # 长度
     tab-width: 1 # tab 算几个长度
 
   # 拼写错误
