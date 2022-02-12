@@ -1,6 +1,7 @@
 # http://git-scm.com/docs/gitignore
 # "/" files/dirs in root path.
 /.vscode
+/.vim
 /.history
 /.idea
 /*.iml
