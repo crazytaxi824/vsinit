@@ -60,7 +60,8 @@ func filesMightNeedToWrite() {
 		)
 	} else {
 		// vscode settings -> "overrideConfigFile": "全局绝对位置"
-		overrideConfigFile = fmt.Sprintf(`"overrideConfigFile": %q`, appsettings.ESLintGlobalPath+appsettings.JSESLintFileName)
+		overrideConfigFile = fmt.Sprintf(`"overrideConfigFile": %q`,
+			appsettings.ESLintGlobalPath+appsettings.JSESLintFileName)
 
 		// eslint 文件安装在 Global Path 位置
 		fs = append(fs,
@@ -72,13 +73,22 @@ func filesMightNeedToWrite() {
 		)
 	}
 
-	// 添加 .vscode/settings.json 文件
+	// 添加 .vscode/settings.json | .vim/coc-settings.json 文件
 	fs = append(fs,
 		util.FileContent{
 			Dir:      ".vscode/",
 			FileName: "settings.json",
 			Content: bytes.ReplaceAll(resource.JSVsSettings,
 				[]byte(`"overrideConfigFile": "eslintrc-js.json"`), // 这里是写死在 .vscode/settings.json 文件中的内容, 不要改.
+				[]byte(overrideConfigFile),
+			),
+			Suggestion: fmt.Sprintf(settingsSuggestion, util.COLOR_YELLOW, overrideConfigFile, util.COLOR_RESET),
+		},
+		util.FileContent{
+			Dir:      ".vim/",
+			FileName: "coc-settings.json",
+			Content: bytes.ReplaceAll(resource.JSVimCocSettings,
+				[]byte(`"overrideConfigFile": "eslintrc-js.json"`), // 这里是写死在 .vim/coc-settings.json 文件中的内容, 不要改.
 				[]byte(overrideConfigFile),
 			),
 			Suggestion: fmt.Sprintf(settingsSuggestion, util.COLOR_YELLOW, overrideConfigFile, util.COLOR_RESET),
