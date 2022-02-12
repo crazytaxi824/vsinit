@@ -19,14 +19,16 @@ var fs []util.FileContent
 func filesHasToWrite() {
 	fs = append(fs, []util.FileContent{
 		{
-			FileName:   ".gitignore",
-			Content:    resource.ReactGitignore,
-			Suggestion: fmt.Sprintf("# add dev environment\n%s/.vscode\n**/*.bak%s\n", util.COLOR_YELLOW, util.COLOR_RESET), // add config
+			FileName: ".gitignore",
+			Content:  resource.ReactGitignore,
+			Suggestion: fmt.Sprintf("# add dev environment\n%s/.vscode\n/.vim\n**/*.bak\n**/*.swp%s\n",
+				util.COLOR_YELLOW, util.COLOR_RESET), // add config
 		},
 		{
-			FileName:   "tsconfig.json",
-			Content:    resource.ReactConfigJSON,
-			Suggestion: fmt.Sprintf(tsconfigSuggestion, util.COLOR_YELLOW, util.COLOR_RESET, util.COLOR_YELLOW, util.COLOR_RESET),
+			FileName: "tsconfig.json",
+			Content:  resource.ReactConfigJSON,
+			Suggestion: fmt.Sprintf(tsconfigSuggestion,
+				util.COLOR_YELLOW, util.COLOR_RESET, util.COLOR_YELLOW, util.COLOR_RESET),
 		},
 		{
 			FileName: ".editorconfig",
@@ -59,7 +61,8 @@ func filesMightNeedToWrite() {
 		)
 	} else {
 		// vscode settings -> "overrideConfigFile": "全局绝对位置"
-		overrideConfigFile = fmt.Sprintf(`"overrideConfigFile": %q`, appsettings.ESLintGlobalPath+appsettings.ReactESLintFileName)
+		overrideConfigFile = fmt.Sprintf(`"overrideConfigFile": %q`,
+			appsettings.ESLintGlobalPath+appsettings.ReactESLintFileName)
 
 		// eslint 文件安装在 Global Path 位置
 		fs = append(fs,
@@ -71,13 +74,22 @@ func filesMightNeedToWrite() {
 		)
 	}
 
-	// 添加 .vscode/settings.json 文件
+	// 添加 .vscode/settings.json | .vim/coc-settings.json 文件
 	fs = append(fs,
 		util.FileContent{
 			Dir:      ".vscode/",
 			FileName: "settings.json",
 			Content: bytes.ReplaceAll(resource.ReactVsSettings,
 				[]byte(`"overrideConfigFile": "eslintrc-react.json"`), // 这里是写死在 .vscode/settings.json 文件中的内容, 不要改.
+				[]byte(overrideConfigFile),
+			),
+			Suggestion: fmt.Sprintf(settingsSuggestion, util.COLOR_YELLOW, overrideConfigFile, util.COLOR_RESET),
+		},
+		util.FileContent{
+			Dir:      ".vim/",
+			FileName: "coc-settings.json",
+			Content: bytes.ReplaceAll(resource.ReactVimCocSettings,
+				[]byte(`"overrideConfigFile": "eslintrc-react.json"`), // 这里是写死在 .vim/coc-settings.json 文件中的内容, 不要改.
 				[]byte(overrideConfigFile),
 			),
 			Suggestion: fmt.Sprintf(settingsSuggestion, util.COLOR_YELLOW, overrideConfigFile, util.COLOR_RESET),
