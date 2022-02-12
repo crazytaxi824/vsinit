@@ -1,5 +1,3 @@
-// args - go
-
 package main
 
 import (
