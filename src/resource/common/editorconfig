@@ -25,8 +25,8 @@ trim_trailing_whitespace = true  # 删除行最后的空白
 indent_style = space
 indent_size = 2
 
-# html js ts 相关语言使用单引号.
-[*.{htm,html,js,jsx,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,svg,vue}]
+# js ts css 等相关语言使用单引号.
+[*.{js,jsx,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,vue}]
 quote_type = single
 
 # python indent 4 个空格.
