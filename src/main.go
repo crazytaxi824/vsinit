@@ -5,6 +5,7 @@ import (
 	"local/src/golang"
 	"local/src/javascript"
 	"local/src/react"
+	"local/src/singlefile"
 	"local/src/typescript"
 	"local/src/util"
 	"os"
@@ -38,6 +39,11 @@ func main() {
 			os.Exit(2)
 		}
 
+	case "editorconfig", "editor":
+		if err := singlefile.WriteEditorConfigFile(); err != nil {
+			os.Exit(2)
+		}
+
 	default:
 		fmt.Printf(helpMsg, util.COLOR_YELLOW, util.COLOR_RESET, util.COLOR_YELLOW, util.COLOR_RESET)
 		os.Exit(2)
@@ -47,7 +53,7 @@ func main() {
 }
 
 const helpMsg = `help:%s
-    vs [go|ts|js|react]%s
+    vs [go|ts(typescript)|js(javascript)|react|editor(editorconfig)]%s
 
 more info:%s
     vs ts -h%s

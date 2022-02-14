@@ -47,7 +47,7 @@ func checkDir(fileContents []FileContent) error {
 
 // 写文件
 func createDirAndWriteFiles(fileContents []FileContent) error {
-	fmt.Printf("%sWriting project files ...%s\n", COLOR_GREEN, COLOR_RESET)
+	fmt.Printf("%sWriting files ...%s\n", COLOR_GREEN, COLOR_RESET)
 
 	// create dir, if Dir == "" skip
 	for _, fc := range fileContents {
@@ -60,7 +60,17 @@ func createDirAndWriteFiles(fileContents []FileContent) error {
 		}
 
 		// write files
-		f, err := os.OpenFile(fc.Dir+fc.FileName, os.O_EXCL|os.O_CREATE|os.O_WRONLY, 0600)
+		var (
+			f   *os.File
+			err error
+		)
+
+		// check overwrite option
+		if fc.Overwrite {
+			f, err = os.OpenFile(fc.Dir+fc.FileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
+		} else {
+			f, err = os.OpenFile(fc.Dir+fc.FileName, os.O_EXCL|os.O_CREATE|os.O_WRONLY, 0600)
+		}
 		if err != nil && !errors.Is(err, os.ErrExist) {
 			log.Println(err)
 			return err
