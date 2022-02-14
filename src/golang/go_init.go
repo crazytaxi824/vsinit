@@ -10,10 +10,8 @@ import (
 	"os"
 )
 
-var goFlags *util.GoFlags
-
 func InitGoProj() error {
-	// go flags only for -help
+	// go flags only for `-help`
 	goFlags := util.SetGoFlags()
 	err := goFlags.FlagSet.Parse(os.Args[2:])
 	if err != nil {
