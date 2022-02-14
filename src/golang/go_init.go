@@ -1,4 +1,3 @@
-// copy files: .vscode/settints.json, .vscode/launch.json, .editorconfig, .gitignore, .golangci.yml, src/main.go, src/main_test.go
 // install '.golangci.yml' locally for vim-go.
 
 package golang
@@ -10,10 +9,8 @@ import (
 	"os"
 )
 
-var goFlags *util.GoFlags
-
 func InitGoProj() error {
-	// go flags only for -help
+	// go flags only for `-help`
 	goFlags := util.SetGoFlags()
 	err := goFlags.FlagSet.Parse(os.Args[2:])
 	if err != nil {
