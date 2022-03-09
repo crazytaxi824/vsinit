@@ -14,7 +14,7 @@ import (
 func main() {
 	// 只输入了 'vs' 命令的情况下
 	if len(os.Args) < 2 {
-		fmt.Printf(helpMsg, util.COLOR_YELLOW, util.COLOR_RESET, util.COLOR_YELLOW, util.COLOR_RESET)
+		fmt.Printf(helpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
 		os.Exit(2)
 	}
 
@@ -39,13 +39,13 @@ func main() {
 			os.Exit(2)
 		}
 
-	case "editorconfig", "editor":
+	case "editorconfig":
 		if err := singlefile.WriteEditorConfigFile(); err != nil {
 			os.Exit(2)
 		}
 
 	default:
-		fmt.Printf(helpMsg, util.COLOR_YELLOW, util.COLOR_RESET, util.COLOR_YELLOW, util.COLOR_RESET)
+		fmt.Printf(helpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
 		os.Exit(2)
 	}
 
@@ -53,7 +53,7 @@ func main() {
 }
 
 const helpMsg = `help:%s
-    vs [go|ts(typescript)|js(javascript)|react|editor(editorconfig)]%s
+    vs [go | ts | js | react | editorconfig]%s
 
 more info:%s
     vs ts -h%s
