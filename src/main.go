@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"local/src/golang"
 	"local/src/javascript"
@@ -14,7 +15,7 @@ import (
 func main() {
 	// 只输入了 'vs' 命令的情况下
 	if len(os.Args) < 2 {
-		fmt.Printf(helpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
+		fmt.Printf(mainHelpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
 		os.Exit(2)
 	}
 
@@ -39,23 +40,57 @@ func main() {
 			os.Exit(2)
 		}
 
-	case "editorconfig":
-		if err := singlefile.WriteEditorConfigFile(); err != nil {
+	case "file":
+		if err := writeFile(); err != nil {
 			os.Exit(2)
 		}
 
 	default:
-		fmt.Printf(helpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
+		fmt.Printf(mainHelpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
 		os.Exit(2)
 	}
 
 	fmt.Printf("%sAll Done! Happy Coding!%s\n", util.COLOR_BOLD_GREEN, util.COLOR_RESET)
 }
 
-const helpMsg = `help:%s
-    vs [go | ts | js | react | editorconfig]%s
+const mainHelpMsg = `Init a project at current directory
+Usage:%s
+    vs [go | ts | js | react | file]%s
 
-more info:%s
-    vs ts -h%s
+flags info:%s
+    vs ts -h
+    vs js -h
+    vs react -h
+    vs file -h%s
+
+`
+
+// write a specific file.
+func writeFile() error {
+	// 只输入了 'vs file' 命令的情况下
+	if len(os.Args) < 3 {
+		fmt.Printf(fileHelpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
+		return errors.New("filename not specified")
+	}
+
+	switch os.Args[2] {
+	case "editorconfig":
+		return singlefile.WriteEditorConfigFile()
+
+	case "golangci":
+		return singlefile.WriteGolangciFile()
+	}
+
+	fmt.Printf(fileHelpMsg, util.COLOR_GREEN, util.COLOR_RESET, util.COLOR_GREEN, util.COLOR_RESET)
+	return errors.New("specified filename does not exist")
+}
+
+const fileHelpMsg = `write a single file at current directory
+Usage:%s
+    vs file [editorconfig | golangci]%s
+
+flags info:%s
+    vs file editorconfig -h
+    vs file golangci -h%s
 
 `

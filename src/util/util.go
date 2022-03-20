@@ -28,7 +28,9 @@ func AskBeforeProceed(lang string) error {
 		return errors.New(projectCanceled(lang))
 	}
 
-	fmt.Printf("Init %s Project at %s%q%s? [Yes/no]: ", COLOR_BOLD_YELLOW+lang+COLOR_RESET, COLOR_YELLOW, pwd, COLOR_RESET)
+	fmt.Printf("Init %s Project at %s%q%s? [Yes/no]: ",
+		COLOR_BOLD_YELLOW+lang+COLOR_RESET, COLOR_YELLOW, pwd, COLOR_RESET)
+
 	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
 		return errors.New(projectCanceled(lang))
