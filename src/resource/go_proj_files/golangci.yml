@@ -1,5 +1,6 @@
-# golangci-lint v1.42.1
+# golangci-lint v1.45.0 支持 go1.18
 # https://golangci-lint.run/
+# https://github.com/golangci/golangci-lint/pull/2438
 
 # 出现错误可以清除 lint 缓存
 # golangci-lint cache status
@@ -7,6 +8,9 @@
 
 # 运行配置
 run:
+  # 支持 generic
+  go: 1.18
+
   # 要使用的CPU核心数
   concurrency: 4
 
@@ -135,23 +139,28 @@ linters-settings:
     # minimal occurrences count to trigger, 3 by default
     min-occurrences: 3
 
-  # 类似 golint，https://go-critic.github.io/overview
+  # [VVI] 目前不完全支持 go1.18, 类似 golint，https://go-critic.github.io/overview
   gocritic:
-    enabled-tags: # 开启所有分类，tags
+    # 既没有 enable 也没有 disable 的 checker group 会开启默认项目.
+    enabled-tags: # 开启所有分类，group of checkers
       - diagnostic
       # - experimental
       - opinionated
       - performance
       - style
-    # disabled-tags:  # 禁用 tags
+    # disabled-tags: # 禁用 group of checkers
     #   - experimental
     disabled-checks: # 禁用个别 checks
       - dupImport # https://github.com/go-critic/go-critic/issues/845
-      - ifElseChain # 建议多个 if else 情况用 switch
-      - octalLiteral # 检测8进制数字，0开头的数字，有错误会检查到 0b 二进制开头的
+      - octalLiteral # 检测 8 进制数字
+      - hexLiteral # 检测 16 进制数字
       - whyNoLint # 必须为 // nolint 提供一个原因
-      - wrapperFunc
+      - wrapperFunc # 不允许使用 wg.Add(-1), 使用 wg.Done()
       - commentedOutCode # 移除代码中注释的 code (正式发布时注释掉就行了)
+      # FIXME 以下 checker 目前不支持 go1.18
+      - paramTypeCombine # 提示有错误, 不适配 go1.18
+      - hugeParam # go1.18 无法使用, 导致 golangci-lint 崩溃
+      - typeDefFirst # go1.18 无法使用, 导致 golangci-lint 崩溃
 
   # 检查函数的复杂程度，gocyclo / gocognit / colop 三选一
   gocyclo:
@@ -293,35 +302,76 @@ linters-settings:
     # true - 需要指定哪个 linter 不检查，false - 不需要指定，所有 linter 都不检查.
     require-specific: false
 
-  # 替代 golint, 目前使用 stylecheck 替代。
+  # 替代 golint
+  # https://golangci-lint.run/usage/linters/#revive
+  # https://github.com/mgechev/revive#available-rules
   revive:
-    # https://github.com/mgechev/revive#available-rules
-    ignore-generated-header: true
+    max-open-files: 2048
+    ignore-generated-header: false # false - 忽略带有 "GENERATED" 头的文件; true - 不忽略
     severity: warning
+    # enable-all-rules: true # 不需要开启全部, 很多重复 checker.
+    confidence: 0.1
     # 需要开启的 linter 都需要在下面列出来.
     rules:
-      - name: receiver-naming # Conventions around the naming of receivers.
-        severity: error
       - name: atomic # Check for common mistaken usages of the sync/atomic package
-        severity: error
       - name: argument-limit # maximum num of args a function can receive.
-        arguments: 4
-      - name: range # Prevents redundant variables when iterating over a collection.
-      - name: time-naming # Conventions around the naming of time variables.
-      - name: if-return
-      - name: unexported-return # Warns when a public return is from unexported type.
-      - name: time-naming # Conventions around the naming of time variables.
-      #- name: time-equal # time.Time.Equal instead of == and != for equality check time.
-      - name: dot-imports # Forbids . imports.
-      - name: context-keys-type # Disallows the usage of basic types in context.WithValue.
+        arguments: [4]
+      - name: bare-return
+      - name: confusing-results
+      - name: constant-logical-expr
       - name: context-as-argument # context.Context should be the first argument of a function.
-      - name: increment-decrement # Use i++ and i-- instead of i += 1 and i -= 1.
+      - name: context-keys-type # Disallows the usage of basic types in context.WithValue.
+      - name: deep-exit # 检查程序不是在 main() 函数退出的情况.
+      - name: defer
+        severity: error
+        arguments:
+          - ["call-chain", "loop", "return", "method-call"]
+      - name: dot-imports
+      - name: early-return
+      - name: empty-block
+      - name: error-return # The error return parameter should be last.
+      - name: error-strings
+      - name: errorf
+      - name: function-result-limit
+        arguments: [3]
+      # - name: function-length
+      #   arguments: [10, 0]
+      - name: identical-branches
+        severity: error
+      - name: if-return
+      - name: increment-decrement
+      - name: indent-error-flow # Prevents redundant else statements.
+      - name: import-shadowing
+      - name: line-length-limit # 取代 lll
+        arguments: [120]
+      - name: modifies-parameter
+      - name: modifies-value-receiver
+        severity: error
+      - name: range # Prevents redundant variables when iterating over a collection.
+      - name: range-val-in-closure
+        severity: error
+      - name: range-val-address
+        severity: error
+      - name: receiver-naming # Conventions around the naming of receivers.
+      - name: redefines-builtin-id
+        severity: error
+      - name: struct-tag
+      - name: superfluous-else
+      - name: time-equal # time.Time.Equal instead of == and != for equality check time.
       - name: var-naming # Naming rules.
       - name: var-declaration # Reduces redundancies around variable declaration.
-      - name: errorf # replace errors.New(fmt.Sprintf()) with fmt.Errorf()
-      - name: error-naming # Naming of error variables.
-      - name: error-return # The error return parameter should be last.
-      - name: indent-error-flow # Prevents redundant else statements.
+      - name: unconditional-recursion
+        severity: error
+      - name: unexported-naming # un-exported symbols whose name start with a capital letter.
+      - name: unexported-return # Warns when a public return is from unexported type.
+      # - name: unhandled-error # FIXME 有 bug.
+      - name: unnecessary-stmt
+      - name: unreachable-code
+      - name: unused-parameter
+      - name: unused-receiver
+      - name: useless-break
+      - name: waitgroup-by-value
+        severity: error
       #- name: exported # 注释, Naming and commenting conventions on exported symbols.
       #  severity: info
       #- name: package-comments # package 必须有一个注释.
@@ -329,7 +379,7 @@ linters-settings:
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
+    go: "1.18"
 
     # https://staticcheck.io/docs/options#checks
     # 开启全部检查, 去掉的基本都是 comments 检查.
@@ -386,18 +436,13 @@ linters:
     ### 默认开启的 lints
     # - deadcode # 直接用 unused 就可以了
     - errcheck # 未处理的 error，eg: defer file.Close()
-    - gosimple # 简化代码
     - govet # 检查影子变量等...
     - ineffassign # 检测无效赋值
-    - staticcheck # 检查合集 https://staticcheck.io/docs/checks
     - structcheck # 结构体私有属性 tag 检查，对 tableName 支持不好
     - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
-    # - unused # NOTE 生产环境下打开
     - varcheck # 检查没用的全局变量
 
     ### 自愿开启的 lints
-    - bodyclose # check HTTP res.Body is correctly closed.
-    # - contextcheck # NOTE unknown, 检查 context 使用是否有错误.
     # - colop # NOTE unknown, 检查函数的复杂程度，gocyclo / gocognit / colop 三选一
     - depguard # dep 包管理工具，第三方 package 白名单, depguard / gomodguard 二选一
     - dogsled # 超过n个返回值未接受，eg: x, _, _, _, := f()
@@ -417,20 +462,29 @@ linters:
     # - goprintffuncname  # For example, myLog should be named myLogf
     - gosec # [VVI], security problems
     - ifshort # 简化 if 语法
-    - lll # 同一行代码过长会报错
+    # - lll # 同一行代码过长会报错, 使用 revive line-length-limit 设置.
     - misspell # 拼写错误
     - nakedret # 如果函数长度超过设置，同时有返回值，不能只有 return，必须有参数
-    - nilerr # 如果 err 不是 nil，则不能 return nil。如果 err 是 nil, 则必须 return nil.
     # - nilnil # NOTE unknown, 检查 nil error 和 invalid value 不能同时返回。
     - nolintlint # // nolint 设置
-    # - revive # 替代 golint, stylecheck / revive 二选一
-    - rowserrcheck # 检查 sql.Rows.Err 是否正确处理，针对 sql.
-    - stylecheck # 检查合集 Stylecheck is a replacement for golint. stylecheck / revive 二选一
-    - tparallel # 在 test 文件中错误使用 t.Parallel(). tparallel / paralleltest 二选一
+    - revive # 替代 golint, stylecheck / revive 二选一
     - unconvert # 检查不必要的类型转换
-    #- unparam # NOTE 生产环境下打开，检查函数内没用到的入参，出参
     - whitespace # detection of 开始和结尾的空行 leading and trailing whitespace
     # - nilnil # 检查 return 的值中不会有 nil error 和 nil value 同时存在。
+
+    ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
+    # - gosimple # 简化代码
+    # # - unused # NOTE 生产环境下打开
+    # - staticcheck # 检查合集 https://staticcheck.io/docs/checks
+    # - stylecheck # 检查合集 Stylecheck is a replacement for golint. stylecheck / revive 二选一
+    # - bodyclose # check HTTP res.Body is correctly closed.
+    # # - contextcheck # NOTE unknown, 检查 context 使用是否有错误.
+    # - nilerr # 如果 err 不是 nil，则不能 return nil。如果 err 是 nil, 则必须 return nil.
+    # - rowserrcheck # 检查 sql.Rows.Err 是否正确处理，针对 sql.
+    # - sqlclosecheck # checks if SQL rows/statements are closed.
+    # - tparallel # 在 test 文件中错误使用 t.Parallel()
+    # # - unparam # NOTE 生产环境下打开，检查函数内没用到的入参，出参
+    # # - wastedassign # 无效的赋值
 
     ### 下面是不建议开启的
     # - asciicheck        # 检查代码是否包含 non-ASCII identifiers
@@ -539,7 +593,7 @@ issues:
   # max-same-issues: 0
 
   # AutoFix found issues (if it's supported by the linter)
-  fix: false  # FIXME 自动修复有bug.
+  fix: false  # NOTE 自动修复, 该功能有 bug.
 
 severity:
   # Default value is empty string.
