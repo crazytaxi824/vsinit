@@ -513,9 +513,9 @@ linters:
     # - wsl           # 需要使用空行的地方 - 和 whitespace 作用正好相反
 
     ### 下面是已经弃用的
-    # - interfacer # Linter that suggests narrower interface types
-    # - scopelint # 检查 for k,v:=range 时，直接使用 &v 造成的问题。因为 v 的内存是不停复用的，所以每次循环是一样的。
-    # - maligned      # 结构体4k对齐检查
+    # - interfacer  # Linter that suggests narrower interface types
+    # - scopelint   # 检查 for k,v:=range 时，直接使用 &v 造成的问题。因为 v 的内存是不停复用的，所以每次循环是一样的。
+    # - maligned    # 结构体4k对齐检查
 
   # presets:
   #   - bugs
