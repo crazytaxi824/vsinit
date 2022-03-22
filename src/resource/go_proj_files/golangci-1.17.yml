@@ -135,10 +135,10 @@ linters-settings:
   # 可以用常量申明的重复字符串
   goconst:
     # minimal length of string constant, 3 by default
-    # string 的长度.
-    min-len: 3
+    # string 的长度需要 >= n 才进行检查. 默认 3.
+    min-len: 6
     # minimal occurrences count to trigger, 3 by default
-    # 相同 string 出现的次数, 默认 3
+    # 相同 string 出现的次数, 默认 3.
     min-occurrences: 5
 
   # 类似 golint，https://go-critic.github.io/overview
@@ -154,6 +154,7 @@ linters-settings:
     #   - experimental
     disabled-checks: # 禁用个别 checks
       - dupImport # https://github.com/go-critic/go-critic/issues/845
+      - ifElseChain # NOTE 在生产模式时, 检查一次即可.
       - octalLiteral # 检测 8 进制数字
       - hexLiteral # 检测 16 进制数字
       - whyNoLint # 必须为 // nolint 提供一个原因
@@ -165,11 +166,13 @@ linters-settings:
     # 最小复杂性
     min-complexity: 10
 
-  # 未使用。- TODO, DEBUG and FIXME 标记
+  # 显示标记
   godox:
     # these can be overwritten by this setting
     keywords:
-      - NOTE
+      - TODO
+      - FIXME
+      - OPTIMIZE
 
   # go 格式化工具
   gofmt:
@@ -184,11 +187,19 @@ linters-settings:
 
   # 检查数字常量
   gomnd:
-    settings:
-      mnd:
-        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
-        # don't include the "operation" and "assign"
-        checks: argument,case,condition,return # operation,assign
+    # the list of enabled checks, https://github.com/tommy-muehle/go-mnd/#checks
+    # don't include the "operation" and "assign"
+    checks:
+      - argument
+      - case
+      - condition
+      # - operation
+      - return
+      # - assign
+    ignored-numbers:
+      - '0600'
+      - '0666'
+      - '0755'
 
   # 第三方 package 白名单
   gomodguard:
@@ -289,19 +300,21 @@ linters-settings:
   # 写法 // nolint:structcheck,unused // my explanation
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
-    # 是否允许 nolint 指定的规则是无效的？
+    # 是否允许 nolint 指定的规则是无效的? 无效解释会继续提示错误.
     allow-unused: false
     # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    # 最前面是否允许有一个空格？ 可以写为 //nolint 也可以写为 // nolint
+    # 是否允许有空格？ 可以写为 //nolint 也可以写为 // nolint
     allow-leading-space: true
     # Exclude following linters from requiring an explanation.  Default is [].
-    # 不需要提供解释的 linter, 默认是空[], 表示所有 lint 都需要解释。
+    # 不需要提供解释的 linter, 默认是空[], 表示所有 nolint 都需要提供解释。
     allow-no-explanation: []
     # Enable to require an explanation after each nolint directive. Default is false.
-    # true - 使用 nolint 需要提供解释
+    # // nolint 格式要求.
+    # true - // nolint 这个格式会被要求提供解释; false - 直接 // nolint 即可, 不需要提供解释.
     require-explanation: false
     # Enable to require an explanation after each nolint directive. Default is false.
-    # true - 需要指定哪个 linter 不检查，false - 不需要指定，所有 linter 都不检查.
+    # 使用 // nolint 时那些 linter 不需要运行.
+    # true - 需要指定哪个 linter 不检查; false - 不需要指定, 所有 linter 都不检查.
     require-specific: false
 
   # 替代 golint
@@ -383,10 +396,10 @@ linters-settings:
       - name: useless-break
       - name: waitgroup-by-value
         severity: error
-      #- name: exported # 注释, Naming and commenting conventions on exported symbols.
-      #  severity: info
-      #- name: package-comments # package 必须有一个注释.
-      #  severity: info
+      # - name: exported # 注释, Naming and commenting conventions on exported symbols.
+      #   severity: info
+      # - name: package-comments # package 必须有一个注释.
+      #   severity: info
 
   # 类似 revive 的 linter 合集
   stylecheck:
@@ -408,7 +421,7 @@ linters-settings:
     # ST1013 - https://staticcheck.io/docs/options#http_status_code_whitelist
     http-status-code-whitelist: ["200", "204", "400", "403", "404", "500"]
 
-  # 检查函数内没用到的入参，出参
+  # 检查函数内没用到的入参/出参
   unparam:
     check-exported: false
 
@@ -419,7 +432,7 @@ linters-settings:
   # 空行检查
   whitespace:
     multi-if: false # Enforces newlines (or comments) after every multi-line if statement
-    multi-func: false # Enforces newlines (or comments) after every multi-line function signature
+    multi-func: true # Enforces newlines (or comments) after every multi-line function signature
 
   # 需要使用空行的地方 - 和 whitespace 作用正好相反
   wsl:
@@ -452,7 +465,7 @@ linters:
     - govet        # 检查影子变量等...
     - ineffassign  # 检测无效赋值
     - staticcheck  # 检查合集 https://staticcheck.io/docs/checks
-    - structcheck  # 结构体私有属性 tag 检查，对 tableName 支持不好
+    - structcheck  # 结构体私有属性 unused 检查, 对 tableName 支持不好
     - typecheck    # Like the front-end of a Go compiler, parses and type-checks Go code
     # - unused     # NOTE 生产环境下打开
     - varcheck     # 检查没用的全局变量
@@ -460,28 +473,24 @@ linters:
     ### 自愿开启的 lints
     - bodyclose      # check HTTP res.Body is correctly closed.
     - contextcheck   # 检查 context 使用是否有错误.
-    # - cyclop       # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
     # - depguard     # imports 管理工具 depguard / gomodguard / revive-imports-blacklist 三选一, 目前使用 revive.
     - dogsled        # 超过n个返回值未接受，eg: x, _, _, _, := f()
     - dupl           # 检查重复代码
     - durationcheck  # 检查 time.Duration 入参是否带单位 (time.second ...)
     - errorlint      # 检查 error wrap 错误.
     - exhaustive     # 检查 switch 语法
-    - exportloopref  # An analyzer that finds exporting pointers for loop variables.
+    - exportloopref  # 在闭包函数中使用 for-loop 的 var. eg: `for { go func(){...}() }`
     # - funlen       # function 长度检查, 使用 revive-function-length 代替.
     - gochecknoinits # 检查是否有 func init() 函数
-    - goconst        # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
     - gocritic       # [VVI], 检查合集 https://go-critic.github.io/overview
     # - gocyclo      # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
     # - gofmt        # 和 goimports 二选一即可。
     - goimports      # 格式化工具
-    - gomnd          # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
     # - gomodguard   # imports 管理工具 depguard / gomodguard / revive-imports-blacklist 三选一, 目前使用 revive.
     # - goprintffuncname  # For example, myLog should be named myLogf
     - gosec          # [VVI], security problems
-    - ifshort        # 简化 if 语法
-    # - lll          # 同一行代码过长会报错, 使用 revive line-length-limit 代替.
-    - makezero       # 检查可预先分配 Cap 的 slice 的 Len 是否为 0
+    # - lll          # 同一行代码过长会报错, 使用 revive line-length-limit 设置.
+    - makezero       # 使用 append 时, 检查预先分配容量的 slice 的 Len 是否为 0
     - misspell       # 拼写错误
     - nakedret       # 如果函数长度超过设置，同时有返回值，不能只有 return，必须有参数
     - nilerr         # 如果 err 不是 nil，则不能 return nil。如果 err 是 nil, 则必须 return nil.
@@ -494,25 +503,32 @@ linters:
     # - stylecheck   # 检查合集 Stylecheck is a replacement for golint. stylecheck / revive 二选一
     - tparallel      # 在 test 文件中错误使用 t.Parallel(). tparallel / paralleltest 二选一
     - unconvert      # 检查不必要的类型转换
-    # - unparam      # 检查函数内没用到的入参，出参. 可以使用 revive-unused-parameter
-    - whitespace     # detection of 开始和结尾的空行 leading and trailing whitespace
 
-    ### 下面是不建议开启的
-    # - asciicheck        # 检查代码是否包含 non-ASCII identifiers
+    ### NOTE prod 时才需要检查的项
+    # - whitespace   # functions, if, for ... 开始和结尾的空行 leading and trailing whitespace
+    # - goconst      # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
+    # - unused       # unused global var, function ...
+    # - unparam      # 检查函数内没用到的入参，出参. 可以使用 revive-unused-parameter
+    # - ifshort      # 简化 if 语法, 开发时不检查简化语法
+
+    ### 不建议开启
+    # - asciicheck    # 检查代码是否包含 non-ASCII identifiers
+    # - cyclop        # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
+    # - gomnd         # 检查常量数字, NOTE 太多提示, 不推荐使用.
     # - gochecknoglobals  # 检查是否有全局变量
     # - gocognit      # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
     # - godot         # 检查注释是否句号结尾。
-    # - godox         # 检查是否有 FIXME / TODO 标记
+    # - godox         # 检查是否有 FIXME / TODO ... 标记
     # - goerr113      # 检查 error 表达式中的错误
     # - golint        # 检查合集，已经不再更新，Replaced by revive.
     # - nestif        # 检查深度嵌套的 if 语句
     # - nlreturn      # return 之前必须空一行.
-    # - prealloc      # 查找可以被与先分配的 slice
+    # - prealloc      # 查找可以被预先分配 Len & Cap 的 slice, make([]int, Len, Cap)
     # - paralleltest  # 有 bug. tparallel / paralleltest 二选一
     # - testpackage   # linter that makes you use a separate _test package
     # - wsl           # 需要使用空行的地方 - 和 whitespace 作用正好相反
 
-    ### 下面是已经弃用的
+    ### 已弃用
     # - interfacer  # Linter that suggests narrower interface types
     # - scopelint   # 检查 for k,v:=range 时，直接使用 &v 造成的问题。因为 v 的内存是不停复用的，所以每次循环是一样的。
     # - maligned    # 结构体4k对齐检查
@@ -556,9 +572,9 @@ issues:
     #     - staticcheck
     #   text: "SA9003:" # if/else 语句中 body 是空的情况 if true{}else{}
 
-    - linters:
-        - gomnd
-      text: "Magic number" # 不检查 Magic number
+    # - linters:
+    #     - gomnd
+    #   text: "Magic number" # 不检查 Magic number
 
     # Exclude lll issues for long lines with go:generate
     - linters:
@@ -568,12 +584,15 @@ issues:
     # Exclude errcheck `defer xxx.Close()` error check
     - linters:
         - errcheck
-      source: "\\sdefer .*\\.Close()"   # \s 表示只要是空白不管是 space 或者 \t 都匹配
+      source: "\\sdefer .*\\.Close()"  # 不检查 defer XXX.Close(). \s 表示只要是空白不管是 space 或者 \t 都匹配.
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
   # excluded by default patterns execute `golangci-lint run --help`.
-  # Default value for this option is true.
+  # Default true.
+  # 这个设置是和下面 include 配合使用的.
+  # true  - 排除所有 EXC000X 的错误提示, 加入 include 的 checker 提示错误.
+  # false - 不排除任何 EXC000X 的错误提示, 加入 include 的 checker 不提示错误.
   exclude-use-default: true
 
   # https://golangci-lint.run/usage/configuration/
