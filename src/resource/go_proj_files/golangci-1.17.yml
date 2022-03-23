@@ -86,7 +86,7 @@ linters-settings:
     # 检查断言错误, eg：a := b.(MyStruct) 需要写成 a,ok:=b.(MyStruct)
     check-type-assertions: true
     # 检查空标识符, num, _ := strconv.Atoi(numStr)
-    # true-检查,false-不检查。
+    # true - 检查; false - 不检查
     check-blank: true
     # list of functions to exclude from checking, where each entry is a single function to exclude.
     # see https://github.com/kisielk/errcheck#excluding-functions for details
@@ -219,6 +219,7 @@ linters-settings:
     # To specify a set of rules to explicitly exclude.
     # Available rules: https://github.com/securego/gosec#available-rules
     excludes:
+      - G104 # Audit errors not checked, 使用 errorcheck 做检查.
       - G204 # exec.Command(cmd, args...) - cmd/args 是变量的情况
       - G304 # ioutil.ReadFile(filename) - filename 是变量的情况
     # Exclude generated files
@@ -388,7 +389,7 @@ linters-settings:
         severity: error
       - name: unexported-naming # un-exported symbols whose name start with a capital letter.
       - name: unexported-return # Warns when a public return is from unexported type.
-      # - name: unhandled-error # FIXME 有 bug.
+      # - name: unhandled-error # 使用 errcheck 做检查.
       - name: unnecessary-stmt
       - name: unreachable-code
       - name: unused-parameter
@@ -401,23 +402,12 @@ linters-settings:
       # - name: package-comments # package 必须有一个注释.
       #   severity: info
 
-  # 类似 revive 的 linter 合集
-  stylecheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.17"
-
+  staticcheck:
+    # Select the Go version to target.
+    # Default: 1.13
+    go: "1.15"
     # https://staticcheck.io/docs/options#checks
-    # 开启全部检查, 去掉的基本都是 comments 检查.
-    checks: ["all", "-ST1000", "-ST1006", "-ST1020", "-ST1021", "-ST1022"]
-
-    # ST1001 - https://staticcheck.io/docs/options#dot_import_whitelist
-    dot-import-whitelist:
-      - fmt
-
-    # ST1003 - https://staticcheck.io/docs/options#initialisms
-    # 使用默认设置.
-    # initialisms: [ "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", ... ]
-
+    checks: ["all", "-ST1000", "-ST1003", "-ST1020", "-ST1021", "-ST1022"]
     # ST1013 - https://staticcheck.io/docs/options#http_status_code_whitelist
     http-status-code-whitelist: ["200", "204", "400", "403", "404", "500"]
 
@@ -455,19 +445,19 @@ linters-settings:
     # Allow leading comments to be separated with empty liens
     allow-separated-leading-comment: false
 
+# NOTE gosimple & stylecheck 都是 staticcheck 中的一部分, 三者都不属于 --fast linters.
 linters:
   disable-all: true
   enable:
     ### 默认开启的 lints
-    # - deadcode # 直接用 unused 就可以了
+    # - deadcode   # 直接用 unused 就可以了
     - errcheck     # 未处理的 error，eg: defer file.Close()
-    - gosimple     # 简化代码
+    # - gosimple   # staticcheck 的 S 部分, 直接使用 staticcheck
     - govet        # 检查影子变量等...
     - ineffassign  # 检测无效赋值
     - staticcheck  # 检查合集 https://staticcheck.io/docs/checks
     - structcheck  # 结构体私有属性 unused 检查, 对 tableName 支持不好
     - typecheck    # Like the front-end of a Go compiler, parses and type-checks Go code
-    # - unused     # NOTE 生产环境下打开
     - varcheck     # 检查没用的全局变量
 
     ### 自愿开启的 lints
@@ -500,9 +490,9 @@ linters:
     - revive         # 替代 golint, stylecheck / revive 二选一
     - rowserrcheck   # 检查 sql.Rows.Err 是否正确处理，针对 sql.
     - sqlclosecheck  # checks if SQL rows/statements are closed.
-    # - stylecheck   # 检查合集 Stylecheck is a replacement for golint. stylecheck / revive 二选一
     - tparallel      # 在 test 文件中错误使用 t.Parallel(). tparallel / paralleltest 二选一
     - unconvert      # 检查不必要的类型转换
+    - wastedassign   # 无效的赋值
 
     ### NOTE prod 时才需要检查的项
     # - whitespace   # functions, if, for ... 开始和结尾的空行 leading and trailing whitespace
@@ -523,8 +513,10 @@ linters:
     # - golint        # 检查合集，已经不再更新，Replaced by revive.
     # - nestif        # 检查深度嵌套的 if 语句
     # - nlreturn      # return 之前必须空一行.
-    # - prealloc      # 查找可以被预先分配 Len & Cap 的 slice, make([]int, Len, Cap)
     # - paralleltest  # 有 bug. tparallel / paralleltest 二选一
+    # - prealloc      # 查找可以被预先分配 Len & Cap 的 slice, make([]int, Len, Cap)
+    # - predeclared   # 检查是否使用了关键字 (new, make, append uint, etc.) 使用 revive/redefines-builtin-id 代替
+    # - stylecheck    # staticcheck 的 ST 部分, 直接使用 staticcheck
     # - testpackage   # linter that makes you use a separate _test package
     # - wsl           # 需要使用空行的地方 - 和 whitespace 作用正好相反
 
@@ -564,27 +556,24 @@ issues:
       linters:
         - gosec
 
-    # 排除指定 lint 的指定错误
-    # text 指输出的 error 中包含的文字。
-    # source 指源代码中包含的文字。
-    # 这里指 staticcheck 时，如果报错内容是 SA9003 开头则不显示。
-    # - linters:
-    #     - staticcheck
-    #   text: "SA9003:" # if/else 语句中 body 是空的情况 if true{}else{}
-
-    # - linters:
-    #     - gomnd
-    #   text: "Magic number" # 不检查 Magic number
+    # NOTE 排除指定 lint 的指定错误
+    # text   - 指输出的 error 中包含的文字。
+    # source - 指源代码中包含的文字。
+    # errcheck & gosec 遇到代码 "defer XXX.Close()" 跳过.
+    - linters:
+        - errcheck
+        - gosec
+      source: "\\sdefer .*\\.Close()"  # \s 表示只要是空白不管是 space 或者 \t 都匹配.
 
     # Exclude lll issues for long lines with go:generate
     - linters:
         - lll
       source: "^//go:generate" # 代码自动生成
 
-    # Exclude errcheck `defer xxx.Close()` error check
-    - linters:
-        - errcheck
-      source: "\\sdefer .*\\.Close()"  # 不检查 defer XXX.Close(). \s 表示只要是空白不管是 space 或者 \t 都匹配.
+    # staticcheck 检查中, 如果报错内容是 SA9003 开头则不输出.
+    # - linters:
+    #     - staticcheck
+    #   text: "SA9003:"  # if/else 语句中 body 是空的情况 if true{}else{}
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
