@@ -25,7 +25,7 @@
     "staticcheck": false
   },
 
-  // DEBUG 神器，可以通过访问 http://localhost:16060 查看性能参数
+  // DEBUG 神器, 可以通过访问 http://localhost:16060 查看性能参数
   "go.languageServerFlags": [
     "-rpc.trace", // for more detailed debug logging
     "serve",
@@ -37,7 +37,7 @@
 
   // dlv debug 设置, go 插件 v0.27.0 默认使用 dlv-dap
   "go.delveConfig": {
-    // "debugAdapter": "legacy", // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式。
+    // "debugAdapter": "legacy", // dlv-dap | legacy(dlv), 新增 dlv-dap 是默认模式
     "showGlobalVariables": true // debug 时显示全局变量
   },
 
@@ -54,8 +54,8 @@
   // golangci-lint 设置
   "go.lintTool": "golangci-lint",
 
-  // NOTE save 时 golangci-lint 整个 package，使用 'file' 时，
-  // 如果变量定义在别的文件中会造成 undeclared 错误。
+  // NOTE save 时 golangci-lint 整个 package, 使用 'file' 时,
+  // 如果变量定义在别的文件中会造成 undeclared 错误
   "go.lintOnSave": "package", // package | file | workspace | off
 
   "go.lintFlags": [
@@ -68,7 +68,7 @@
 
   // search.exclude 用来忽略搜索的文件夹
   // files.exclude 用来忽略工程打开的文件夹
-  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配, 不要用 / ./ 开头,
   // **/所有路径下进行匹配
   "search.exclude": {
     ".idea": true,
@@ -78,8 +78,8 @@
     ".history": true
   },
 
-  // files.exclude 不显示文件，
-  // 直接写文件/文件夹名字就实在项目根路径下进行匹配，不要用 / ./ 开头，
+  // files.exclude 不显示文件,
+  // 直接写文件/文件夹名字就实在项目根路径下进行匹配, 不要用 / ./ 开头,
   // **/所有路径下进行匹配
   "files.exclude": {
     ".idea": true

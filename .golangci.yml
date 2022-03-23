@@ -13,14 +13,14 @@ run:
   # 要使用的CPU核心数
   concurrency: 4
 
-  # 分析超时，例如 30s, 5m，默认是 1m
+  # 分析超时, 例如 30s, 5m, 默认是 1m
   timeout: 30s
 
-  # 包管理模式，go modules使用readonly
+  # 包管理模式, go modules使用readonly
   # 可用的值范围 readonly|release|vendor
   modules-download-mode: readonly
 
-  # 退出 code，exit 1
+  # 退出 code, exit 1
   issues-exit-code: 1
 
   # 是否包含测试文件
@@ -29,7 +29,7 @@ run:
   # build-tags:
   #   - mytag
 
-  # 要跳过检查的目录，没成功过
+  # 要跳过检查的目录, 没成功过
   # which dirs to skip: issues from them won't be reported;
   skip-dirs:
     - .vscode
@@ -71,7 +71,7 @@ linters-settings:
     # should ignore tests (default false)
     skip-tests: true
 
-  # 超过n个返回值未接受，eg: x, _, _, _, := f()
+  # 超过n个返回值未接受, eg: x, _, _, _, := f()
   dogsled:
     # checks assignments with too many blank identifiers; default is 2
     max-blank-identifiers: 2
@@ -81,7 +81,7 @@ linters-settings:
     # tokens count to trigger issue, 150 by default
     threshold: 150
 
-  # 未处理的 error，eg: defer file.Close()
+  # 未处理的 error, eg: defer file.Close()
   errcheck:
     # 检查断言错误, eg：a := b.(MyStruct) 需要写成 a,ok:=b.(MyStruct)
     check-type-assertions: true
@@ -111,7 +111,7 @@ linters-settings:
     # switch
     default-signifies-exhaustive: false
 
-  # 未使用。禁止使用的方法。
+  # 未使用. 禁止使用的方法.
   forbidigo:
     # Forbid the following identifiers
     forbid:
@@ -141,10 +141,10 @@ linters-settings:
     # 相同 string 出现的次数, 默认 3.
     min-occurrences: 5
 
-  # 类似 golint，https://go-critic.github.io/overview
+  # 类似 golint, https://go-critic.github.io/overview
   gocritic:
     # 既没有 enable 也没有 disable 的 checker group 会开启默认项目.
-    enabled-tags: # 开启所有分类，group of checkers
+    enabled-tags: # 开启所有分类, group of checkers
       - diagnostic
       # - experimental
       - opinionated
@@ -255,7 +255,7 @@ linters-settings:
     list-type: blacklist
     include-go-root: false
     packages:
-      - github.com/sirupsen/logrus # 定义 logrus 包到 blacklist。
+      - github.com/sirupsen/logrus # 定义 logrus 包到 blacklist.
     packages-with-error-message:
       # specify an error message to output when a blacklisted package is used
       - github.com/sirupsen/logrus: 'this is a custom depguard error msg because of usage of "github.com/sirupsen/logrus"'
@@ -278,7 +278,7 @@ linters-settings:
     ignore-words:
       # - someword
 
-  # 如果func的代码行数比这个设置的多，并且它的 return 是空的，就会产生报错，默认是30
+  # 如果func的代码行数比这个设置的多, 并且它的 return 是空的, 就会产生报错, 默认是30
   nakedret:
     max-func-lines: 30
 
@@ -287,7 +287,7 @@ linters-settings:
     # minimal complexity of if statements to report, 5 by default
     min-complexity: 4
 
-  # 检查 return 的值中不会有 nil error 和 nil value 同时存在。
+  # 检查 return 的值中不会有 nil error 和 nil value 同时存在.
   nilnil:
     # By default, nilnil checks all returned types below.
     checked-types:
@@ -307,7 +307,7 @@ linters-settings:
     # 是否允许有空格？ 可以写为 //nolint 也可以写为 // nolint
     allow-leading-space: true
     # Exclude following linters from requiring an explanation.  Default is [].
-    # 不需要提供解释的 linter, 默认是空[], 表示所有 nolint 都需要提供解释。
+    # 不需要提供解释的 linter, 默认是空[], 表示所有 nolint 都需要提供解释.
     allow-no-explanation: []
     # Enable to require an explanation after each nolint directive. Default is false.
     # // nolint 格式要求.
@@ -415,7 +415,7 @@ linters-settings:
   unparam:
     check-exported: false
 
-  # 检查没用的函数，结构体属性等
+  # 检查没用的函数, 结构体属性等
   unused:
     check-exported: false
 
@@ -451,7 +451,7 @@ linters:
   enable:
     ### 默认开启的 lints
     # - deadcode   # 直接用 unused 就可以了
-    - errcheck     # 未处理的 error，eg: defer file.Close()
+    - errcheck     # 未处理的 error, eg: defer file.Close()
     # - gosimple   # staticcheck 的 S 部分, 直接使用 staticcheck
     - govet        # 检查影子变量等...
     - ineffassign  # 检测无效赋值
@@ -464,7 +464,7 @@ linters:
     - bodyclose      # check HTTP res.Body is correctly closed.
     - contextcheck   # 检查 context 使用是否有错误.
     # - depguard     # imports 管理工具 depguard / gomodguard / revive-imports-blacklist 三选一, 目前使用 revive.
-    - dogsled        # 超过n个返回值未接受，eg: x, _, _, _, := f()
+    - dogsled        # 超过n个返回值未接受, eg: x, _, _, _, := f()
     - dupl           # 检查重复代码
     - durationcheck  # 检查 time.Duration 入参是否带单位 (time.second ...)
     - errorlint      # 检查 error wrap 错误.
@@ -474,7 +474,7 @@ linters:
     - gochecknoinits # 检查是否有 func init() 函数
     - gocritic       # [VVI], 检查合集 https://go-critic.github.io/overview
     # - gocyclo      # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
-    # - gofmt        # 和 goimports 二选一即可。
+    # - gofmt        # 和 goimports 二选一即可.
     - goimports      # 格式化工具
     # - gomodguard   # imports 管理工具 depguard / gomodguard / revive-imports-blacklist 三选一, 目前使用 revive.
     # - goprintffuncname  # For example, myLog should be named myLogf
@@ -482,13 +482,13 @@ linters:
     # - lll          # 同一行代码过长会报错, 使用 revive line-length-limit 设置.
     - makezero       # 使用 append 时, 检查预先分配容量的 slice 的 Len 是否为 0
     - misspell       # 拼写错误
-    - nakedret       # 如果函数长度超过设置，同时有返回值，不能只有 return，必须有参数
-    - nilerr         # 如果 err 不是 nil，则不能 return nil。如果 err 是 nil, 则必须 return nil.
+    - nakedret       # 如果函数长度超过设置, 同时有返回值, 不能只有 return, 必须有参数
+    - nilerr         # 如果 err 不是 nil, 则不能 return nil. 如果 err 是 nil, 则必须 return nil.
     - nilnil         # 不允许同时返回 nil error 和 nil value
     - noctx          # 发送 http request 的时候没有使用 context.Context
     - nolintlint     # // nolint 设置
     - revive         # 替代 golint, stylecheck / revive 二选一
-    - rowserrcheck   # 检查 sql.Rows.Err 是否正确处理，针对 sql.
+    - rowserrcheck   # 检查 sql.Rows.Err 是否正确处理, 针对 sql.
     - sqlclosecheck  # checks if SQL rows/statements are closed.
     - tparallel      # 在 test 文件中错误使用 t.Parallel(). tparallel / paralleltest 二选一
     - unconvert      # 检查不必要的类型转换
@@ -496,9 +496,9 @@ linters:
 
     ### NOTE prod 时才需要检查的项
     # - whitespace   # functions, if, for ... 开始和结尾的空行 leading and trailing whitespace
-    # - goconst      # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
+    # - goconst      # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的.
     # - unused       # unused global var, function ...
-    # - unparam      # 检查函数内没用到的入参，出参. 可以使用 revive-unused-parameter
+    # - unparam      # 检查函数内没用到的入参, 出参. 可以使用 revive-unused-parameter
     # - ifshort      # 简化 if 语法, 开发时不检查简化语法
 
     ### 不建议开启
@@ -507,10 +507,10 @@ linters:
     # - gomnd         # 检查常量数字, NOTE 太多提示, 不推荐使用.
     # - gochecknoglobals  # 检查是否有全局变量
     # - gocognit      # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
-    # - godot         # 检查注释是否句号结尾。
+    # - godot         # 检查注释是否句号结尾.
     # - godox         # 检查是否有 FIXME / TODO ... 标记
     # - goerr113      # 检查 error 表达式中的错误
-    # - golint        # 检查合集，已经不再更新，Replaced by revive.
+    # - golint        # 检查合集, 已经不再更新, Replaced by revive.
     # - nestif        # 检查深度嵌套的 if 语句
     # - nlreturn      # return 之前必须空一行.
     # - paralleltest  # 有 bug. tparallel / paralleltest 二选一
@@ -522,7 +522,7 @@ linters:
 
     ### 已弃用
     # - interfacer  # Linter that suggests narrower interface types
-    # - scopelint   # 检查 for k,v:=range 时，直接使用 &v 造成的问题。因为 v 的内存是不停复用的，所以每次循环是一样的。
+    # - scopelint   # 检查 for k,v:=range 时, 直接使用 &v 造成的问题. 因为 v 的内存是不停复用的, 所以每次循环是一样的.
     # - maligned    # 结构体4k对齐检查
 
   # presets:
@@ -533,14 +533,14 @@ issues:
   # 只显示新报出来的错误
   new: false
 
-  # 如果错误内容和以下正则匹配的话则不显示。
+  # 如果错误内容和以下正则匹配的话则不显示.
   exclude:
-    # - ^.*should have.*comment # golint 和 stylecheck 都不报注释错误。
-    # - ^.*comment on exported type # golint 和 stylecheck 都不报注释错误。
+    # - ^.*should have.*comment # golint 和 stylecheck 都不报注释错误.
+    # - ^.*comment on exported type # golint 和 stylecheck 都不报注释错误.
 
   exclude-rules:
-    # 设置某个文件的排除规则。
-    - path: _test\.go # _test.go 测试文件，不使用以下lint
+    # 设置某个文件的排除规则.
+    - path: _test\.go # _test.go 测试文件, 不使用以下lint
       linters:
         - gocyclo
         - errcheck
@@ -550,15 +550,15 @@ issues:
         - goconst
         - funlen
 
-    # 设置某个目录的排除规则。
+    # 设置某个目录的排除规则.
     - path: internal/hmac/
       text: "weak cryptographic primitive"
       linters:
         - gosec
 
     # NOTE 排除指定 lint 的指定错误
-    # text   - 指输出的 error 中包含的文字。
-    # source - 指源代码中包含的文字。
+    # text   - 指输出的 error 中包含的文字.
+    # source - 指源代码中包含的文字.
     # errcheck & gosec 遇到代码 "defer XXX.Close()" 跳过.
     - linters:
         - errcheck
@@ -591,7 +591,7 @@ issues:
     - EXC0003 # golint: when tests are defined in package 'test'
     # - EXC0004 # govet: misuse of unsafe.Pointer
     - EXC0005 # staticcheck: write an explicit 'break' in a 'switch'
-    - EXC0006 # gosec: unsafe 包使用，需要审计
+    - EXC0006 # gosec: unsafe 包使用, 需要审计
     - EXC0007 # gosec: Too many false-positives for parametrized shell calls
     - EXC0009 # gosec: 读写文件权限 0600
     # - EXC0010 # gosec: ioutil.ReadFile(filename) filename 是变量的情况. 之前的 linters-settings 中已经处理(G304)
@@ -639,6 +639,6 @@ severity:
         - dupl     # 重复代码
         - lll      # 同一行代码过长会报错
         - funlen   # 函数长度
-        - goconst  # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的。
-        - gomnd    # 检查可以用 const 定义的常量数字。https://github.com/tommy-muehle/go-mnd/#checks
+        - goconst  # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的.
+        - gomnd    # 检查可以用 const 定义的常量数字. https://github.com/tommy-muehle/go-mnd/#checks
       severity: info
