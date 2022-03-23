@@ -13,7 +13,7 @@ type FileContent struct {
 	FileName   string // 文件名, 不带路径
 	Content    []byte // 文件内容
 	Overwrite  bool   // 是否需要覆盖文件内容
-	Suggestion string // 如果文件冲突，提供建议
+	Suggestion string // 如果文件冲突, 提供建议
 }
 
 func WriteAllFiles(fileContents []FileContent) error {

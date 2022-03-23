@@ -1,17 +1,17 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "typescript",
-			"tsconfig": "tsconfig.json", // tsconfig 文件位置
-			"problemMatcher": ["$tsc"], // 使用 tsc 命令转码
-			"group": "build",
-			"label": "tsc: build - tsconfig.json",
-			"presentation": {
-				"reveal": "silent",
-				"clear": true,
-				"showReuseMessage": false
-			}
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "typescript",
+      "tsconfig": "tsconfig.json", // tsconfig 文件位置
+      "problemMatcher": ["$tsc"], // 使用 tsc 命令转码
+      "group": "build",
+      "label": "tsc: build - tsconfig.json",
+      "presentation": {
+        "reveal": "silent",
+        "clear": true,
+        "showReuseMessage": false
+      }
+    }
+  ]
 }

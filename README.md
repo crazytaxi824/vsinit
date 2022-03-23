@@ -56,13 +56,13 @@ files:
 
 - `.gitignore`
 
-- `eslintrc.json` - `npm install eslint rules`, 根据 `-eslint-local` 设置，安装在不同的地方. (local | global)
+- `eslintrc.json` - `npm install eslint rules`, 根据 `-eslint-local` 设置, 安装在不同的地方. (local | global)
 
 - `package.json`, 不管有没有 `-jest`, 或者有没有安装 jest, 都写入 jest setting.
 
 - `src/main.js`
 
-- `src/example.test.js`, 根据 `-jest` 选择是否写入 test 文件。
+- `src/example.test.js`, 根据 `-jest` 选择是否写入 test 文件
 
 - `.editorconfig` for github tab_size
 
@@ -102,7 +102,7 @@ files:
 
 - `jest` 设置 - `npm install -D ts-jest @types/jest`; js 不需要安装
 
-- `package.json` - jest setting. 根据 `-jest` 决定是否向 package.json 中写入 jest setting. 这里和 `js` 不同，`js` 是不管有没有 `-jest` 都直接写入 jest setting.
+- `package.json` - jest setting. 根据 `-jest` 决定是否向 package.json 中写入 jest setting. 这里和 `js` 不同, `js` 是不管有没有 `-jest` 都直接写入 jest setting.
 
 - `src/example.test.ts` - jest
 

@@ -35,7 +35,7 @@ func filesHasToWrite() {
 			Content:  resource.Editorconfig,
 		},
 		{
-			// package.json 中需要修改设置，不需要重新写入文件.
+			// package.json 中需要修改设置, 不需要重新写入文件.
 			FileName:   "package.json",
 			Content:    []byte("{}"),
 			Suggestion: fmt.Sprintf(packageSuggestion, util.COLOR_YELLOW, util.COLOR_RESET, util.COLOR_YELLOW, util.COLOR_RESET),
