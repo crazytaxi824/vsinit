@@ -6,9 +6,16 @@
 # `golangci-lint cache status`
 # `golangci-lint cache clean`
 
-# `golangci-lint help linters` - 列出所有 linter
+# `golangci-lint help linters` - 列出所有 linter, 是否是 fast linter, 是否支持 auto-fix
+# NOTE 几个重要 linter 集合:
+#   - gocritic: 包括 diagnostic, style, performance, security ... 方面的检查.
+#   - gosec: 各种安全检查. 包括语法, 加密算法, 错误处理等...
+#   - govet: 错误检查. 不是语法错误, 而是导致常见 bug 的错误.
+#   - revive: golint 替代. 包括各种风格, 错误 ... 检查.
+#   - staticcheck: 类似 gocritic, 包括了各方面的检查. 其中包含了: gosimple - S 部分; stylecheck - ST 部分.
 
-# 运行配置
+# https://golangci-lint.run/usage/configuration/#run-configuration
+# run --- {{{
 run:
   # 支持 generic
   go: 1.18
@@ -50,7 +57,10 @@ run:
     # - "^.*main.go$"
     - ^.*debug
 
-# 输出配置
+# }}}
+
+# https://golangci-lint.run/usage/configuration/#output-configuration
+# output --- {{{
 output:
   # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
   format: colored-line-number
@@ -63,7 +73,10 @@ output:
   # sorts results by: filepath, line and column
   sort-results: false
 
-# 质量检查配置
+# }}}
+
+# https://golangci-lint.run/usage/configuration/#linters-settings-configuration
+# linters-settings --- {{{
 linters-settings:
   # 复杂度检查
   cyclop:
@@ -409,6 +422,7 @@ linters-settings:
       # - name: package-comments # package 必须有一个注释.
       #   severity: info
 
+  # https://staticcheck.io/docs/checks/
   staticcheck:
     # Select the Go version to target.
     # Default: 1.13
@@ -452,6 +466,10 @@ linters-settings:
     # Allow leading comments to be separated with empty liens
     allow-separated-leading-comment: false
 
+# }}}
+
+# https://golangci-lint.run/usage/configuration/#linters-configuration
+# linters --- {{{
 # NOTE gosimple & stylecheck 都是 staticcheck 中的一部分, 三者都不属于 --fast linters.
 linters:
   disable-all: true
@@ -536,8 +554,15 @@ linters:
 
   # presets:
   #   - bugs
+
+  # true - 只运行 fast linter.
+  # `golangci-lint help linters` 查看哪些是 fast linter
   # fast: false
 
+# }}}
+
+# https://golangci-lint.run/usage/configuration/#issues-configuration
+# issues --- {{{
 issues:
   # 只显示新报出来的错误
   new: false
@@ -623,6 +648,10 @@ issues:
   # AutoFix found issues (if it's supported by the linter)
   fix: false  # NOTE 自动修复, 该功能有 bug.
 
+# }}}
+
+# https://golangci-lint.run/usage/configuration/#severity-configuration
+# severity --- {{{
 severity:
   # Default value is empty string.
   # Set the default severity for issues. If severity rules are defined and the issues
@@ -651,3 +680,5 @@ severity:
         - goconst  # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的
         - gomnd    # 检查可以用 const 定义的常量数字. https://github.com/tommy-muehle/go-mnd/#checks
       severity: info
+
+# }}}
