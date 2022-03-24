@@ -314,8 +314,8 @@ linters-settings:
   # 写法 // nolint:structcheck,unused // my explanation
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
-    # 是否允许 nolint 指定的规则是无效的? 无效解释会继续提示错误.
-    allow-unused: false
+    # // nolint 注释没有起到任何作用时, 是否需要报错? true - unused 时不报错; false - unused 时报错.
+    allow-unused: true
     # Disable to ensure that nolint directives don't have a leading space. Default is true.
     # 是否允许有空格？ 可以写为 //nolint 也可以写为 // nolint
     allow-leading-space: true

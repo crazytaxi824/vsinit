@@ -127,7 +127,7 @@ linters-settings:
     # switch
     default-signifies-exhaustive: false
 
-  # 未使用, 禁止使用的方法
+  # 禁止使用的方法
   forbidigo:
     # Forbid the following identifiers
     forbid:
@@ -177,9 +177,10 @@ linters-settings:
       - wrapperFunc # 不允许使用 wg.Add(-1), 使用 wg.Done()
       - commentedOutCode # 移除代码中注释的 code (正式发布时注释掉就行了)
       # FIXME 以下 checker 目前不支持 go1.18
-      - paramTypeCombine # 提示有错误, 不适配 go1.18
-      - hugeParam # go1.18 无法使用, 导致 golangci-lint 崩溃
-      - typeDefFirst # go1.18 无法使用, 导致 golangci-lint 崩溃
+      - paramTypeCombine # 同类型入参/出参合并. func f(a int, b int) -> func f(a, b int)
+      - hugeParam # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
+      - typeDefFirst # 使用类型(struct/interface)前必须先定义.
+      - rangeValCopy # for k,v := range 中如果 v 是引用类型, 则不要使用 k,v 形式.
 
   # 复杂度检查
   gocyclo:
@@ -321,8 +322,8 @@ linters-settings:
   # 写法 // nolint:structcheck,unused // my explanation
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
-    # 是否允许 nolint 指定的规则是无效的? 无效解释会继续提示错误.
-    allow-unused: false
+    # // nolint 注释没有起到任何作用时, 是否需要报错? true - unused 时不报错; false - unused 时报错.
+    allow-unused: true
     # Disable to ensure that nolint directives don't have a leading space. Default is true.
     # 是否允许有空格？ 可以写为 //nolint 也可以写为 // nolint
     allow-leading-space: true
@@ -480,7 +481,6 @@ linters:
     # - gosimple   # staticcheck 的 S 部分, 直接使用 staticcheck
     - govet        # 检查影子变量等...
     - ineffassign  # 检测无效赋值
-    - structcheck  # 结构体私有属性 unused 检查, 对 tableName 支持不好
     - typecheck    # Like the front-end of a Go compiler, parses and type-checks Go code
     - varcheck     # 检查没用的全局变量
 
@@ -519,6 +519,7 @@ linters:
 
     ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
     # - staticcheck    # 检查合集 https://staticcheck.io/docs/checks
+    # - structcheck    # 结构体私有属性 unused 检查, 对 tableName 支持不好
     # - bodyclose      # check HTTP res.Body is correctly closed.
     # - contextcheck   # 检查 context 使用是否有错误.
     # - nilerr         # 如果 err 不是 nil, 则不能 return nil. 如果 err 是 nil, 则必须 return nil.
