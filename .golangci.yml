@@ -525,10 +525,9 @@ linters:
     # - gomnd         # 检查常量数字, NOTE 太多提示, 不推荐使用.
     # - gochecknoglobals  # 检查是否有全局变量
     # - gocognit      # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
-    # - godot         # 检查注释是否句号结尾.
-    # - godox         # 检查是否有 FIXME / TODO ... 标记
+    # - godot         # 检查注释是否句号结尾
+    # - godox         # 检查是否有 fixme / todo ... 标记
     # - goerr113      # 检查 error 表达式中的错误
-    # - golint        # 检查合集, 已经不再更新, Replaced by revive.
     # - nestif        # 检查深度嵌套的 if 语句
     # - nlreturn      # return 之前必须空一行.
     # - paralleltest  # 有 bug. tparallel / paralleltest 二选一
@@ -539,9 +538,10 @@ linters:
     # - wsl           # 需要使用空行的地方 - 和 whitespace 作用正好相反
 
     ### 已弃用
+    # - golint      # 已弃用, 使用 revive 代替.
     # - interfacer  # Linter that suggests narrower interface types
-    # - scopelint   # 检查 for k,v:=range 时, 直接使用 &v 造成的问题. 因为 v 的内存是不停复用的, 所以每次循环是一样的.
     # - maligned    # 结构体4k对齐检查
+    # - scopelint   # 检查 for k,v:=range 时, 直接使用 &v 造成的问题. 因为 v 的内存是不停复用的, 所以每次循环是一样的
 
   # presets:
   #   - bugs
@@ -602,29 +602,28 @@ issues:
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all
-  # excluded by default patterns execute `golangci-lint run --help`.
   # Default true.
   # 这个设置是和下面 include 配合使用的.
   # true  - 排除所有 EXC000X 的错误提示, 加入 include 的 checker 提示错误.
   # false - 不排除任何 EXC000X 的错误提示, 加入 include 的 checker 不提示错误.
   exclude-use-default: true
 
-  # https://golangci-lint.run/usage/configuration/
+  # excluded by default patterns execute `golangci-lint run --help`.
   include:
     # - EXC0001 # errcheck: 不检查某些特殊情况 eg: defer file.Close()
-    # - EXC0002 # golint: comment on exported (method|function|type|const)
-    - EXC0003 # golint: when tests are defined in package 'test'
-    # - EXC0004 # govet: misuse of unsafe.Pointer
+    # - EXC0002 # golint 已弃用: comment on exported (method|function|type|const)
+    # - EXC0003 # golint 已弃用: when tests are defined in package 'test'
+    - EXC0004 # govet: misuse of unsafe.Pointer
     - EXC0005 # staticcheck: write an explicit 'break' in a 'switch'
     - EXC0006 # gosec: unsafe 包使用, 需要审计
     - EXC0007 # gosec: Too many false-positives for parametrized shell calls
     - EXC0009 # gosec: 读写文件权限 0600
     # - EXC0010 # gosec: ioutil.ReadFile(filename) filename 是变量的情况. 之前的 linters-settings 中已经处理(G304)
-    # 以下都是检查 comments 的, 全部关闭.
-    # - EXC0002
-    # - EXC0011
-    # - EXC0012
-    # - EXC0013
+    # - EXC0011 # stylecheck: Annoying issue about not having a comment.
+    # - EXC0012 # revive: Annoying issue about not having a comment.
+    # - EXC0013 # revive: Annoying issue about not having a comment.
+    # - EXC0014 # revive: Annoying issue about not having a comment.
+    # - EXC0015 # revive: Annoying issue about not having a comment.
 
   # The default value is false. If set to true exclude and exclude-rules
   # regular expressions become case sensitive.
