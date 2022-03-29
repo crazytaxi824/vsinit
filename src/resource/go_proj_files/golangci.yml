@@ -169,18 +169,19 @@ linters-settings:
     # disabled-tags: # 禁用 group of checkers
     #   - experimental
     disabled-checks: # 禁用个别 checks
-      - dupImport # https://github.com/go-critic/go-critic/issues/845
-      - ifElseChain # NOTE 在生产模式时, 检查一次即可.
-      - octalLiteral # 检测 8 进制数字
-      - hexLiteral # 检测 16 进制数字
-      - whyNoLint # 必须为 // nolint 提供一个原因
-      - wrapperFunc # 不允许使用 wg.Add(-1), 使用 wg.Done()
-      - commentedOutCode # 移除代码中注释的 code (正式发布时注释掉就行了)
+      - dupImport         # 有 bug, https://github.com/go-critic/go-critic/issues/845
+      - ifElseChain       # NOTE 生产模式时检查即可. 多个 if-else 转成 switch.
+      - octalLiteral      # 检测 8 进制数字
+      - hexLiteral        # 检测 16 进制数字
+      - whyNoLint         # 必须为 // nolint 提供一个原因
+      - wrapperFunc       # 不允许使用 wg.Add(-1), 使用 wg.Done()
+      - commentedOutCode  # 移除代码中注释的 code (正式发布时注释掉就行了)
       # FIXME 以下 checker 目前不支持 go1.18
-      - paramTypeCombine # 同类型入参/出参合并. func f(a int, b int) -> func f(a, b int)
-      - hugeParam # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
-      - typeDefFirst # 使用类型(struct/interface)前必须先定义.
-      - rangeValCopy # for k,v := range 中如果 v 是引用类型, 则不要使用 k,v 形式.
+      - paramTypeCombine       # 同类型入参/出参合并. func f(a int, b int) -> func f(a, b int)
+      - hugeParam              # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
+      - typeDefFirst           # 使用类型(struct/interface)前必须先定义.
+      - rangeValCopy           # for k,v := range 中如果 v 是引用类型, 则不要使用 k,v 形式.
+      - externalErrorReassign  # io.EOF = nil, 不允许.
 
   # 复杂度检查
   gocyclo:
