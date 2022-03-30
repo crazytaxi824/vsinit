@@ -25,6 +25,7 @@ yarn-error.log*
 # dev environment
 /.vscode
 /.vim
+/.history
 **/*.bak
 **/*.swp
 

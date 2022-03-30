@@ -65,6 +65,12 @@ func createDirAndWriteFiles(fileContents []FileContent) error {
 			err error
 		)
 
+		// 如果文件名为空, 则跳过. 只需要创建文件夹的时候用.
+		if fc.FileName == "" {
+			fmt.Printf("%s - %s ... done%s\n", COLOR_GREEN, fc.Dir+fc.FileName, COLOR_RESET)
+			continue
+		}
+
 		// check overwrite option
 		if fc.Overwrite {
 			f, err = os.OpenFile(fc.Dir+fc.FileName, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
