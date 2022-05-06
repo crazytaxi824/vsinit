@@ -8,9 +8,6 @@ var (
 	//go:embed ts_proj_files/gitignore
 	TSGitignore []byte
 
-	//go:embed ts_proj_files/coc-settings.json
-	TSVimCocSettings []byte
-
 	//go:embed ts_proj_files/settings.json
 	TSVsSettings []byte
 

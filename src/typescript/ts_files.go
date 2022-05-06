@@ -80,22 +80,13 @@ func filesMightNeedToWrite() {
 		)
 	}
 
-	// 添加 .vscode/settings.json | .vim/coc-settings.json 文件
+	// 添加 .vscode/settings.json 文件
 	fs = append(fs,
 		util.FileContent{
 			Dir:      ".vscode/",
 			FileName: "settings.json",
 			Content: bytes.ReplaceAll(resource.TSVsSettings,
 				[]byte(`"overrideConfigFile": "eslintrc-ts.json"`), // 这里是写死在 .vscode/settings.json 文件中的内容, 不要改.
-				[]byte(overrideConfigFile),
-			),
-			Suggestion: fmt.Sprintf(settingsSuggestion, util.COLOR_YELLOW, overrideConfigFile, util.COLOR_RESET),
-		},
-		util.FileContent{
-			Dir:      ".vim/",
-			FileName: "coc-settings.json",
-			Content: bytes.ReplaceAll(resource.TSVimCocSettings,
-				[]byte(`"overrideConfigFile": "eslintrc-ts.json"`), // 这里是写死在 .vim/coc-settings.json 文件中的内容, 不要改.
 				[]byte(overrideConfigFile),
 			),
 			Suggestion: fmt.Sprintf(settingsSuggestion, util.COLOR_YELLOW, overrideConfigFile, util.COLOR_RESET),
@@ -127,7 +118,7 @@ func writeProjectFiles() error {
 }
 
 const (
-	// .vscode/settings.json eslint | .vim/coc-settings.json filepath suggestion
+	// .vscode/settings.json eslint filepath suggestion
 	settingsSuggestion = `{
   "eslint.options": {%s
     %s%s

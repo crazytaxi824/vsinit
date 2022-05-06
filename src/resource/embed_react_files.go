@@ -8,9 +8,6 @@ var (
 	//go:embed react_proj_files/gitignore
 	ReactGitignore []byte
 
-	//go:embed react_proj_files/coc-settings.json
-	ReactVimCocSettings []byte
-
 	//go:embed react_proj_files/settings.json
 	ReactVsSettings []byte
 
