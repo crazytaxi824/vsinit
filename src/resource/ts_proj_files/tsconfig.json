@@ -6,7 +6,8 @@
     "moduleResolution": "node",
     "target": "es5", // es6=es2015, 默认情况下使用es6, 拥有 map & set
     "lib": ["dom", "dom.iterable", "esnext"], // 包含了声明文件列表, 你仍然拥有较新的类型声明
-    "outDir": "dist", // important, ts 转为 js 文件时的地址. 一般为 "dist" | "out"
+    "outDir": "dist", // VVI: ts 转为 js 文件时的地址. 一般为 "dist" | "out"
+    "rootDir": "./", // VVI: 确保 tsc 编译后生成 dist/src/ 文件夹. './' 是相对 tsconfig.json 文件的.
     "sourceMap": true, // 必须为true, debug 用. 和 outDir 配合使用.
     "jsx": "react-jsx", // 指定 jsx 代码的生成: preserve | react | react-jsx | react-native
     "allowJs": true, // 允许编译 js 文件.
