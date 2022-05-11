@@ -17,8 +17,8 @@
 # https://golangci-lint.run/usage/configuration/#run-configuration
 # run --- {{{
 run:
-  # 支持 generic
-  go: 1.18
+  # Default: use Go version from the go.mod file, fallback on the env var `GOVERSION`, fallback on 1.17
+  # go: 1.18
 
   # 要使用的CPU核心数
   concurrency: 4
@@ -157,7 +157,7 @@ linters-settings:
     # 相同 string 出现的次数, 默认 3.
     min-occurrences: 5
 
-  # [VVI] 目前不完全支持 go1.18, 类似 golint, https://go-critic.github.io/overview
+  # 检查合集, 类似 golint. https://go-critic.github.io/overview
   gocritic:
     # 既没有 enable 也没有 disable 的 checker group 会开启默认项目.
     enabled-tags: # 开启所有分类, group of checkers
