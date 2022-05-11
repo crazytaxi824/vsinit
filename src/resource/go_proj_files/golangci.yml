@@ -1,4 +1,4 @@
-# golangci-lint v1.45.0 支持 go1.18
+# golangci-lint v1.46.0 支持 go1.18
 # https://golangci-lint.run/
 # https://github.com/golangci/golangci-lint/pull/2438
 
@@ -12,7 +12,7 @@
 #   - gosec: 各种安全检查. 包括语法, 加密算法, 错误处理等...
 #   - govet: 错误检查. 不是语法错误, 而是导致常见 bug 的错误.
 #   - revive: golint 替代. 包括各种风格, 错误 ... 检查.
-#   - staticcheck: 类似 gocritic, 包括了各方面的检查. 其中包含了: gosimple - S 部分; stylecheck - ST 部分.
+#   - staticcheck: 在 golangci-lint 中被分为四个: gosimple, staticcheck, unused, stylecheck.
 
 # https://golangci-lint.run/usage/configuration/#run-configuration
 # run --- {{{
@@ -169,19 +169,15 @@ linters-settings:
     # disabled-tags: # 禁用 group of checkers
     #   - experimental
     disabled-checks: # 禁用个别 checks
-      - dupImport         # 有 bug, https://github.com/go-critic/go-critic/issues/845
-      - ifElseChain       # NOTE 生产模式时检查即可. 多个 if-else 转成 switch.
+      - dupImport         # 多次引入同一个包 with different alias.
+      - ifElseChain       # NOTE: 生产模式时检查即可. 多个 if-else 转成 switch.
       - octalLiteral      # 检测 8 进制数字
       - hexLiteral        # 检测 16 进制数字
       - whyNoLint         # 必须为 // nolint 提供一个原因
       - wrapperFunc       # 不允许使用 wg.Add(-1), 使用 wg.Done()
       - commentedOutCode  # 移除代码中注释的 code (正式发布时注释掉就行了)
-      # FIXME 以下 checker 目前不支持 go1.18
-      - paramTypeCombine       # 同类型入参/出参合并. func f(a int, b int) -> func f(a, b int)
+      # FIXME 以下 checker 目前有 BUG
       - hugeParam              # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
-      - typeDefFirst           # 使用类型(struct/interface)前必须先定义.
-      - rangeValCopy           # for k,v := range 中如果 v 是引用类型, 则不要使用 k,v 形式.
-      - externalErrorReassign  # io.EOF = nil, 不允许.
 
   # 复杂度检查
   gocyclo:
@@ -425,21 +421,23 @@ linters-settings:
       #   severity: info
 
   # https://staticcheck.io/docs/checks/
+  # staticcheck 在 golangci-lint 中被分为四个: gosimple, staticcheck, unused, stylecheck.
   staticcheck:
-    # Select the Go version to target.
-    # Default: 1.13
-    go: "1.18"
-    # https://staticcheck.io/docs/options#checks
-    checks: ["all", "-ST1000", "-ST1003", "-ST1020", "-ST1021", "-ST1022"]
-    # ST1013 - https://staticcheck.io/docs/options#http_status_code_whitelist
-    http-status-code-whitelist: ["200", "204", "400", "403", "404", "500"]
+    go: "1.15"  # Select the Go version to target. Default: 1.13
+    checks: ["all"]
 
-  # 检查函数内没用到的入参/出参
-  unparam:
-    check-exported: false
+  stylecheck:
+    go: "1.15"   # Select the Go version to target. Default: 1.13
+    checks: ["ST1003"]  # NOTE: check var-name ONLY
+    # checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022"]
+    # http-status-code-whitelist: ["200", "204", "400", "404", "500"]
 
   # 检查没用的函数, 结构体属性等
   unused:
+    check-exported: false
+
+  # 检查函数内没用到的入参/出参
+  unparam:
     check-exported: false
 
   # 空行检查
@@ -479,9 +477,10 @@ linters:
     ### 默认开启的 lints
     # - deadcode   # 直接用 unused 就可以了
     - errcheck     # 未处理的 error, eg: defer file.Close()
-    # - gosimple   # staticcheck 的 S 部分, 直接使用 staticcheck
+    - gosimple     # staticcheck 的 S 部分
     - govet        # 检查影子变量等...
     - ineffassign  # 检测无效赋值
+    - staticcheck  # 检查合集 https://staticcheck.io/docs/checks
     - typecheck    # Like the front-end of a Go compiler, parses and type-checks Go code
     - varcheck     # 检查没用的全局变量
 
@@ -508,10 +507,11 @@ linters:
     - nakedret       # 如果函数长度超过设置, 同时有返回值, 不能只有 return, 必须有参数
     - nilnil         # 不允许同时返回 nil error 和 nil value
     - nolintlint     # // nolint 设置
-    - revive         # 替代 golint, stylecheck / revive 二选一
+    - revive         # 替代 golint / stylecheck / revive 三选一
+    - stylecheck     # staticcheck 的 ST 部分. NOTE: 这里只检查 var name.
     - unconvert      # 检查不必要的类型转换
 
-    ### NOTE prod 时才需要检查的项
+    ### NOTE: prod 时才需要检查的项
     # - whitespace   # functions, if, for ... 开始和结尾的空行 leading and trailing whitespace
     # - goconst      # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的
     # - unused       # unused global var, function ...
@@ -519,8 +519,8 @@ linters:
     # - ifshort      # 简化 if 语法, 开发时不检查简化语法
 
     ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
-    # - staticcheck    # 检查合集 https://staticcheck.io/docs/checks
-    # - structcheck    # 结构体私有属性 unused 检查, 对 tableName 支持不好
+    ### golang 1.18 release date: 15 March 2022
+    ### these linters are not updated yet.
     # - bodyclose      # check HTTP res.Body is correctly closed.
     # - contextcheck   # 检查 context 使用是否有错误.
     # - nilerr         # 如果 err 不是 nil, 则不能 return nil. 如果 err 是 nil, 则必须 return nil.
@@ -544,7 +544,7 @@ linters:
     # - paralleltest  # 有 bug. tparallel / paralleltest 二选一
     # - prealloc      # 查找可以被预先分配 Len & Cap 的 slice, make([]int, Len, Cap)
     # - predeclared   # 检查是否使用了关键字 (new, make, append uint, etc.) 使用 revive/redefines-builtin-id 代替
-    # - stylecheck    # staticcheck 的 ST 部分, 直接使用 staticcheck
+    # - structcheck   # 结构体私有属性 unused 检查, 对 tableName 支持不好
     # - testpackage   # linter that makes you use a separate _test package
     # - wsl           # 需要使用空行的地方 - 和 whitespace 作用正好相反
 
