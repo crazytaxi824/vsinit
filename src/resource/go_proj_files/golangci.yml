@@ -428,9 +428,8 @@ linters-settings:
 
   stylecheck:
     go: "1.15"   # Select the Go version to target. Default: 1.13
-    checks: ["ST1003"]  # NOTE: check var-name ONLY
-    # checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022"]
-    # http-status-code-whitelist: ["200", "204", "400", "404", "500"]
+    checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022"]
+    http-status-code-whitelist: ["200", "204", "400", "404", "500"]
 
   # 检查没用的函数, 结构体属性等
   unused:
@@ -508,7 +507,7 @@ linters:
     - nilnil         # 不允许同时返回 nil error 和 nil value
     - nolintlint     # // nolint 设置
     - revive         # 替代 golint / stylecheck / revive 三选一
-    - stylecheck     # staticcheck 的 ST 部分. NOTE: 这里只检查 var name.
+    # - stylecheck   # staticcheck 的 ST 部分. NOTE: 太严格.
     - unconvert      # 检查不必要的类型转换
 
     ### NOTE: prod 时才需要检查的项
