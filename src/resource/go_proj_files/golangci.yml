@@ -63,12 +63,12 @@ run:
 # output --- {{{
 output:
   # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
-  format: colored-line-number
-  # 打印行号
-  print-issued-lines: true
-  # 打印检查器的名称
+  format: json  # VVI: VSCode: '--out-format=colored-line-number' && Null-ls: '--out-format=json'
+  # 打印错误行内容.
+  print-issued-lines: false
+  # 输出 linter name, VSCode 用.
   print-linter-name: true
-  # make issues output unique by line, default is true
+  # 相同错误内容不要多次输出, default is true
   uniq-by-line: true
   # sorts results by: filepath, line and column
   sort-results: false
@@ -86,6 +86,25 @@ linters-settings:
     package-average: 0.0
     # should ignore tests (default false)
     skip-tests: true
+
+  # 检查顺序
+  decorder:
+    # Required order of `type`, `const`, `var` and `func` declarations inside a file.
+    # Default: types before constants before variables before functions.
+    dec-order:
+      - type
+      - const
+      - var
+      - func
+    # If true, order of declarations is not checked at all.
+    # Default: true (disabled)
+    disable-dec-order-check: false
+    # If true, `init` func can be anywhere in file (does not have to be declared before all other functions).
+    # Default: true (disabled)
+    disable-init-func-first-check: false
+    # If true, multiple global `type`, `const` and `var` declarations are allowed.
+    # Default: true (disabled)
+    disable-dec-num-check: true
 
   # 超过n个返回值未接受, eg: x, _, _, _, := f()
   dogsled:
@@ -165,15 +184,15 @@ linters-settings:
       # - experimental
       - opinionated
       - performance
-      - style
+      # - style
     # disabled-tags: # 禁用 group of checkers
-    #   - experimental
+      # - experimental
     disabled-checks: # 禁用个别 checks
-      - dupImport         # 多次引入同一个包 with different alias.
+      # - dupImport         # 多次引入同一个包 with different alias.
       - ifElseChain       # NOTE: 生产模式时检查即可. 多个 if-else 转成 switch.
-      - octalLiteral      # 检测 8 进制数字
-      - hexLiteral        # 检测 16 进制数字
-      - whyNoLint         # 必须为 // nolint 提供一个原因
+      # - octalLiteral      # 检测 8 进制数字
+      # - hexLiteral        # 检测 16 进制数字
+      # - whyNoLint         # 必须为 // nolint 提供一个原因
       - wrapperFunc       # 不允许使用 wg.Add(-1), 使用 wg.Done()
       - commentedOutCode  # 移除代码中注释的 code (正式发布时注释掉就行了)
       # FIXME 以下 checker 目前有 BUG
@@ -481,7 +500,7 @@ linters:
     - ineffassign  # 检测无效赋值
     - staticcheck  # 检查合集 https://staticcheck.io/docs/checks
     - typecheck    # Like the front-end of a Go compiler, parses and type-checks Go code
-    - varcheck     # 检查没用的全局变量
+    - varcheck     # 检查 unused 变量 const, var
 
     ### 自愿开启的 lints
     # - depguard     # imports 管理工具 depguard / gomodguard / revive-imports-blacklist 三选一, 目前使用 revive.
@@ -516,6 +535,7 @@ linters:
     # - unused       # unused global var, function ...
     # - unparam      # 检查函数内没用到的入参, 出参. 可以使用 revive-unused-parameter
     # - ifshort      # 简化 if 语法, 开发时不检查简化语法
+    # - decorder     # 检查 type, const, var, func 顺序.
 
     ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
     ### golang 1.18 release date: 15 March 2022
