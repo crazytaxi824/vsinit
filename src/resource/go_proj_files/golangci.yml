@@ -87,6 +87,25 @@ linters-settings:
     # should ignore tests (default false)
     skip-tests: true
 
+  # 检查顺序
+  decorder:
+    # Required order of `type`, `const`, `var` and `func` declarations inside a file.
+    # Default: types before constants before variables before functions.
+    dec-order:
+      - type
+      - const
+      - var
+      - func
+    # If true, order of declarations is not checked at all.
+    # Default: true (disabled)
+    disable-dec-order-check: false
+    # If true, `init` func can be anywhere in file (does not have to be declared before all other functions).
+    # Default: true (disabled)
+    disable-init-func-first-check: false
+    # If true, multiple global `type`, `const` and `var` declarations are allowed.
+    # Default: true (disabled)
+    disable-dec-num-check: true
+
   # 超过n个返回值未接受, eg: x, _, _, _, := f()
   dogsled:
     # checks assignments with too many blank identifiers; default is 2
@@ -516,6 +535,7 @@ linters:
     # - unused       # unused global var, function ...
     # - unparam      # 检查函数内没用到的入参, 出参. 可以使用 revive-unused-parameter
     # - ifshort      # 简化 if 语法, 开发时不检查简化语法
+    # - decorder     # 检查 type, const, var, func 顺序.
 
     ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
     ### golang 1.18 release date: 15 March 2022
