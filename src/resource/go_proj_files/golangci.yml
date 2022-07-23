@@ -197,6 +197,7 @@ linters-settings:
       - commentedOutCode  # 移除代码中注释的 code (正式发布时注释掉就行了)
       # FIXME 以下 checker 目前有 BUG. https://github.com/golangci/golangci-lint/issues/2649
       - hugeParam  # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
+      - paramTypeCombine  # 对泛型支持不好.
 
   # 复杂度检查
   gocyclo:
