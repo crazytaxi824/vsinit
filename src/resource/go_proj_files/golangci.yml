@@ -612,15 +612,6 @@ issues:
       linters:
         - gosec
 
-    # NOTE 排除指定 lint 的指定错误
-    # text   - 指输出的 error 中包含的文字
-    # source - 指源代码中包含的文字
-    # errcheck & gosec 遇到代码 "defer XXX.Close()" 跳过.
-    - linters:
-        - errcheck
-        - gosec
-      source: "\\sdefer .*\\.Close()"  # \s 表示只要是空白不管是 space 或者 \t 都匹配.
-
     # Exclude lll issues for long lines with go:generate
     - linters:
         - lll
