@@ -359,7 +359,7 @@ linters-settings:
   revive:
     max-open-files: 2048
     ignore-generated-header: false # false - 忽略带有 "GENERATED" 头的文件; true - 不忽略
-    severity: warning
+    severity: error
     # enable-all-rules: true # 不需要开启全部, 很多重复 checker.
     confidence: 0.1
     # 需要开启的 linter 都需要在下面列出来.
@@ -448,10 +448,6 @@ linters-settings:
     checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022"]
     http-status-code-whitelist: ["200", "204", "400", "404", "500"]
 
-  # 检查没用的函数, 结构体属性等
-  unused:
-    check-exported: false
-
   # 检查函数内没用到的入参/出参
   unparam:
     check-exported: false
@@ -530,7 +526,6 @@ linters:
     # - goconst      # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的
     # - unused       # unused global var, function ...
     # - unparam      # 检查函数内没用到的入参, 出参. 可以使用 revive-unused-parameter
-    # - ifshort      # 简化 if 语法, 开发时不检查简化语法
     # - decorder     # 检查 type, const, var, func 顺序.
 
     ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
@@ -554,6 +549,7 @@ linters:
     # - godot         # 检查注释是否句号结尾
     # - godox         # 检查是否有 fixme / todo ... 标记
     # - goerr113      # 检查 error 表达式中的错误
+    # - ifshort       # 简化 if 语法
     # - nestif        # 检查深度嵌套的 if 语句
     # - nlreturn      # return 之前必须空一行.
     # - paralleltest  # 有 bug. tparallel / paralleltest 二选一

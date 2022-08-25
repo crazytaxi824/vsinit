@@ -1,3 +1,6 @@
+# NOTE: This is golangci-lint produciton config.
+# 和 dev 设置的主要区别: 是开启了  "gocritic" 中的几个规则, 和 "unused", "unparam" ... 等几个 linter.
+#
 # NOTE: golangci-lint v1.49.0 支持 > go1.18
 # https://golangci-lint.run/
 # https://github.com/golangci/golangci-lint/pull/2438
@@ -189,8 +192,8 @@ linters-settings:
       # - experimental
     disabled-checks: # 禁用个别 checks
       # - dupImport       # 多次引入同一个包 with different alias.
-      - commentedOutCode  # 移除代码中注释的 code. NOTE: 生产模式时检查即可.
-      - ifElseChain       # 多个 if-else 转成 switch. NOTE: 生产模式时检查即可.
+      # - commentedOutCode  # 移除代码中注释的 code. NOTE: 生产模式时检查即可.
+      # - ifElseChain       # 多个 if-else 转成 switch. NOTE: 生产模式时检查即可.
       - octalLiteral      # 检测 8 进制数字
       # - hexLiteral      # 检测 16 进制数字, disabled by default.
       # - whyNoLint       # 必须为 // nolint 提供一个原因
@@ -522,11 +525,11 @@ linters:
     - unconvert      # 检查不必要的类型转换
 
     ### NOTE: prod 时才需要检查的项
-    # - whitespace   # functions, if, for ... 开始和结尾的空行 leading and trailing whitespace
-    # - goconst      # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的
-    # - unused       # unused global var, function ...
-    # - unparam      # 检查函数内没用到的入参, 出参. 可以使用 revive-unused-parameter
-    # - decorder     # 检查 type, const, var, func 顺序.
+    - whitespace   # functions, if, for ... 开始和结尾的空行 leading and trailing whitespace
+    - goconst      # 查找是否有重复的 string 可以用常量 const 表示. gomnd 是检查数字的
+    - unused       # unused global var, function ...
+    - unparam      # 检查函数内没用到的入参, 出参. 可以使用 revive-unused-parameter
+    - decorder     # 检查 type, const, var, func 顺序.
 
     ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
     ### golang 1.18 release date: 15 March 2022

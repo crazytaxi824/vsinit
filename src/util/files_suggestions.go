@@ -9,7 +9,7 @@ import (
 
 // 需要写入项目的文件
 type FileContent struct {
-	Dir        string // 文件夹地址, 用于 mkdir
+	Dir        string // 文件夹地址, 用于 mkdir. 必须为空 '' 或者以 '/' 结尾. 空 '' 表示当前文件夹.
 	FileName   string // 文件名, 不带路径
 	Content    []byte // 文件内容
 	Overwrite  bool   // 是否需要覆盖文件内容

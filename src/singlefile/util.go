@@ -22,7 +22,7 @@ func askBeforeProceed(lang string) error {
 	}
 
 	fmt.Printf("Write file %s%q%s at %s%q%s? [Yes/no]: ",
-		util.COLOR_BOLD_YELLOW, lang, util.COLOR_RESET, util.COLOR_YELLOW, pwd, util.COLOR_RESET)
+		util.COLOR_BOLD_YELLOW, lang, util.COLOR_RESET, util.COLOR_YELLOW, pwd+"/", util.COLOR_RESET)
 	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
 		return errors.New(writeFileCanceled(lang))
