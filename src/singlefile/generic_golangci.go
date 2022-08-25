@@ -26,30 +26,30 @@ func setGolangciFlags() *golangciFlags {
 	gcif.Overwrite = gcif.FlagSet.Bool("overwrite", false, "overwrite '.golangci.yml' file\n")
 
 	// no-generic flag
-	gcif.NoGeneric = gcif.FlagSet.Bool("no-generic", false,
-		"'golangci.yml' no-generic settings, for go version < 1.18\n")
+	// gcif.NoGeneric = gcif.FlagSet.Bool("no-generic", false,
+	// 	"'golangci.yml' no-generic settings, for go version < 1.18\n")
 
 	// alias
 	overwrite := gcif.FlagSet.Lookup("overwrite")
 	gcif.FlagSet.Var(overwrite.Value, "ov", fmt.Sprintf("alias to -%s\n", overwrite.Name))
 
-	nogeneric := gcif.FlagSet.Lookup("no-generic")
-	gcif.FlagSet.Var(nogeneric.Value, "ng", fmt.Sprintf("alias to -%s\n", nogeneric.Name))
+	// nogeneric := gcif.FlagSet.Lookup("no-generic")
+	// gcif.FlagSet.Var(nogeneric.Value, "ng", fmt.Sprintf("alias to -%s\n", nogeneric.Name))
 
 	return &gcif
 }
 
 func golangciFile() []util.FileContent {
 	// 判断是否需要使用 no-generic settings
-	if *gciFlags.NoGeneric {
-		return []util.FileContent{
-			{
-				FileName:  ".golangci.yml",
-				Content:   resource.Golangci17,
-				Overwrite: *gciFlags.Overwrite,
-			},
-		}
-	}
+	// if *gciFlags.NoGeneric {
+	// 	return []util.FileContent{
+	// 		{
+	// 			FileName:  ".golangci.yml",
+	// 			Content:   resource.Golangci17,
+	// 			Overwrite: *gciFlags.Overwrite,
+	// 		},
+	// 	}
+	// }
 
 	return []util.FileContent{
 		{

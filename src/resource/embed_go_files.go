@@ -21,8 +21,8 @@ var (
 	//go:embed go_proj_files/golangci.yml
 	Golangci []byte
 
-	//go:embed go_proj_files/golangci-1.17.yml
-	Golangci17 []byte
+	// //go:embed go_proj_files/golangci-1.17.yml
+	// Golangci17 []byte
 
 	//go:embed go_proj_files/main_file.go.txt
 	GoMain []byte
