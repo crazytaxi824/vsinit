@@ -1,4 +1,4 @@
-# golangci-lint v1.46.0 支持 go1.18
+# NOTE: golangci-lint v1.49.0 支持 > go1.18
 # https://golangci-lint.run/
 # https://github.com/golangci/golangci-lint/pull/2438
 
@@ -178,7 +178,7 @@ linters-settings:
 
   # 检查合集, 类似 golint. https://go-critic.github.io/overview
   gocritic:
-    # 既没有 enable 也没有 disable 的 checker group 会开启默认项目.
+    # NOTE: 既不在 enable-tags 也不在 disable-tags 的 checker group 会开启默认项目.
     enabled-tags: # 开启所有分类, group of checkers
       - diagnostic
       # - experimental
@@ -189,15 +189,15 @@ linters-settings:
       # - experimental
     disabled-checks: # 禁用个别 checks
       # - dupImport       # 多次引入同一个包 with different alias.
-      - ifElseChain       # NOTE: 生产模式时检查即可. 多个 if-else 转成 switch.
-      # - octalLiteral    # 检测 8 进制数字
-      # - hexLiteral      # 检测 16 进制数字
+      - commentedOutCode  # 移除代码中注释的 code. NOTE: 生产模式时检查即可.
+      - ifElseChain       # 多个 if-else 转成 switch. NOTE: 生产模式时检查即可.
+      - octalLiteral      # 检测 8 进制数字
+      # - hexLiteral      # 检测 16 进制数字, disabled by default.
       # - whyNoLint       # 必须为 // nolint 提供一个原因
       - wrapperFunc       # 不允许使用 wg.Add(-1), 使用 wg.Done()
-      - commentedOutCode  # 移除代码中注释的 code (正式发布时注释掉就行了)
       # FIXME 以下 checker 目前有 BUG. https://github.com/golangci/golangci-lint/issues/2649
       - hugeParam  # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
-      - paramTypeCombine  # 对泛型支持不好.
+      - rangeValCopy  # Detects loops that copy big objects during each iteration
 
   # 复杂度检查
   gocyclo:
@@ -341,9 +341,6 @@ linters-settings:
     # Enable to ensure that nolint directives are all used. Default is true.
     # // nolint 注释没有起到任何作用时, 是否需要报错? true - unused 时不报错; false - unused 时报错.
     allow-unused: true
-    # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    # 是否允许有空格？ 可以写为 //nolint 也可以写为 // nolint
-    allow-leading-space: true
     # Exclude following linters from requiring an explanation.  Default is [].
     # 不需要提供解释的 linter, 默认是空[], 表示所有 nolint 都需要提供解释
     allow-no-explanation: []
@@ -494,14 +491,12 @@ linters:
   disable-all: true
   enable:
     ### 默认开启的 lints
-    # - deadcode   # 直接用 unused 就可以了
     - errcheck     # 未处理的 error, eg: defer file.Close()
     - gosimple     # staticcheck 的 S 部分
     - govet        # 检查影子变量等...
     - ineffassign  # 检测无效赋值
     - staticcheck  # 检查合集 https://staticcheck.io/docs/checks
     - typecheck    # Like the front-end of a Go compiler, parses and type-checks Go code
-    - varcheck     # 检查 unused 变量 const, var
 
     ### 自愿开启的 lints
     # - depguard     # imports 管理工具 depguard / gomodguard / revive-imports-blacklist 三选一, 目前使用 revive.
@@ -573,6 +568,8 @@ linters:
     # - interfacer  # Linter that suggests narrower interface types
     # - maligned    # 结构体4k对齐检查
     # - scopelint   # 检查 for k,v:=range 时, 直接使用 &v 造成的问题. 因为 v 的内存是不停复用的, 所以每次循环是一样的
+    # - varcheck    # 检查 unused 变量 const, var, 官方推荐使用 unused.
+    # - deadcode    # 官方推荐使用 unused.
 
   # presets:
   #   - bugs
@@ -611,15 +608,6 @@ issues:
       text: "weak cryptographic primitive"
       linters:
         - gosec
-
-    # NOTE 排除指定 lint 的指定错误
-    # text   - 指输出的 error 中包含的文字
-    # source - 指源代码中包含的文字
-    # errcheck & gosec 遇到代码 "defer XXX.Close()" 跳过.
-    - linters:
-        - errcheck
-        - gosec
-      source: "\\sdefer .*\\.Close()"  # \s 表示只要是空白不管是 space 或者 \t 都匹配.
 
     # Exclude lll issues for long lines with go:generate
     - linters:
