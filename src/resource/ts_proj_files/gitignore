@@ -1,5 +1,5 @@
 # http://git-scm.com/docs/gitignore
-# "/" files/dirs in root path.
+# "/" files|dirs in root path.
 /.vscode
 /.vim
 /.history
@@ -15,7 +15,8 @@
 # DO NOT upload config files to any repositories. password may exposed.
 /config.*
 
-# "**/" files/dirs in any folder.
+# "**/" files|dirs in any folder.
+# "file" equals "**/file"; "dir" equals "**/dir"; dir/file NOT equals **/dir/file, but equals /dir/file
 .DS_Store
 **/vendor
 **/*.bak

@@ -1,4 +1,5 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# "file" equals "**/file"; "dir" equals "**/dir"; dir/file NOT equals **/dir/file, but equals /dir/file
 
 # dependencies
 /node_modules
