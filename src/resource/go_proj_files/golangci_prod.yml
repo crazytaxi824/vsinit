@@ -184,11 +184,10 @@ linters-settings:
     # NOTE: 既不在 enable-tags 也不在 disable-tags 的 checker group 会开启默认项目.
     enabled-tags: # 开启所有分类, group of checkers
       - diagnostic
-      # - experimental
-      - opinionated
       - performance
-      # - style
+      - style
     # disabled-tags: # 禁用 group of checkers
+      # - opinionated
       # - experimental
     disabled-checks: # 禁用个别 checks
       # - dupImport       # 多次引入同一个包 with different alias.
@@ -201,6 +200,7 @@ linters-settings:
       # FIXME 以下 checker 目前有 BUG. https://github.com/golangci/golangci-lint/issues/2649
       - hugeParam  # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
       - rangeValCopy  # Detects loops that copy big objects during each iteration
+      - rangeExprCopy # Detects expensive copies of for loop range expressions.
 
   # 复杂度检查
   gocyclo:
