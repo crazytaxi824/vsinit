@@ -8,7 +8,7 @@
     "lib": ["dom", "dom.iterable", "esnext"], // 包含了声明文件列表, 你仍然拥有较新的类型声明
     "jsx": "react-jsx", // 指定 jsx 代码的生成: preserve | react | react-jsx | react-native
     "allowJs": true, // 允许编译 js 文件.
-    "strict": true, // 启用所有严格模式, 6个严格规则
+    "strict": true, // 启用所有严格模式. https://www.typescriptlang.org/tsconfig#strict
     "noImplicitReturns": true, // 强制定义出参类型
     "noFallthroughCasesInSwitch": true, // switch 语句 fall-through 不允许
     "esModuleInterop": true, // ts 编译 CommonJS/AMD/UMD 时特殊处理, 防止错误

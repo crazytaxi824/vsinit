@@ -11,7 +11,7 @@
     "sourceMap": true, // 必须为true, debug 用. 和 outDir 配合使用.
     "jsx": "react-jsx", // 指定 jsx 代码的生成: preserve | react | react-jsx | react-native
     "allowJs": true, // 允许编译 js 文件.
-    "strict": true, // 启用所有严格模式, 6个严格规则
+    "strict": true, // 启用所有严格模式. https://www.typescriptlang.org/tsconfig#strict
     "noImplicitReturns": true, // 强制定义出参类型
     "noFallthroughCasesInSwitch": true, // switch 语句 fall-through 不允许
     "experimentalDecorators": true, // 使用装饰器
