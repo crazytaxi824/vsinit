@@ -1,6 +1,6 @@
-# NOTE: golangci-lint v1.49.0 支持 > go1.18
+# README:
 # https://golangci-lint.run/
-# https://github.com/golangci/golangci-lint/pull/2438
+# https://github.com/golangci/golangci-lint/issues/2649
 
 # 出现错误可以清除 lint 缓存
 # `golangci-lint cache status`
@@ -12,13 +12,14 @@
 #   - gosec: 各种安全检查. 包括语法, 加密算法, 错误处理等...
 #   - govet: 错误检查. 不是语法错误, 而是导致常见 bug 的错误.
 #   - revive: golint 替代. 包括各种风格, 错误 ... 检查.
-#   - staticcheck: 在 golangci-lint 中被分为四个: gosimple, staticcheck, unused, stylecheck.
+#   - staticcheck: (https://staticcheck.io/docs/checks) 在 golangci-lint 中被分为四个: gosimple(S), staticcheck(SA), stylecheck(ST), unused.
 
 # https://golangci-lint.run/usage/configuration/#run-configuration
 # run --- {{{
 run:
-  # Default: use Go version from the go.mod file, fallback on the env var `GOVERSION`, fallback on 1.17
-  # go: 1.18
+  # Mainly related to generics support since go1.18.
+  # Default: use Go version from the go.mod file, fallback on the env var `GOVERSION`, fallback on 1.18
+  #go: 1.18
 
   # 要使用的CPU核心数
   concurrency: 4
@@ -491,10 +492,11 @@ linters:
     - gosimple     # staticcheck 的 S 部分
     - govet        # 检查影子变量等...
     - ineffassign  # 检测无效赋值
-    - staticcheck  # 检查合集 https://staticcheck.io/docs/checks
+    - staticcheck  # staticcheck 的 SA 部分
     - typecheck    # Like the front-end of a Go compiler, parses and type-checks Go code
 
     ### 自愿开启的 lints
+    - contextcheck   # 检查 context 使用是否有错误.
     # - depguard     # imports 管理工具 depguard / gomodguard / revive-imports-blacklist 三选一, 目前使用 revive.
     - dogsled        # 超过n个返回值未接受, eg: x, _, _, _, := f()
     - dupl           # 检查重复代码
@@ -504,7 +506,7 @@ linters:
     - exportloopref  # 在闭包函数中使用 for-loop 的 var. eg: `for { go func(){...}() }`
     # - funlen       # function 长度检查, 使用 revive-function-length 代替.
     - gochecknoinits # 检查是否有 func init() 函数
-    - gocritic       # [VVI], 检查合集 https://go-critic.github.io/overview
+    - gocritic       # [VVI], 检查合集 https://go-critic.github.io/overview, (FIXME: 没有完全支持 generic)
     # - gocyclo      # 复杂度检查 gocyclo / gocognit / cyclop / revive-cyclomatic 四选一
     # - gofmt        # 和 goimports 二选一即可
     - goimports      # 格式化工具
@@ -519,6 +521,7 @@ linters:
     - nolintlint     # // nolint 设置
     - revive         # 替代 golint / stylecheck / revive 三选一
     # - stylecheck   # staticcheck 的 ST 部分. NOTE: 太严格.
+    # - tparallel      # 在 test 文件中错误使用 t.Parallel()
     - unconvert      # 检查不必要的类型转换
 
     ### NOTE: prod 时才需要检查的项
@@ -527,17 +530,13 @@ linters:
     # - unused       # unused global var, function ...
     # - unparam      # 检查函数内没用到的入参, 出参. 可以使用 revive-unused-parameter
     # - decorder     # 检查 type, const, var, func 顺序.
+    # - nilerr       # 如果 err 不是 nil, 则不能 return nil. 如果 err 是 nil, 则必须 return nil.
+    # - noctx        # 发送 http request 的时候没有使用 context.Context
 
-    ### FIXME 目前不支持 go1.18 的 checker. https://github.com/golangci/golangci-lint/pull/2438
-    ### golang 1.18 release date: 15 March 2022
-    ### these linters are not updated yet.
+    ### FIXME: 目前不支持 go1.18+ generic 的列表. https://github.com/golangci/golangci-lint/issues/2649
     # - bodyclose      # check HTTP res.Body is correctly closed.
-    # - contextcheck   # 检查 context 使用是否有错误.
-    # - nilerr         # 如果 err 不是 nil, 则不能 return nil. 如果 err 是 nil, 则必须 return nil.
-    # - noctx          # 发送 http request 的时候没有使用 context.Context
     # - rowserrcheck   # 检查 sql.Rows.Err 是否正确处理, 针对 sql.
     # - sqlclosecheck  # checks if SQL rows/statements are closed.
-    # - tparallel      # 在 test 文件中错误使用 t.Parallel()
     # - wastedassign   # 无效的赋值
 
     ### 不建议开启
@@ -555,7 +554,6 @@ linters:
     # - paralleltest  # 有 bug. tparallel / paralleltest 二选一
     # - prealloc      # 查找可以被预先分配 Len & Cap 的 slice, make([]int, Len, Cap)
     # - predeclared   # 检查是否使用了关键字 (new, make, append uint, etc.) 使用 revive/redefines-builtin-id 代替
-    # - structcheck   # 结构体私有属性 unused 检查, 对 tableName 支持不好
     # - testpackage   # linter that makes you use a separate _test package
     # - wsl           # 需要使用空行的地方 - 和 whitespace 作用正好相反
 
@@ -566,6 +564,7 @@ linters:
     # - scopelint   # 检查 for k,v:=range 时, 直接使用 &v 造成的问题. 因为 v 的内存是不停复用的, 所以每次循环是一样的
     # - varcheck    # 检查 unused 变量 const, var, 官方推荐使用 unused.
     # - deadcode    # 官方推荐使用 unused.
+    # - structcheck # 结构体私有属性 unused 检查, 对 tableName 支持不好
 
   # presets:
   #   - bugs
