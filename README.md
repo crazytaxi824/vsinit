@@ -183,3 +183,10 @@ settings:
 - `.gitignore`
 
 <br />
+
+# TODO
+
+## golangci-lint generic
+
+- `bodyclose` - v1.51.0
+- `sqlclosecheck` - v1.51.1
