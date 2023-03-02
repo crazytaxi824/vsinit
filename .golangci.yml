@@ -1,4 +1,4 @@
-# README:
+# README: v1.51.2
 # https://golangci-lint.run/
 # https://github.com/golangci/golangci-lint/issues/2649
 
@@ -177,24 +177,25 @@ linters-settings:
     # 相同 string 出现的次数, 默认 3.
     min-occurrences: 5
 
-  # 检查合集, 类似 golint. https://go-critic.github.io/overview
+  # 检查合集, 类似 golint.
+  # https://go-critic.github.io/overview, https://go-critic.com/overview
   gocritic:
     # NOTE: 既不在 enable-tags 也不在 disable-tags 的 checker group 会开启默认项目.
-    enabled-tags: # 开启所有分类, group of checkers
+    # 不能同时在 enabled-tags 和 disabled-tags 中添加相同 group.
+    enabled-tags: # 开启所有分类中的所有项目, group of checkers
       - diagnostic
       - performance
       - style
     # disabled-tags: # 禁用 group of checkers
-      # - opinionated
-      # - experimental
+      # - style
     disabled-checks: # 禁用个别 checks
       # - dupImport       # 多次引入同一个包 with different alias.
       - commentedOutCode  # 移除代码中注释的 code. NOTE: 生产模式时检查即可.
       - ifElseChain       # 多个 if-else 转成 switch. NOTE: 生产模式时检查即可.
-      - octalLiteral      # 检测 8 进制数字
+      - octalLiteral      # 有bug, 检测 8 进制数字
       # - hexLiteral      # 检测 16 进制数字, disabled by default.
-      # - whyNoLint       # 必须为 // nolint 提供一个原因
-      - wrapperFunc       # 不允许使用 wg.Add(-1), 使用 wg.Done()
+      - whyNoLint         # 必须为 // nolint 提供一个原因
+      - wrapperFunc       # 有bug, 根据用户函数功能推荐内置函数. Detects function calls that can be replaced with convenience wrappers
       # FIXME 以下 checker 目前有 BUG. https://github.com/golangci/golangci-lint/issues/2649
       - hugeParam  # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
       - rangeValCopy  # Detects loops that copy big objects during each iteration
