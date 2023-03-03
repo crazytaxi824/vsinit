@@ -3,10 +3,11 @@ package singlefile
 import (
 	"flag"
 	"fmt"
-	"local/src/resource"
-	"local/src/util"
 	"log"
 	"os"
+
+	"local/src/resource"
+	"local/src/util"
 )
 
 var gciFlags *golangciFlags
@@ -15,7 +16,6 @@ var gciFlags *golangciFlags
 type golangciFlags struct {
 	FlagSet   *flag.FlagSet
 	Overwrite *bool
-	Product   *bool // false (default) - settings for Develop; true - settings for Production.
 }
 
 func setGolangciFlags() *golangciFlags {
@@ -25,33 +25,14 @@ func setGolangciFlags() *golangciFlags {
 	// overwrite '.golangci.yml' file
 	gcif.Overwrite = gcif.FlagSet.Bool("overwrite", false, "overwrite '.golangci.yml' file\n")
 
-	// Production flag
-	gcif.Product = gcif.FlagSet.Bool("product", false,
-		"'golangci.yml' settings for Production.\n")
-
 	// alias
 	overwrite := gcif.FlagSet.Lookup("overwrite")
 	gcif.FlagSet.Var(overwrite.Value, "ov", fmt.Sprintf("alias to -%s\n", overwrite.Name))
-
-	prod := gcif.FlagSet.Lookup("product")
-	gcif.FlagSet.Var(prod.Value, "pd", fmt.Sprintf("alias to -%s\n", prod.Name))
 
 	return &gcif
 }
 
 func golangciFile() (string, []util.FileContent) {
-	// 判断是否需要使用 Production settings
-	if *gciFlags.Product {
-		filename := ".golangci_prod.yml"
-		return filename, []util.FileContent{
-			{
-				FileName:  filename,
-				Content:   resource.GolangciProd,
-				Overwrite: *gciFlags.Overwrite,
-			},
-		}
-	}
-
 	filename := ".golangci.yml"
 	return filename, []util.FileContent{
 		{
