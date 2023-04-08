@@ -30,7 +30,7 @@ indent_style = space
 indent_size = 2
 
 # js ts css 等相关语言使用单引号.
-[*.{js,jsx,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,vue}]
+[*.{htm,html,js,jsx,ts,tsx,cjs,cts,ctsx,mjs,mts,mtsx,css,sass,scss,less,pcss,vue}]
 quote_type = single
 
 # python indent 4 个空格.
