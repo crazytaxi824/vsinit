@@ -6,10 +6,11 @@ package singlefile
 import (
 	"flag"
 	"fmt"
-	"local/src/resource"
-	"local/src/util"
 	"log"
 	"os"
+
+	"local/src/resource"
+	"local/src/util"
 )
 
 var ecFlags *editorConfigFlags

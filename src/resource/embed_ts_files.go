@@ -1,8 +1,6 @@
 package resource
 
-import (
-	_ "embed"
-)
+import _ "embed"
 
 var (
 	//go:embed ts_proj_files/gitignore

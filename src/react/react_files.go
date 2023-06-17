@@ -5,11 +5,12 @@ package react
 import (
 	"bytes"
 	"fmt"
+	"log"
+	"strings"
+
 	"local/src/appsettings"
 	"local/src/resource"
 	"local/src/util"
-	"log"
-	"strings"
 )
 
 // files need to write

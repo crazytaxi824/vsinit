@@ -2,9 +2,10 @@ package javascript
 
 import (
 	"fmt"
+	"log"
+
 	"local/src/appsettings"
 	"local/src/util"
-	"log"
 )
 
 // return dependencies' names

@@ -2,9 +2,10 @@ package react
 
 import (
 	"fmt"
-	"local/src/util"
 	"log"
 	"os"
+
+	"local/src/util"
 )
 
 var reactFlags *util.ReactFlags

@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"local/src/util"
 	"os"
 	"strings"
+
+	"local/src/util"
 )
 
 // 获取命令行的前两个参数 - eg: "vs file xxx"

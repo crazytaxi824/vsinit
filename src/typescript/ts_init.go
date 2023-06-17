@@ -2,9 +2,10 @@ package typescript
 
 import (
 	"fmt"
-	"local/src/util"
 	"log"
 	"os"
+
+	"local/src/util"
 )
 
 var jstsFlags *util.JSTSFlags

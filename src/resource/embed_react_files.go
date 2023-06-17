@@ -1,8 +1,6 @@
 package resource
 
-import (
-	"embed"
-)
+import "embed"
 
 var (
 	//go:embed react_proj_files/gitignore

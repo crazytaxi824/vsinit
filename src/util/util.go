@@ -8,7 +8,6 @@ import (
 )
 
 // print color
-// nolint
 const (
 	COLOR_RED    = "\x1b[31m"
 	COLOR_GREEN  = "\x1b[32m"

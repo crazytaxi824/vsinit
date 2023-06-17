@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"local/src/resource"
 	"os/user"
 	"strings"
 	"testing"
+
+	"local/src/resource"
 )
 
 func Test_Flags(t *testing.T) {
