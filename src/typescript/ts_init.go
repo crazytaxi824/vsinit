@@ -20,7 +20,7 @@ func InitTSProj() error {
 	}
 
 	// ask before init project
-	err = util.AskBeforeProceed("Typescript")
+	err = util.Prompt("Typescript")
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

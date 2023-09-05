@@ -21,7 +21,7 @@ const (
 )
 
 // 询问是否在当前文件夹初始化项目
-func AskBeforeProceed(lang string) error {
+func Prompt(lang string) error {
 	pwd, err := os.Getwd() // 获取当前路径
 	if err != nil {
 		return errors.New(projectCanceled(lang))
