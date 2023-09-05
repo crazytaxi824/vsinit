@@ -1,6 +1,5 @@
-# README: v1.53.2
+# README: v1.54.2
 # https://golangci-lint.run/
-# https://github.com/golangci/golangci-lint/issues/2649
 
 # 出现错误可以清除 lint 缓存
 # `golangci-lint cache status`
@@ -197,10 +196,10 @@ linters-settings:
       # - hexLiteral      # 检测 16 进制数字, disabled by default.
       - whyNoLint         # 必须为 // nolint 提供一个原因
       - wrapperFunc       # 有bug, 根据用户函数功能推荐内置函数. Detects function calls that can be replaced with convenience wrappers
-      # FIXME 以下 checker 目前有 BUG. https://github.com/golangci/golangci-lint/issues/2649
-      - hugeParam  # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
-      - rangeValCopy  # Detects loops that copy big objects during each iteration
-      - rangeExprCopy # Detects expensive copies of for loop range expressions.
+      # NOTE 以下 checker 在 generic 下无法检测, 但是也不会 panic. fixed at gocritic v0.9.0
+      # - hugeParam  # 超大入参/出参使用 pointer 类型. func f(x [1024]int) -> func f(x *[1024]int)
+      # - rangeValCopy  # Detects loops that copy big objects during each iteration
+      # - rangeExprCopy # Detects expensive copies of for loop range expressions.
 
   # 复杂度检查
   gocyclo:
