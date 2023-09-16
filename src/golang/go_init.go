@@ -20,7 +20,7 @@ func InitGoProj() error {
 	}
 
 	// ask before init project
-	err = util.AskBeforeProceed("Go")
+	err = util.Prompt("Go")
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

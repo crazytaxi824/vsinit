@@ -21,7 +21,7 @@ func InitJSProj() error {
 	}
 
 	// ask before init project
-	err = util.AskBeforeProceed("Javascript")
+	err = util.Prompt("Javascript")
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

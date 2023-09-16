@@ -20,7 +20,7 @@ func InitReactProj() error {
 	}
 
 	// ask before init project
-	err = util.AskBeforeProceed("React")
+	err = util.Prompt("React")
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
