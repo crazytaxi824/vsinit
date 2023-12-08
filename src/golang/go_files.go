@@ -3,42 +3,87 @@
 package golang
 
 import (
-	"local/src/resource"
+	"fmt"
+
+	"local/src/files"
 	"local/src/util"
 )
 
 func filesNeedToWrite() []util.FileContent {
 	return []util.FileContent{
 		{
-			Dir:      ".vscode/",
-			FileName: "settings.json",
-			Content:  resource.GoVsSettings,
+			Filepath: ".nvim/settings.lua",
+			Content:  files.GoNvimSettings,
 		},
 		{
-			Dir:      ".vscode/",
-			FileName: "launch.json",
-			Content:  resource.GoVsLaunch,
+			Filepath: ".vscode/settings.json",
+			Content:  files.GoVsSettings,
 		},
 		{
-			FileName: ".gitignore",
-			Content:  resource.GoGitignore,
+			Filepath: ".vscode/launch.json",
+			Content:  files.GoVsLaunch,
 		},
 		{
-			FileName: ".golangci.yml",
-			Content:  resource.Golangci,
+			Filepath: ".editorconfig",
+			Content:  files.Editorconfig,
 		},
 		{
-			FileName: ".editorconfig",
-			Content:  resource.Editorconfig,
+			Filepath: ".gitignore",
+			Content:  files.GoGitignore,
 		},
 		{
-			Dir:      "src/",
-			FileName: "main.go",
-			Content:  resource.GoMain,
+			Filepath: ".golangci.yml",
+			Content:  files.Golangci,
+		},
+		{
+			Filepath: "src/main.go",
+			Content:  files.GoMain,
 		},
 	}
 }
 
 func writeProjectFiles() error {
-	return util.WriteAllFiles(filesNeedToWrite())
+	err := util.Prompt("Go")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	err = util.WriteFiles(filesNeedToWrite())
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf(goMsg, util.COLOR_BOLD_YELLOW, util.COLOR_RESET)
+	return nil
 }
+
+func writeSingleFile() error {
+	fs, err := util.ChooseSingleFile(filesNeedToWrite(), "write")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	err = util.WriteFiles(fs)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func printSingleFile() error {
+	fs, err := util.ChooseSingleFile(filesNeedToWrite(), "print")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	fmt.Printf("%sfile content:%s\n"+string(fs[0].Content), util.COLOR_GREEN, util.COLOR_RESET)
+	return nil
+}
+
+const goMsg = `%srun:
+    go mod init <repo>%s
+`

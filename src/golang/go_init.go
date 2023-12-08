@@ -1,34 +1,39 @@
-// install '.golangci.yml' locally for vim-go.
-
 package golang
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"local/src/util"
 )
 
-func InitGoProj() error {
-	// go flags only for `-help`
-	goFlags := util.SetGoFlags()
-	err := goFlags.FlagSet.Parse(os.Args[2:])
+func InitProj() error {
+	flags := util.SetFlags()
+	err := flags.FlagSet.Parse(os.Args[2:])
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	// ask before init project
-	err = util.Prompt("Go")
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
+	// choose file to print
+	if *flags.Print {
+		err = printSingleFile()
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	fmt.Printf("%sIniting Go Project ...%s\n", util.COLOR_GREEN, util.COLOR_RESET)
+	// choose file to write
+	if *flags.File {
+		err = writeSingleFile()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
-	// write project files
+	// write all files
 	err = writeProjectFiles()
 	if err != nil {
 		return err

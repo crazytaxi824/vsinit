@@ -1,116 +1,99 @@
 package javascript
 
 import (
-	"bytes"
 	"fmt"
 
-	"local/src/appsettings"
-	"local/src/resource"
+	"local/src/files"
 	"local/src/util"
 )
 
-// files need to write
-var fs []util.FileContent
-
 // 一定需要写的文件
-func filesHasToWrite() {
-	fs = append(fs, []util.FileContent{
+func filesNeedToWrite() []util.FileContent {
+	return []util.FileContent{
 		{
-			Dir:      ".vscode/",
-			FileName: "launch.json",
-			Content:  resource.JSVsLaunch,
-		},
-		{
-			FileName: ".gitignore",
-			Content:  resource.JSGitignore,
+			Filepath: ".nvim/settings.lua",
+			Content:  files.JSNvimSettings,
 		},
 		{
-			FileName: ".editorconfig",
-			Content:  resource.Editorconfig,
+			Filepath: ".vscode/settings.json",
+			Content:  files.JSVsSettings,
 		},
 		{
-			Dir:      "src/",
-			FileName: "main.js",
-			Content:  resource.JSMain,
+			Filepath: ".vscode/launch.json",
+			Content:  files.JSVsLaunch,
 		},
 		{
-			FileName: "package.json",
-			Content:  resource.JSPackageJSON, // jest settings included anyway
+			Filepath: ".editorconfig",
+			Content:  files.Editorconfig,
 		},
-	}...)
-}
-
-// vscode 'settings.json' content 'eslint config filepath' based on ESLint flag - local / global
-// ESLint Dir path based on ESLint flag - local / global
-// 'src/example.test.js' based on Jest flag
-// 'package.json' content based on Jest flag
-func filesMightNeedToWrite() {
-	var overrideConfigFile string
-
-	if *jstsFlags.ESlintLocal {
-		// vscode settings -> "overrideConfigFile": "本地相对位置"
-		overrideConfigFile = fmt.Sprintf(`"overrideConfigFile": %q`, appsettings.JSESLintFileName)
-
-		// eslint 文件安装在项目本地
-		fs = append(fs,
-			util.FileContent{
-				// Dir:      "", // dir path based on ESLint flag - local / global
-				FileName: appsettings.JSESLintFileName,
-				Content:  resource.JSESlint,
-			},
-		)
-	} else {
-		// vscode settings -> "overrideConfigFile": "全局绝对位置"
-		overrideConfigFile = fmt.Sprintf(`"overrideConfigFile": %q`,
-			appsettings.ESLintGlobalPath+appsettings.JSESLintFileName)
-
-		// eslint 文件安装在 Global Path 位置
-		fs = append(fs,
-			util.FileContent{
-				Dir:      appsettings.ESLintGlobalPath, // dir path based on ESLint flag - local / global
-				FileName: appsettings.JSESLintFileName,
-				Content:  resource.JSESlint,
-			},
-		)
-	}
-
-	// 添加 .vscode/settings.json 文件
-	fs = append(fs,
-		util.FileContent{
-			Dir:      ".vscode/",
-			FileName: "settings.json",
-			Content: bytes.ReplaceAll(resource.JSVsSettings,
-				[]byte(`"overrideConfigFile": "eslintrc-js.json"`), // 这里是写死在 .vscode/settings.json 文件中的内容, 不要改.
-				[]byte(overrideConfigFile),
-			),
-			Suggestion: fmt.Sprintf(settingsSuggestion, util.COLOR_YELLOW, overrideConfigFile, util.COLOR_RESET),
+		{
+			Filepath: ".gitignore",
+			Content:  files.JSGitignore,
 		},
-	)
-
-	if *jstsFlags.Jest {
-		fs = append(fs,
-			// write example.test.js file at "src/"
-			util.FileContent{
-				Dir:      "src/",
-				FileName: "example.test.js",
-				Content:  resource.JSTest,
-			},
-		)
+		{
+			Filepath: ".eslintrc.json",
+			Content:  files.JSESlint,
+		},
+		{
+			Filepath: "package.json",
+			Content:  files.JSPackageJSON, // jest settings included
+		},
+		{
+			Filepath: "example.test.js",
+			Content:  files.JSTest,
+		},
+		{
+			Filepath: "src/main.js",
+			Content:  files.JSMain,
+		},
 	}
 }
 
 func writeProjectFiles() error {
-	filesHasToWrite()
-	filesMightNeedToWrite()
-	return util.WriteAllFiles(fs)
+	err := util.Prompt("Javascript")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	err = util.WriteFiles(filesNeedToWrite())
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf(jsMsg, util.COLOR_BOLD_YELLOW, util.COLOR_RESET)
+	return nil
 }
 
-const (
-	// .vscode/settings.json eslint filepath suggestion
-	settingsSuggestion = `{
-  "eslint.options": {%s
-    %s%s
-  },
+func writeSingleFile() error {
+	fs, err := util.ChooseSingleFile(filesNeedToWrite(), "write")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	err = util.WriteFiles(fs)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
+
+func printSingleFile() error {
+	fs, err := util.ChooseSingleFile(filesNeedToWrite(), "print")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	fmt.Printf("%sfile content:%s\n"+string(fs[0].Content), util.COLOR_GREEN, util.COLOR_RESET)
+	return nil
+}
+
+const jsMsg = `%srun:
+    npm install -g eslint jest
+    npm install -D <packages> # eslint deps: eslint-config-prettier
+".eslintrc.json" file:
+    change "settings.jest.version" to your current jest version.%s
 `
-)

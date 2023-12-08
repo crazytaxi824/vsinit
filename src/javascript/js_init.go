@@ -1,48 +1,43 @@
 package javascript
 
 import (
-	"fmt"
 	"log"
 	"os"
 
 	"local/src/util"
 )
 
-// change name
-var jstsFlags *util.JSTSFlags
-
-func InitJSProj() error {
-	// parse flags
-	jstsFlags = util.SetJSTSFlags()
-	err := jstsFlags.FlagSet.Parse(os.Args[2:])
+func InitProj() error {
+	flags := util.SetFlags()
+	err := flags.FlagSet.Parse(os.Args[2:])
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	// ask before init project
-	err = util.Prompt("Javascript")
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
+	// choose file to print
+	if *flags.Print {
+		err = printSingleFile()
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	fmt.Printf("%sIniting Javascript Project ...%s\n", util.COLOR_GREEN, util.COLOR_RESET)
+	// choose file to write
+	if *flags.File {
+		err = writeSingleFile()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
-	// choose files based on flags
+	// write all files
 	err = writeProjectFiles()
 	if err != nil {
 		return err
 	}
-
-	// [VVI] need to write files before npm install <packages>, because 'package.json' file might be overwritten.
-	// choose dependencies based on flags
-	err = installPackages()
-	if err != nil {
-		return err
-	}
-
-	util.PrintSuggestions()
 
 	return nil
 }

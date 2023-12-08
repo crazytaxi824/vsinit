@@ -12,63 +12,26 @@ func getCmd() string {
 	return fmt.Sprintf("%q", strings.Join(os.Args[:2], " "))
 }
 
-// golang flags.
-type GoFlags struct {
+type Flags struct {
 	FlagSet *flag.FlagSet
+
+	File  *bool // choose a single file to write
+	Print *bool // choose a single file to print
 }
 
-func SetGoFlags() *GoFlags {
-	var gf GoFlags
-	gf.FlagSet = flag.NewFlagSet(getCmd(), flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+func SetFlags() *Flags {
+	var flags Flags
+	flags.FlagSet = flag.NewFlagSet(getCmd(), flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
+	flags.File = flags.FlagSet.Bool("file", false, "choose single file to write")
+	flags.Print = flags.FlagSet.Bool("print", false, "choose single file to print")
+
+	// alias
+	f := flags.FlagSet.Lookup("file")
+	flags.FlagSet.Var(f.Value, "f", fmt.Sprintf("alias to -%s\n", f.Name))
+
+	p := flags.FlagSet.Lookup("print")
+	flags.FlagSet.Var(p.Value, "p", fmt.Sprintf("alias to -%s\n", p.Name))
 
 	// golang 没有任何 flag, 这里只是为了 -h 命令.
-	return &gf
-}
-
-// for javascript & typescript use only
-type JSTSFlags struct {
-	FlagSet     *flag.FlagSet
-	ESlintLocal *bool // set eslintrc.json locally, default globally
-	Jest        *bool // test tool
-}
-
-func SetJSTSFlags() *JSTSFlags {
-	var tsfs JSTSFlags
-	tsfs.FlagSet = flag.NewFlagSet(getCmd(), flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
-
-	// eslint
-	tsfs.ESlintLocal = tsfs.FlagSet.Bool("eslint-local", false,
-		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)\n")
-
-	// alias
-	f := tsfs.FlagSet.Lookup("eslint-local")
-	tsfs.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s\n", f.Name))
-
-	// jest
-	tsfs.Jest = tsfs.FlagSet.Bool("jest", false, "install 'jest' related dependencies.\n")
-	j := tsfs.FlagSet.Lookup("jest")
-	tsfs.FlagSet.Var(j.Value, "j", fmt.Sprintf("alias to -%s\n", j.Name))
-
-	return &tsfs
-}
-
-// for react use only
-type ReactFlags struct {
-	FlagSet     *flag.FlagSet
-	ESlintLocal *bool // set eslintrc.json locally, default globally
-}
-
-func SetReactFlags() *ReactFlags {
-	var rf ReactFlags
-	rf.FlagSet = flag.NewFlagSet(getCmd(), flag.ExitOnError) // Call os.Exit(2) or for -h/-help Exit(0)
-
-	// eslint
-	rf.ESlintLocal = rf.FlagSet.Bool("eslint-local", false,
-		"install 'eslint-rules' related dependencies locally.\n(default: install dependencies globally)\n")
-
-	// alias
-	f := rf.FlagSet.Lookup("eslint-local")
-	rf.FlagSet.Var(f.Value, "l", fmt.Sprintf("alias to -%s\n", f.Name))
-
-	return &rf
+	return &flags
 }
