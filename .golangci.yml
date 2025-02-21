@@ -507,7 +507,7 @@ linters:
     - durationcheck  # 检查 time.Duration 入参是否带单位 (time.second ...)
     - errorlint      # 检查 error wrap 错误.
     - exhaustive     # 检查 switch 语法
-    - exportloopref  # 在闭包函数中使用 for-loop 的 var. eg: `for { go func(){...}() }`
+    # - exportloopref  # 在闭包函数中使用 for-loop 的 var. eg: `for { go func(){...}() }`
     # - funlen       # function 长度检查, 使用 revive-function-length 代替.
     - gocheckcompilerdirectives
     - gochecknoinits # 检查是否有 func init() 函数
