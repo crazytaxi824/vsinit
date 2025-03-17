@@ -1,0 +1,32 @@
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml
+[project]
+requires-python = ">=3.10"
+
+# https://microsoft.github.io/pyright/#/configuration
+[tool.pyright]
+executionEnvironments = [
+  { root = "src" }
+]
+verboseOutput = true
+
+# python3 -m venv .venv
+# python3 -m venv --upgrade .venv
+venvPath = "."
+venv = ".venv"
+
+exclude = [
+  "**/node_modules",
+  "**/__pycache__",
+  "src/experimental",
+]
+
+# https://docs.astral.sh/ruff/tutorial/#configuration
+[tool.ruff]
+# Set the maximum line length to 79.
+line-length = 79
+
+[tool.ruff.lint]
+# Add the `line-too-long` rule to the enforced rule set. By default, Ruff omits rules that
+# overlap with the use of a formatter, like Black, but we can override this behavior by
+# explicitly adding the rule.
+extend-select = ["E501"]
