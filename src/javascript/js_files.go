@@ -31,10 +31,6 @@ func filesNeedToWrite() []util.FileContent {
 			Content:  files.JSGitignore,
 		},
 		{
-			Filepath: "package.json",
-			Content:  files.JSPackageJSON, // jest settings included
-		},
-		{
 			Filepath: "example.test.js",
 			Content:  files.JSTest,
 		},

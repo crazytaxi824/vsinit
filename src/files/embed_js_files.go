@@ -23,8 +23,5 @@ var (
 	//go:embed js_proj_files/example.test.js
 	JSTest []byte
 
-	//go:embed js_proj_files/package.json
-	JSPackageJSON []byte
-
 	// common/editorconfig
 )
