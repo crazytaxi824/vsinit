@@ -31,10 +31,6 @@ func filesNeedToWrite() []util.FileContent {
 			Content:  files.JSGitignore,
 		},
 		{
-			Filepath: ".eslintrc.json",
-			Content:  files.JSESlint,
-		},
-		{
 			Filepath: "package.json",
 			Content:  files.JSPackageJSON, // jest settings included
 		},

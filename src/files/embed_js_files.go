@@ -17,9 +17,6 @@ var (
 	//go:embed js_proj_files/launch.json
 	JSVsLaunch []byte
 
-	//go:embed js_proj_files/eslintrc-js.json
-	JSESlint []byte
-
 	//go:embed js_proj_files/main.js
 	JSMain []byte
 
