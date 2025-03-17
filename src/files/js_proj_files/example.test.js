@@ -1,7 +1,12 @@
 // https://jestjs.io/docs/getting-started
-// 使用 jest 单元测试需要安装 jest 命令行工具, npm install --save-dev jest
-// package.json 中加入 { "scripts": { "test": "jest" } }
-// 测试文件必须以 *.test.js 结尾
+// 1. 安装 jest 命令行工具, `npm install --save-dev jest`
+// 2. package.json 中加入
+//    {
+//      "scripts": {
+//        "test": "jest"
+//      }
+//    }
+// 3. 测试文件必须以 *.test.js 结尾
 
 // 测试方法:
 // npm test                 // 所有文件
