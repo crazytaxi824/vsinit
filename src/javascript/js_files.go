@@ -88,8 +88,6 @@ func printSingleFile() error {
 }
 
 const jsMsg = `%srun:
-    npm install -g eslint jest
-    npm install -D <packages> # eslint deps: eslint-config-prettier
-".eslintrc.json" file:
-    change "settings.jest.version" to your current jest version.%s
+	1. npm init  # create package.json
+	2. npm init @eslint/config@latest  # create eslint.config.mjs%s
 `
