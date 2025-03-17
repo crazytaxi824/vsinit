@@ -8,7 +8,10 @@
 
 # project generated files
 /node_modules
-/coverage
+/__pycache__
+/.pytest_cache
+/.mypy_cache
+/.venv
 
 # DO NOT upload config files to any repositories. password may exposed.
 /config.*

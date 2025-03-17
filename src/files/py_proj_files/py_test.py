@@ -1,4 +1,4 @@
-# `pip install pytest`
+# `pip install -U pytest`
 # `pytest xxx_test.py`
 
 
