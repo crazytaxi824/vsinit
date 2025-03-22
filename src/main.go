@@ -8,6 +8,7 @@ import (
 
 	"local/src/golang"
 	"local/src/javascript"
+	"local/src/python"
 	"local/src/util"
 )
 
@@ -28,6 +29,11 @@ func main() {
 
 	case "js", "javascript":
 		if err := javascript.InitProj(); err != nil {
+			os.Exit(2)
+		}
+
+	case "py", "python":
+		if err := python.InitProj(); err != nil {
 			os.Exit(2)
 		}
 

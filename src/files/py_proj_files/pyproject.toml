@@ -12,15 +12,15 @@ exclude = [
   "**/__pycache__",
   "src/experimental",
 ]
+
+# root: Root path for the code that will execute within this execution environment.
+# extraPaths: Additional search paths that will be used when searching for modules imported by files.
 executionEnvironments = [
-  {
-    # Root path for the code that will execute within this execution environment.
-    root = "src/tests",
-    # Additional search paths that will be used when searching for modules imported by files.
-    extraPaths = ["src/tests/e2e", "src/sdk"]
-  },
+  { root = "src/tests", extraPaths = ["src/tests/e2e", "src/sdk"] },
   { root = "src" }
 ]
+
+# output logs should be verbose.
 verboseOutput = true
 
 # python3 -m venv .venv
