@@ -4,21 +4,28 @@ requires-python = ">=3.10"
 
 # https://microsoft.github.io/pyright/#/configuration
 [tool.pyright]
-executionEnvironments = [
-  { root = "src" }
-]
-verboseOutput = true
-
-# python3 -m venv .venv
-# python3 -m venv --upgrade .venv
-venvPath = "."
-venv = ".venv"
-
+# Paths of directories or files that should be considered part of the project.
+include = ["src"]
+# Paths of directories or files that should not be considered part of the project.
 exclude = [
   "**/node_modules",
   "**/__pycache__",
   "src/experimental",
 ]
+executionEnvironments = [
+  {
+    # Root path for the code that will execute within this execution environment.
+    root = "src/tests",
+    # Additional search paths that will be used when searching for modules imported by files.
+    extraPaths = ["src/tests/e2e", "src/sdk"]
+  },
+  { root = "src" }
+]
+verboseOutput = true
+
+# python3 -m venv .venv
+venvPath = "."
+venv = ".venv"
 
 # https://docs.astral.sh/ruff/tutorial/#configuration
 [tool.ruff]
