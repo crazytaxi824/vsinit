@@ -9,9 +9,6 @@ import (
 )
 
 var (
-	//go:embed go_proj_files/gitignore
-	GoGitignore []byte
-
 	//go:embed go_proj_files/settings.lua
 	GoNvimSettings []byte
 
@@ -26,6 +23,4 @@ var (
 
 	//go:embed go_proj_files/main_file.go.txt
 	GoMain []byte
-
-	// common/editorconfig
 )

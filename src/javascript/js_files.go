@@ -28,7 +28,7 @@ func filesNeedToWrite() []util.FileContent {
 		},
 		{
 			Filepath: ".gitignore",
-			Content:  files.JSGitignore,
+			Content:  files.Gitignore,
 		},
 		{
 			Filepath: "example.test.js",

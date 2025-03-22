@@ -5,9 +5,6 @@ import (
 )
 
 var (
-	//go:embed py_proj_files/gitignore
-	PyGitignore []byte
-
 	//go:embed py_proj_files/main.py
 	PyMain []byte
 
@@ -16,6 +13,4 @@ var (
 
 	//go:embed py_proj_files/pyproject.toml
 	PyProject []byte
-
-	// common/editorconfig
 )
