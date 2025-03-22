@@ -57,7 +57,8 @@ func writeProjectFiles() error {
 		return err
 	}
 
-	fmt.Printf(jsMsg, util.COLOR_BOLD_YELLOW, util.COLOR_RESET)
+	fmt.Printf(jsMsg, util.COLOR_BOLD_YELLOW, util.COLOR_GREEN,
+		util.COLOR_BOLD_YELLOW, util.COLOR_GREEN, util.COLOR_RESET)
 	return nil
 }
 
@@ -88,6 +89,6 @@ func printSingleFile() error {
 }
 
 const jsMsg = `%srun:
-	1. npm init  # create package.json
-	2. npm init @eslint/config@latest  # create eslint.config.mjs%s
+    1. npm init  %s# create package.json%s
+    2. npm init @eslint/config@latest  %s# create eslint.config.mjs%s
 `
