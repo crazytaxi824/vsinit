@@ -31,6 +31,10 @@ func filesNeedToWrite() []util.FileContent {
 			Content:  files.Gitignore,
 		},
 		{
+			Filepath: "jsconfig.json",
+			Content:  files.JsConfig,
+		},
+		{
 			Filepath: "example.test.js",
 			Content:  files.JSTest,
 		},

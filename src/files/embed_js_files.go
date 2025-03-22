@@ -19,4 +19,7 @@ var (
 
 	//go:embed js_proj_files/example.test.js
 	JSTest []byte
+
+	//go:embed js_proj_files/jsconfig.json
+	JsConfig []byte
 )

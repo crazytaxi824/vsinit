@@ -1,0 +1,19 @@
+// https://code.visualstudio.com/docs/languages/jsconfig
+{
+  "compilerOptions": {
+    // Specifies the module system, when generating module code.
+    // The values are "AMD", "CommonJS", "ES2015", "ES2020", "ES2022",
+    // "ES6", "Node16", "NodeNext", "ESNext", "None", "System", "UMD".
+    "module": "CommonJS",
+
+    // Specifies which default library (lib.d.ts) to use.
+    // The values are "ES3", "ES5", "ES6", "ES2015", "ES2016",
+    // "ES2017", "ES2018", "ES2019", "ES2020", "ES2021", "ES2022",
+    // "ES2023", "ESNext".
+    "target": "ES6"
+  },
+  // explicitly set the files in your project using the include attribute.
+  "include": ["src/**/*"],
+  // tells the lsp what files are not part of your source code.
+  "exclude": ["node_modules"]
+}
