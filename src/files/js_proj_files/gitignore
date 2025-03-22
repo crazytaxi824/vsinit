@@ -2,6 +2,7 @@
 # "/" files|dirs in root path.
 /.vscode
 /.nvim
+/.vim
 /.history
 /.idea
 /*.iml

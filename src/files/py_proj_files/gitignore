@@ -2,16 +2,17 @@
 # "/" files|dirs in root path.
 /.vscode
 /.nvim
+/.vim
 /.history
 /.idea
 /*.iml
 
 # project generated files
 /node_modules
-/__pycache__
-/.pytest_cache
-/.mypy_cache
 /.venv
+/.mypy_cache
+/.pytest_cache
+**/__pycache__
 
 # DO NOT upload config files to any repositories. password may exposed.
 /config.*
