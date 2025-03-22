@@ -5,9 +5,6 @@ import (
 )
 
 var (
-	//go:embed js_proj_files/gitignore
-	JSGitignore []byte
-
 	//go:embed js_proj_files/settings.lua
 	JSNvimSettings []byte
 
@@ -22,6 +19,4 @@ var (
 
 	//go:embed js_proj_files/example.test.js
 	JSTest []byte
-
-	// common/editorconfig
 )

@@ -29,7 +29,7 @@ func filesNeedToWrite() []util.FileContent {
 		},
 		{
 			Filepath: ".gitignore",
-			Content:  files.GoGitignore,
+			Content:  files.Gitignore,
 		},
 		{
 			Filepath: ".golangci.yml",
