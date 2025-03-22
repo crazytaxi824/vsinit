@@ -1,0 +1,48 @@
+# http://git-scm.com/docs/gitignore
+# all paths are relative from the ".gitignore" file.
+# "/foo" [file|dir] from the ".gitignore" file
+# "**/foo" [file|dir] in any file path
+# "foo" [file|dir], equals "**/foo"
+# "foo/" [dir] only, equals "**/foo/"
+# "foo/bar" equals "/foo/bar", but NOT "**/foo/bar", bar=[file|dir]
+# "**/foo/bar/" bar=[dir] only
+
+# DO NOT upload config files to any repositories. password may exposed.
+config/
+
+# editors, eg: vscode, neovim, vim. idea ...
+.vscode/
+.nvim/
+.vim/
+.idea/
+*.iml
+
+# Local history or backups
+.history/
+*.bak
+*.swp
+*.swo
+*~
+
+# python
+.venv/
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+
+# js/ts
+node_modules/
+coverage/
+dist/
+build/
+out/
+
+# go
+go.sum
+*.gorun
+debug
+vendor/
+
+# other files
+.DS_Store
+.Trash-*
