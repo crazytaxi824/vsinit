@@ -47,8 +47,5 @@ func main() {
 
 const mainHelpMsg = `Init a project at current directory
 Usage:
-    vs [go | js]
-flags info:
-    vs go -h
-    vs js -h
+    vs [go | js | py] -h
 `
