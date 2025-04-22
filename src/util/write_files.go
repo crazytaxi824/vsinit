@@ -63,7 +63,7 @@ func WriteFiles(fileContents []FileContent) error {
 			return err
 		}
 
-		fmt.Printf("%s - %s ... done%s\n", COLOR_GREEN, fc.Filepath, COLOR_RESET)
+		fmt.Printf("%s  ✓ %s ... done%s\n", COLOR_GREEN, fc.Filepath, COLOR_RESET)
 	}
 
 	return nil

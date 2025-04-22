@@ -45,7 +45,10 @@ func writeProjectFiles() error {
 		return err
 	}
 
-	fmt.Printf(jsMsg, util.COLOR_BOLD_YELLOW, util.COLOR_RESET)
+	fmt.Printf(pyMsg, util.COLOR_BOLD_YELLOW,
+		util.COLOR_RESET, util.COLOR_BOLD_YELLOW,
+		util.COLOR_RESET, util.COLOR_BOLD_YELLOW,
+		util.COLOR_RESET, util.COLOR_BOLD_YELLOW, util.COLOR_RESET)
 	return nil
 }
 
@@ -75,8 +78,12 @@ func printSingleFile() error {
 	return nil
 }
 
-const jsMsg = `%srun:
-    1. python3 -m venv .venv
+const pyMsg = `%srun:
+    1. python3 -m venv .venv%s or %suv venv
     2. source .venv/bin/activate
-    3. pip3 install debugpy%s
+    3. pip3 install debugpy%s or %suv pip install debugpy
+    4. %swrite %spyproject.toml%s
+        [tool.pyright]
+        venvPath = "."
+        venv = ".venv"
 `
