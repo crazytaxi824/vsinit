@@ -7,4 +7,7 @@ def main():
 
 
 print(main.__doc__)
-main()
+
+
+if __name__ == "__main__":
+    main()
