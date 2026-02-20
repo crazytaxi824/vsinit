@@ -11,10 +11,6 @@ import (
 func filesNeedToWrite() []util.FileContent {
 	return []util.FileContent{
 		{
-			Filepath: ".nvim/settings.lua",
-			Content:  files.JSNvimSettings,
-		},
-		{
 			Filepath: ".vscode/settings.json",
 			Content:  files.JSVsSettings,
 		},

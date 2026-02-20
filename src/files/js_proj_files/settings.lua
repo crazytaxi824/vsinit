@@ -1,8 +1,0 @@
---- :LocalSettingsExample & :LocalSettingsReload
--- return {
---   linter = {
---     eslint = {
---       extra_args = { "-c", "/path/to/.eslintrc.json" }
---     },
---   }
--- }

@@ -5,9 +5,6 @@ import (
 )
 
 var (
-	//go:embed js_proj_files/settings.lua
-	JSNvimSettings []byte
-
 	//go:embed js_proj_files/settings.json
 	JSVsSettings []byte
 
