@@ -1,0 +1,5 @@
+{
+  "golangci_lint": {
+    "extra_args": ["-c", "./.golangci.json"]
+  }
+}

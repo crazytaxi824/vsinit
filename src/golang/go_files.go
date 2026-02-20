@@ -12,8 +12,12 @@ import (
 func filesNeedToWrite() []util.FileContent {
 	return []util.FileContent{
 		{
-			Filepath: ".nvim/settings.lua",
-			Content:  files.GoNvimSettings,
+			Filepath: ".nvim/lsp.json",
+			Content:  files.GoNvimLsp,
+		},
+		{
+			Filepath: ".nvim/linter.json",
+			Content:  files.GoNvimLinter,
 		},
 		{
 			Filepath: ".vscode/settings.json",

@@ -9,8 +9,11 @@ import (
 )
 
 var (
-	//go:embed go_proj_files/settings.lua
-	GoNvimSettings []byte
+	//go:embed go_proj_files/lsp.json
+	GoNvimLsp []byte
+
+	//go:embed go_proj_files/linter.json
+	GoNvimLinter []byte
 
 	//go:embed go_proj_files/settings.json
 	GoVsSettings []byte

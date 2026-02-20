@@ -1,0 +1,14 @@
+{
+  "pyright:python": {
+    "analysis": {
+      "autoSearchPaths": true,
+      "diagnosticMode": "openFilesOnly",
+      "useLibraryCodeForTypes": true
+    }
+  },
+  "gopls": {
+    "semanticTokens": true,
+    "usePlaceholders": false,
+    "buildFlags": ["-tags=!prod"]
+  }
+}
