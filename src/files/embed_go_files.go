@@ -18,7 +18,7 @@ var (
 	//go:embed go_proj_files/launch.json
 	GoVsLaunch []byte
 
-	//go:embed go_proj_files/golangci.yml
+	//go:embed go_proj_files/golangci.json
 	Golangci []byte
 
 	//go:embed go_proj_files/main_file.go.txt
