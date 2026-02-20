@@ -1,0 +1,82 @@
+{
+  "version": "2",
+  "severity": {
+    "default": "warning",
+    "rules": [
+      {
+        "linters": [
+          "unused",
+          "dupl",
+          "errorlint",
+          "err113",
+          "exptostd",
+          "forcetypeassert",
+          "nilnil",
+          "unconvert",
+          "unparam",
+          "wastedassign",
+          "staticcheck"
+        ],
+        "severity": "hint"
+      }
+    ]
+  },
+  "linters": {
+    "default": "standard",
+    "enable": [
+      "asasalint",
+      "bodyclose",
+      "dupl",
+      "durationcheck",
+      "errorlint",
+      "err113",
+      "exptostd",
+      "fatcontext",
+      "forcetypeassert",
+      "gocritic",
+      "nilerr",
+      "nilnil",
+      "revive",
+      "sqlclosecheck",
+      "unconvert",
+      "unparam",
+      "wastedassign"
+    ],
+    "settings": {
+      "revive": {
+        "rules": [
+          { "name": "atomic" },
+          { "name": "bare-return" },
+          { "name": "blank-imports" },
+          { "name": "bool-literal-in-expr" },
+          { "name": "context-keys-type" },
+          { "name": "context-as-argument" },
+          { "name": "deep-exit" },
+          {
+            "name": "defer",
+            "arguments": [["call-chain", "loop", "method-call", "recover", "immediate-recover", "return"]]
+          },
+          { "name": "early-return" },
+          { "name": "error-return" },
+          { "name": "errorf" },
+          { "name": "if-return" },
+          { "name": "indent-error-flow" },
+          { "name": "import-shadowing" },
+          { "name": "increment-decrement" },
+          { "name": "indent-error-flow" },
+          { "name": "superfluous-else" },
+          { "name": "unexported-return" },
+          { "name": "use-slices-sort" },
+          { "name": "useless-break" },
+          { "name": "useless-fallthrough" },
+          { "name": "use-waitgroup-go" },
+          { "name": "waitgroup-by-value" },
+          { "name": "var-declaration" }
+        ]
+      }
+    }
+  },
+  "run": {
+    "timeout": "30s"
+  }
+}
